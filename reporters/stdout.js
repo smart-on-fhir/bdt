@@ -1,10 +1,10 @@
 require("colors");
 
-// Every test that akes more than DURATION_MEDIUM (but less then DURATION_SLOW)
+// Every test that takes more than DURATION_MEDIUM (but less then DURATION_SLOW)
 // will have it's time rendered in yellow
 const DURATION_MEDIUM = 500;
 
-// Every test that akes more than DURATION_SLOW will have it's time rendered in 
+// Every test that takes more than DURATION_SLOW will have it's time rendered in 
 // red
 const DURATION_SLOW = 1000;
 
@@ -59,17 +59,13 @@ function formatDuration(ms) {
         { label: "hour"  , n: 1000 * 60 * 60          },
         { label: "minute", n: 1000 * 60               },
         { label: "second", n: 1000                    },
-        { label: "ms"    , n: 1                       }
+        { label: "m"     , n: 1                       }
     ];
 
     meta.reduce((prev, cur, i, all) => {
         let chunk = Math.floor(prev / cur.n);
         if (chunk) {
-            out.push(
-                `${chunk} ${cur.label}${
-                    chunk > 1 && cur.label != "ms" ? "s" : ""
-                }`
-            );
+            out.push(`${chunk} ${cur.label}${chunk > 1 ? "s" : ""}`);
             return prev - chunk * cur.n
         }
         return prev
@@ -90,7 +86,7 @@ function formatDuration(ms) {
 function duration(node) {
     const dur   = node.endedAt - node.startedAt;
     const color = getColorForDuration(dur);
-    return `(${formatDuration(duration)})`[color];
+    return `(${formatDuration(dur)})`[color];
 }
 
 function indent(depth = 0) {
@@ -99,6 +95,18 @@ function indent(depth = 0) {
         out += INDENT_STRING;
     }
     return out;
+}
+
+function parseHTML(html) {
+    return html.replace(/<(\w+)>(.*?)<\/\1>/gi, (match, tagName, contents) => {
+        switch (tagName.toLowerCase()) {
+            case "b": return contents.bold;
+            case "i": return contents.italic;
+            case "a": return contents.blue;
+            case "code": return contents.bold;
+        }
+        return contents;
+    })
 }
 
 module.exports = function StdoutReporter()
@@ -126,7 +134,10 @@ module.exports = function StdoutReporter()
     function onTestEnd(node) {
         log(`${indent(depth)} ${icon(node)} ${text(node)} ${duration(node)}`);
         if (node.status == "failed") {
-            log(`${indent(depth + 1)} ⮩ ${node.error.message}`.red);
+            if (node.description) {
+                log(`${indent(depth + 1)} ${"├─".grey} ${parseHTML(node.description)}`);    
+            }
+            log(`${indent(depth + 1)} ${"└⮞".grey} ${node.error.message.red}`);
         }
     }
 
