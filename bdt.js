@@ -22,13 +22,14 @@ function describe(name, fn)
     let group = {
         name,
         type: "group",
-        children: []
+        children: [],
+        path: [
+            currentGroup.path,
+            currentGroup.children.length + ""
+        ].filter(Boolean).join(".")
     };
 
-    const index = currentGroup.children.push(group) - 1;
-    group.path = currentGroup.path === "" ?
-        index + "" :
-        currentGroup.path + "." + index;
+    currentGroup.children.push(group);
 
     const parent = currentGroup;
     currentGroup = group;
