@@ -32,11 +32,17 @@ function icon(node) {
     if (node.status == "not-implemented")
         return "⛔".grey;
 
+    if (node.status == "not-supported")
+        return "✘".grey;
+
     return " ";
 }
 
 function text(node) {
     if (node.status == "not-implemented") {
+        return node.name.grey;
+    }
+    if (node.status == "not-supported") {
         return node.name.grey;
     }
     return node.name;
@@ -100,7 +106,7 @@ function indent(depth = 0) {
     return out;
 }
 
-function parseHTML(html) {
+function parseHTML(html, linePrefix = "\t") {
     const parser = sax.parser(
         false, // strict
         {
@@ -132,7 +138,7 @@ function parseHTML(html) {
         i   : { prefix: '\u001b[3m' , suffix: '\u001b[23m' }, // italic
         a   : { prefix: '\u001b[34m', suffix: '\u001b[39m' }, // blue
         code: { prefix: '\u001b[1m' , suffix: '\u001b[22m' }, // bold
-        li  : { prefix: "\n\t* " }
+        li  : { prefix: "\n" + linePrefix + "* " }
     };
 
     parser.ontext = function(t) {
@@ -152,24 +158,8 @@ function parseHTML(html) {
             out += meta.suffix;
         }
     };
-    // parser.onattribute = function (attr) {
-    //     // an attribute.  attr has "name" and "value"
-    // };
-    // parser.onend = function () {
-    //     // parser stream is done, and ready to have more stuff written to it.
-    // };
-    parser.write(html).close();
+    parser.write("<div>" + html + "</div>").close();
     return out;
-
-    // return html.replace(/<(\w+)>(.*?)<\/\1>/gi, (match, tagName, contents) => {
-    //     switch (tagName.toLowerCase()) {
-    //         case "b": return contents.bold;
-    //         case "i": return contents.italic;
-    //         case "a": return contents.blue;
-    //         case "code": return contents.bold;
-    //     }
-    //     return contents;
-    // })
 }
 
 module.exports = function StdoutReporter()
@@ -198,9 +188,17 @@ module.exports = function StdoutReporter()
         log(`${indent(depth)} ${icon(node)} ${text(node)} ${duration(node)}`);
         if (node.status == "failed") {
             if (node.description) {
-                log(`${indent(depth + 1)} ${"├─".grey} ${parseHTML(node.description)}`);    
+                log(`${indent(depth + 1)} ${"├─".grey} ${
+                    parseHTML(node.description, `${indent(depth + 1)} ${"│ ".grey} `)
+                }`);    
             }
             log(`${indent(depth + 1)} ${"└⮞".grey} ${node.error.message.red}`);
+        }
+        else if (node.warnings.length) {
+            node.warnings.forEach(w => {
+                log(`${indent(depth + 1)} ${"❗".yellow} ${w}`);
+            })
+            
         }
     }
 
