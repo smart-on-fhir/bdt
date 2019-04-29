@@ -1,5 +1,8 @@
 require("colors");
 
+const sax = require("sax");
+
+
 // Every test that takes more than DURATION_MEDIUM (but less then DURATION_SLOW)
 // will have it's time rendered in yellow
 const DURATION_MEDIUM = 500;
@@ -98,15 +101,75 @@ function indent(depth = 0) {
 }
 
 function parseHTML(html) {
-    return html.replace(/<(\w+)>(.*?)<\/\1>/gi, (match, tagName, contents) => {
-        switch (tagName.toLowerCase()) {
-            case "b": return contents.bold;
-            case "i": return contents.italic;
-            case "a": return contents.blue;
-            case "code": return contents.bold;
+    const parser = sax.parser(
+        false, // strict
+        {
+            // Boolean. Whether or not to trim text and comment nodes.
+            trim: false,
+
+            // Boolean. If true, then turn any whitespace into a single space.
+            normalize: true,
+
+            // Boolean. If true, then lowercase tag names and attribute names in
+            // loose mode, rather than upper-casing them.
+            lowercase: true,
+
+            // Boolean. If true, then namespaces are supported.
+            xmlns: false,
+
+            // Boolean. If false, then don't track line/col/position.
+            position: true,
+
+            // Boolean. If true, only parse predefined XML entities
+            // (&amp;, &apos;, &gt;, &lt;, and &quot;)
+            strictEntities: true
         }
-        return contents;
-    })
+    );
+    let out = "";
+    
+    const map = {
+        b   : { prefix: '\u001b[1m' , suffix: '\u001b[22m' }, // bold
+        i   : { prefix: '\u001b[3m' , suffix: '\u001b[23m' }, // italic
+        a   : { prefix: '\u001b[34m', suffix: '\u001b[39m' }, // blue
+        code: { prefix: '\u001b[1m' , suffix: '\u001b[22m' }, // bold
+        li  : { prefix: "\n\t* " }
+    };
+
+    parser.ontext = function(t) {
+        out += t;
+    };
+
+    parser.onopentag = function (node) {
+        const meta = map[node.name];
+        if (meta && meta.prefix) {
+            out += meta.prefix;
+        }
+    };
+
+    parser.onclosetag = function (tagName) {
+        const meta = map[tagName];
+        if (meta && meta.suffix) {
+            out += meta.suffix;
+        }
+    };
+    // parser.onattribute = function (attr) {
+    //     // an attribute.  attr has "name" and "value"
+    // };
+    // parser.onend = function () {
+    //     // parser stream is done, and ready to have more stuff written to it.
+    // };
+    parser.write(html).close();
+    return out;
+
+    // return html.replace(/<(\w+)>(.*?)<\/\1>/gi, (match, tagName, contents) => {
+    //     switch (tagName.toLowerCase()) {
+    //         case "b": return contents.bold;
+    //         case "i": return contents.italic;
+    //         case "a": return contents.blue;
+    //         case "code": return contents.bold;
+    //     }
+    //     return contents;
+    // })
 }
 
 module.exports = function StdoutReporter()
