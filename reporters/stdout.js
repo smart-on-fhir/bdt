@@ -166,12 +166,29 @@ module.exports = function StdoutReporter()
 {
     let depth = 0;
 
+    let startTime = 0;
+    let endTime   = 0;
+    let count     = 0;
+    
+    let successful     = 0;
+    let failed         = 0;
+    let notImplemented = 0;
+    let notSupported   = 0;
+    let warnings       = 0;
+
     function onStart() {
+        startTime = Date.now();
         log("");
     }
 
     function onEnd() {
-        log("");
+        endTime = Date.now();
+        log(`\n${count} tests executed in ${formatDuration(endTime - startTime)}`.bold);
+        log(`     succeeded tests: ${successful}`);
+        log(`        failed tests: ${failed}`);
+        log(`     not implemented: ${notImplemented}`);
+        log(` not supported tests: ${notSupported}`);
+        log(`  generated warnings: ${warnings}`);
     }
 
     function onGroupStart(node) {
@@ -185,8 +202,10 @@ module.exports = function StdoutReporter()
     }
 
     function onTestEnd(node) {
+        count += 1;
         log(`${indent(depth)} ${icon(node)} ${text(node)} ${duration(node)}`);
         if (node.status == "failed") {
+            failed += 1;
             if (node.description) {
                 log(`${indent(depth + 1)} ${"├─".grey} ${
                     parseHTML(node.description, `${indent(depth + 1)} ${"│ ".grey} `)
@@ -194,11 +213,24 @@ module.exports = function StdoutReporter()
             }
             log(`${indent(depth + 1)} ${"└⮞".grey} ${node.error.message.red}`);
         }
-        else if (node.warnings.length) {
-            node.warnings.forEach(w => {
-                log(`${indent(depth + 1)} ${"❗".yellow} ${w}`);
-            })
-            
+        else {
+            if (node.status == "not-implemented") {
+                notImplemented += 1;
+            }
+            else {
+                if (node.status == "not-supported") {
+                    notSupported += 1;
+                }
+                else {
+                    successful += 1;
+                    if (node.warnings.length) {
+                        warnings += node.warnings.length;
+                        node.warnings.forEach(w => {
+                            log(`${indent(depth + 1)} ${"❗".yellow} ${w}`);
+                        })
+                    }
+                }
+            }
         }
     }
 

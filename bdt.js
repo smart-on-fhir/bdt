@@ -66,7 +66,7 @@ function it(name, fn)
 function toJSON(node = groups)
 {
     const out = { name: node.name };
-    if (node.type == "group") {
+    if (node.type === "group") {
         out.children = node.children.map(toJSON);
     }
     return out;
@@ -109,9 +109,99 @@ function getPath(path = "")
     );
 }
 
+/**
+ * Tests if the argument is promise-like
+ */
 function isPromise(p)
 {
     return (p && typeof p.catch == "function" && typeof p.then == "function");
+}
+
+/**
+ * Creates and returns an API that will be passed to each test function
+ * when that test is executed.
+ */
+function createTestAPI(testNode)
+{
+    return {
+
+        /**
+         * Sets the status of this test
+         * @param {String} status Possible values are: "loading", "succeeded",
+         * "failed", "not-supported", "not-implemented" and "warned" 
+         */
+        setStatus(status)
+        {
+            testNode.status = status;
+        },
+
+        warn(message)
+        {
+            testNode.warnings.push(message);
+            this.setStatus("warned");
+        },
+
+        /**
+         * Calling this method will mark the test as not supported.
+         * @param {String} message 
+         */
+        setNotSupported(message = "This test was skipped because " +
+            "the server does not support this functionality")
+        {
+            // testNode.notSupported = message;
+            this.warn(message);
+            this.setStatus("not-supported");
+        },
+
+        // setWarning(warning)
+        // {
+        //     testNode.warning = warning;
+        //     this.setStatus("warned");
+        // },
+
+        decorate(name, value)
+        {
+            testNode.decorations[name] = value;
+        },
+
+        decorateHTML(name, value, className = "description")
+        {
+            testNode.decorations[name] = {
+                __type: "html",
+                html: value,
+                className
+            };
+        },
+
+        logRequest(req, label = "Request")
+        {
+            const headers = { ...req.headers };
+            if (headers.authorization) {
+                headers.authorization = headers.authorization.replace(
+                    /^\s*(Bearer)\s+.*$/i,
+                    "$1 ⏺⏺⏺⏺⏺⏺"
+                );
+            }
+            testNode.decorations[label] = {
+                __type: "request",
+                method: req.method,
+                url   : req.uri.href,
+                headers,
+                body: req.body || undefined
+            };
+        },
+
+        logResponse(res, label = "Response")
+        {
+            testNode.decorations[label] = {
+                __type: "response",
+                statusCode: res.statusCode,
+                statusMessage: res.statusMessage,
+                headers: res.headers,
+                body: res.body
+            };
+        }
+    };
 }
 
 
@@ -125,25 +215,26 @@ class Runner extends EventEmitter
 
     async run(node = groups)
     {
-        const isRoot = node.name == "__ROOT__";
+        const _node = { ...node };
+        const isRoot = _node.name === "__ROOT__";
 
-        node.startedAt = Date.now();
+        _node.startedAt = Date.now();
 
-        if (node.type == "group") {
+        if (_node.type === "group") {
 
             if (isRoot) {
                 this.emit("start");
             }
 
-            this.emit("groupStart", node);
+            this.emit("groupStart", _node);
 
-            for (const child of node.children) {
+            for (const child of _node.children) {
                 await this.run(child);
             }
 
-            node.endedAt = Date.now();
+            _node.endedAt = Date.now();
 
-            this.emit("groupEnd", node);
+            this.emit("groupEnd", _node);
 
             if (isRoot) {
                 this.emit("end");
@@ -151,44 +242,55 @@ class Runner extends EventEmitter
 
         }
         else {
-            node.status = "loading";
-            this.emit("testStart", node);
+            _node.status      = "loading";
+            _node.decorations = {};
+            _node.warnings    = [];
+            _node.error       = null;
 
-            const decorations = {};
+            this.emit("testStart", _node);
 
+            const api = createTestAPI(_node);
             const next = (error) => {
-                node.decorations = decorations;
-                node.endedAt = Date.now();
+                _node.endedAt = Date.now();
                 if (error) {
-                    node.status = "failed";
-                    node.error = {
+                    _node.status = "failed";
+                    _node.error = {
                         ...error,
-                        message: String(error),
-                        // stack: error.stack
-                    };// console.log(error)
-                    // node.error.message = String(error);
-                    // this.emit("testFailure", error, node);
+                        message: String(error)
+                    };
                 } else {
-                    node.status = node.fn ? "succeeded" : "not-implemented";
-                    node.error = null;
-                    // this.emit("testSuccess", node);
+                    // _node.error = null;
+                    if (_node.warnings.length) {
+                        if (_node.status === "loading") {
+                            _node.status = "warned";
+                        }
+                    } else {
+                        _node.status = _node.fn ? "succeeded" : "not-implemented";
+                    }
+                    // if (_node.status === "loading") {
+                    //     if (_node.decorations.notSupported) {
+                    //         _node.status  = "not-supported";
+                    //         _node.warning = "Not supported by this server";
+                    //     } else {
+                    //         _node.status = _node.fn ? "succeeded" : "not-implemented";
+                    //     }
+                    // }
                 }
-                this.emit("testEnd", node);
+                this.emit("testEnd", _node);
             };
 
-            node.error = null;
+            
 
             try {
-                if (typeof node.fn == "function") {
-                    const p = node.fn.call(node, this.settings, decorations);
-                    if (p && typeof p.catch == "function" && typeof p.then == "function") {
-                        // p.then(() => next());
+                if (typeof _node.fn == "function") {
+                    const p = _node.fn.call(_node, this.settings, api);
+                    if (isPromise(p)) {
                         return p.then(() => next()).catch(next);
-                        // await p;
                     }
                 }
                 else {
-                    node.warning = "This test is not implemented";
+                    api.warn("This test is not implemented");
+                    api.setStatus("not-implemented");
                     next();
                 }
             } catch (ex) {

@@ -1,209 +1,49 @@
-const expect = require("code").expect;
-const URL    = require("url").URL;
-const moment = require("moment");
-const {
-    request,
-    authorize,
-    logRequest,
-    logResponse,
-    wait
-} = require("./lib");
+const expect           = require("code").expect;
+const moment           = require("moment");
+const { ExportHelper } = require("./lib");
 
-class Export {
 
-    constructor(options, decorations, uri)
-    {
-        this.options         = options;
-        this.decorations     = decorations;
-        this.url             = new URL(uri);
-        this.kickOffRequest  = null;
-        this.kickOffResponse = null;
-        this.statusRequest   = null;
-        this.statusResponse  = null;
-        this.cancelRequest   = null;
-        this.cancelResponse  = null;
-        this.accessToken     = null;
-
-        this.requestHeaders = {
-            accept: "application/fhir+json",
-            prefer: "respond-async"
-        };
-    }
-
-    async getAccessToken()
-    {
-        if (!this.accessToken) {
-            this.accessToken = await authorize(this.options);
-        }
-        return this.accessToken;
-    }
-
-    async kickOff()
-    {
-        const accessToken = await this.getAccessToken();
-        this.kickOffRequest = request({
-            uri: this.url.href,
-            json: true,
-            strictSSL: this.options.strictSSL,
-            headers: {
-                accept: "application/fhir+json",
-                prefer: "respond-async",
-                authorization: "Bearer " + accessToken
-            }
-        });
-
-        logRequest(this.decorations, this.kickOffRequest, "Kick-off Request");
-        const { response } = await this.kickOffRequest.promise();
-        this.kickOffResponse = response;
-        logResponse(this.decorations, this.kickOffResponse, "Kick-off Response");
-    }
-
-    async status()
-    {
-        if (!this.kickOffResponse) {
-            throw new Error(
-                "Trying to check status but there was no kick-off response"
-            );
-        }
-
-        if (!this.kickOffResponse.headers["content-location"]) {
-            throw new Error(
-                "Trying to check status but the kick-off response did not include a content-location header"
-            );
-        }
-
-        this.statusRequest = request({
-            uri      : this.kickOffResponse.headers["content-location"],
-            json     : true,
-            strictSSL: this.options.strictSSL,
-            headers: {
-                authorization: this.kickOffRequest.headers.authorization
-            }
-        });
-
-        logRequest(this.decorations, this.statusRequest, "Status Request");
-        const { response } = await this.statusRequest.promise();
-        this.statusResponse = response;
-        logResponse(this.decorations, this.statusResponse, "Status Response");
-    }
-
-    async waitForExport(suffix = 1) {
-        if (!this.kickOffResponse) {
-            throw new Error(
-                "Trying to wait for export but there was no kick-off response"
-            );
-        }
-
-        if (!this.kickOffResponse.headers["content-location"]) {
-            throw new Error(
-                "Trying to wait for export but the kick-off response did not include a content-location header"
-            );
-        }
-
-        this.statusRequest = request({
-            uri      : this.kickOffResponse.headers["content-location"],
-            json     : true,
-            strictSSL: this.options.strictSSL,
-            headers: {
-                authorization: this.kickOffRequest.headers.authorization
-            }
-        });
-
-        if (suffix === 1) {
-            logRequest(this.decorations, this.statusRequest, "Status Request");
-        }
-        const { response } = await this.statusRequest.promise();
-        this.statusResponse = response;
-        logResponse(this.decorations, this.statusResponse, "Status Response " + suffix);
-        if (response.statusCode === 202) {
-            await wait(5000);
-            return this.waitForExport(suffix + 1);
-        }
-    }
-
-    async cancel()
-    {
-        if (!this.kickOffResponse) {
-            throw new Error(
-                "Trying to cancel but there was no kick-off response"
-            );
-        }
-
-        if (!this.kickOffResponse.headers["content-location"]) {
-            throw new Error(
-                "Trying to cancel but the kick-off response did not include a content-location header"
-            );
-        }
-
-        this.cancelRequest = request({
-            uri      : this.kickOffResponse.headers["content-location"],
-            method   : "DELETE",
-            json     : true,
-            strictSSL: this.options.strictSSL,
-            headers: {
-                authorization: this.kickOffRequest.headers.authorization
-            }
-        });
-
-        logRequest(this.decorations, this.cancelRequest, "Cancellation Request");
-        const { response } = await this.cancelRequest.promise();
-        this.cancelResponse = response;
-        logResponse(this.decorations, this.cancelResponse, "Cancellation Response");
-    }
-
-    async send() {
-        await this.authorize();
-        const req = request({
-            uri: this.url.href,
-            json: true,
-            strictSSL: this.options.strictSSL,
-            headers: this.requestHeaders
-        });
-
-        logRequest(this.decorations, req, "Kick-off Request");
-        const { response } = await req.promise();
-        this.response = response;
-        logResponse(this.decorations, response, "Kick-off Response");
-    }
-
-    // async getStatus() {
-    //     const req = request({
-    //         uri: this.url.href,
-    //         json: true,
-    //         strictSSL: this.options.strictSSL,
-    //         headers: this.requestHeaders
-    //     });
-
-    //     logRequest(this.decorations, req, "Kick-off Request");
-    // }
-
-    expect400()
-    {
-        expect(this.response.statusCode, "response.statusCode").to.equal(400);
-        expect(this.response.statusMessage, "response.statusMessage").to.equal("Bad Request");
-        expect(this.response.body.resourceType, "In case of error the server should return an OperationOutcome").to.equal("OperationOutcome");
-    }
-
-    async expectSuccessAndCancel()
-    {
-        expect(this.response.statusCode, "response.statusCode").to.equal(202);
-        await this.cancel();
-        if (this.response.body) {
-            expect(this.response.body.resourceType).to.equal("OperationOutcome");
-        }
-    }
-}
+const REGEXP_INSTANT = new RegExp(
+    "([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-" +
+    "(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3])" +
+    ":[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?(Z|(\\+|-)((0[0-9]|1[0-3])" +
+    ":[0-5][0-9]|14:00))"
+);
 
 module.exports = function(describe, it) {
 
     describe("Status Endpoint", () => {
 
-        it ({
-            name: "Responds with 202 for active transaction IDs",
-            description: "The status endpoint should return 202 status code until the export is completed"
-        }, async (cfg, decorations) => {
+        // After a bulk data request has been started, the client MAY poll the
+        // URI provided in the Content-Location header.
 
-            const client = new Export(cfg, decorations, `${cfg.baseURL}/Patient/$export?_type=Patient`);
+        // Note: Clients SHOULD follow an exponential backoff approach when
+        // polling for status. Servers SHOULD supply a Retry-After header with
+        // a http date or a delay time in seconds. When provided, clients SHOULD
+        // use this information to inform the timing of future polling requests.
+        // Servers SHOULD keep an accounting of status queries received from a
+        // given client, and if a client is polling too frequently, the server
+        // SHOULD respond with a 429 Too Many Requests status code in addition
+        // to a Retry-After header, and optionally a FHIR OperationOutcome
+        // resource with further explanation. If excessively frequent status
+        // queries persist, the server MAY return a 429 Too Many Requests status
+        // code and terminate the session.
+
+        // Note: When requesting status, the client SHOULD use an Accept header
+        // for indicating content type application/json. In the case that errors
+        // prevent the export from completing, the server SHOULD respond with a
+        // JSON-encoded FHIR OperationOutcome resource.
+
+        it ({
+            id  : "Status-01",
+            name: "Responds with 202 for active transaction IDs",
+            description: "<p>The status endpoint should return <b>202</b> status code until the export is completed.</p>" +
+                'See <a target="_blank" href="https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#response---in-progress-status">' +
+                'https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#response---in-progress-status</a>'
+        }, async (cfg, api) => {
+
+            const resourceType = cfg.fastestResource || "Patient";
+            const client = new ExportHelper(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
             client.url.searchParams.set(cfg.sinceParam || "_since", moment().subtract(1, "months").format("YYYY-MM-DD"));
 
             await client.kickOff();
@@ -213,114 +53,160 @@ module.exports = function(describe, it) {
         });
 
         it ({
-            name: "Responds with 200 for completed transactions",
-            description: "The status endpoint should return 200 status code when the export is completed"
-        }, async (cfg, decorations) => {
+            id  : "Status-02",
+            name: "Replies properly in case of error",
+            description: "Runs a set of assertions to verify that:<ul>" +
+                "<li>The returned HTTP status code is 5XX</li>" +
+                "<li>The server returns a FHIR OperationOutcome resource in JSON format</li>" +
+                "</ul>" +
+                "<p>Note that even if some of the requested resources cannot successfully be exported, " +
+                    "the overall export operation MAY still succeed. In this case, " +
+                    "the Response.error array of the completion response MUST be populated " +
+                    "(see below) with one or more files in ndjson format containing " +
+                    "FHIR OperationOutcome resources to indicate what went wrong.</p>" +
+                'See <a target="_blank" href="https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#response---error-status-1">' +
+                'https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#response---error-status-1</a>'
+        }/*, async (cfg, api) => {
 
-            const client = new Export(cfg, decorations, `${cfg.baseURL}/Patient/$export?_type=Patient`);
+            const resourceType = cfg.fastestResource || "Patient";
+            const client = new Export(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
+            client.url.searchParams.set(cfg.sinceParam || "_since", moment().subtract(1, "months").format("YYYY-MM-DD"));
+
+            await client.kickOff();
+            await client.status();
+            await client.cancel();
+            expect(client.statusResponse.statusCode).to.equal(202);
+        }*/);
+
+        it ({
+            id  : "Status-03",
+            name: "Generates valid status response",
+            description: "Runs a set of assertions to verify that:<ul>" +
+                "<li>The status endpoint should return <b>200</b> status code when the export is completed</li>" +
+                "<li>The status endpoint should respond with <b>JSON</b></li>" +
+                "<li>The <code>expires</code> header (if set) must be valid date in the future</li>" +
+                `<li>The JSON response contains <code>transactionTime</code> which is a valid <a target="` +
+                    `_blank" href="http://hl7.org/fhir/datatypes.html#instant">FHIR instant</a></li>` +
+                "<li>The JSON response contains the kick-off URL in <code>request</code> property</li>" +
+                "<li>The JSON response contains <code>requiresAccessToken</code> boolean property</li>" +
+                "<li>The JSON response contains an <code>output</code> array in which:" +
+                    "<ul>" +
+                        "<li>Every item has valid <code>type</code> property</li>" +
+                        "<li>Every item has valid <code>url</code> property</li>" +
+                        "<li>Every item may a <code>count</code> number property</li>" +
+                    "</ul>" +
+                "</li>" +
+                "<li>The JSON response contains an <code>error</code> array in which:" +
+                    "<ul>" +
+                        "<li>Every item has valid <code>type</code> property</li>" +
+                        "<li>Every item has valid <code>url</code> property</li>" +
+                        "<li>Every item may a <code>count</code> number property</li>" +
+                    "</ul>" +
+                "</li>" +
+                "</ul>"
+        }, async (cfg, api) => {
+
+            const resourceType = cfg.fastestResource || "Patient";
+            const client = new ExportHelper(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
             client.url.searchParams.set(cfg.sinceParam || "_since", moment().subtract(1, "months").format("YYYY-MM-DD"));
 
             await client.kickOff();
             await client.waitForExport();
             await client.cancel();
-            expect(client.statusResponse.statusCode).to.equal(200);
+
+            const body = client.statusResponse.body;
+
+            expect(client.statusResponse.statusCode, "Responds with 200 for completed transactions").to.equal(200);
+
+            expect(client.statusResponse.headers["content-type"], "responds with JSON").to.match(/^application\/json/i);
+
+            // The server MAY return an Expires header indicating when the files listed will no longer be available.
+            if (client.statusResponse.headers["expires"]) {
+                expect(client.statusResponse.headers["expires"], "the expires header must be a string if present").to.be.a.string();
+                expect(moment(client.statusResponse.headers["expires"]).diff(moment(), "seconds") > 0).to.be.true();
+            }
+
+            // transactionTime - a FHIR instant type that indicates the server's time when the query is run.
+            // The response SHOULD NOT include any resources modified after this instant, and SHALL include
+            // any matching resources modified up to (and including) this instant. Note: to properly meet
+            // these constraints, a FHIR Server might need to wait for any pending transactions to resolve
+            // in its database, before starting the export process.
+            expect(body, "the response contains 'transactionTime'").to.include("transactionTime");
+            expect(body.transactionTime, "transactionTime must be a string").to.be.a.string();
+            expect(body.transactionTime, "transactionTime must be FHIR instant").to.match(REGEXP_INSTANT);
+
+            // the full URI of the original bulk data kick-off request
+            expect(body, "the response contains 'request'").to.include("request");
+            expect(body.request, "the 'request' property must contain the kick-off URL").to.equal(client.url.href);
+
+            // requiresAccessToken - boolean value of true or false indicating whether downloading the generated
+            // files requires a bearer access token. Value MUST be true if both the file server and the FHIR API
+            // server control access using OAuth 2.0 bearer tokens. Value MAY be false for file servers that use
+            // access-control schemes other than OAuth 2.0, such as downloads from Amazon S3 bucket URIs or
+            // verifiable file servers within an organization's firewall.
+            expect(body, "the response contains 'requiresAccessToken'").to.include("request");
+            expect(body.requiresAccessToken, "the 'requiresAccessToken' property must have a boolean value").to.be.boolean();
+
+            // array of bulk data file items with one entry for each generated
+            // file. Note: If no resources are returned from the kick-off
+            // request, the server SHOULD return an empty array.
+            expect(body, "the response contains 'output'").to.include("output");
+            expect(body.output, "the 'output' property must be an array").to.be.an.array();
+
+            body.output.forEach(item => {
+
+                // type - the FHIR resource type that is contained in the file. Note: Each file MUST contain
+                // resources of only one type, but a server MAY create more than one file for each resource
+                // type returned. The number of resources contained in a file MAY vary between servers. If no
+                // data are found for a resource, the server SHOULD NOT return an output item for that resource
+                // in the response.
+                expect(item, "every output item must have 'type' property").to.include("type");
+                expect(item.type, "every output item's 'type' property must equal the exported resource type").to.include(resourceType);
+                
+                // url - the path to the file. The format of the file SHOULD reflect that requested in the
+                // _outputFormat parameter of the initial kick-off request. Note that the files-for-download
+                // MAY be served by a file server other than a FHIR-specific server.
+                expect(item, "every output item must have 'url' property").to.include("url");
+                expect(item.url, "every output item url must be a string").to.be.a.string();
+                
+                // Each file item MAY optionally contain the following field:
+                if (item.hasOwnProperty("count")) {
+                    // count - the number of resources in the file, represented as a JSON number.
+                    expect(item.count, "if set, output item count must be a number").to.be.a.number();
+                }
+            });
+
+            // array of error file items following the same structure as the
+            // output array. Note: If no errors occurred, the server SHOULD
+            // return an empty array. Note: Only the OperationOutcome resource
+            // type is currently supported, so a server MUST generate files in
+            // the same format as the bulk data output files that contain
+            // OperationOutcome resources.
+            expect(body, "the response contains 'error'").to.include("error");
+            expect(body.output, "the 'error' property must be an array").to.be.an.array();
+
+            body.error.forEach(item => {
+                // type - the FHIR resource type that is contained in the file. Note: Each file MUST contain
+                // resources of only one type, but a server MAY create more than one file for each resource
+                // type returned. The number of resources contained in a file MAY vary between servers. If no
+                // data are found for a resource, the server SHOULD NOT return an output item for that resource
+                // in the response.
+                expect(item, "every error item must have 'type' property").to.include("error");
+                expect(item.type, "every error item's 'type' property must equal the exported resource type").to.include(resourceType);
+                
+                // url - the path to the file. The format of the file SHOULD reflect that requested in the
+                // _outputFormat parameter of the initial kick-off request. Note that the files-for-download
+                // MAY be served by a file server other than a FHIR-specific server.
+                expect(item, "every error item must have 'url' property").to.include("url");
+                expect(item.url, "every error item url must be a string").to.be.a.string();
+                
+                // Each file item MAY optionally contain the following field:
+                if (item.hasOwnProperty("count")) {
+                    // count - the number of resources in the file, represented as a JSON number.
+                    expect(item.count, "if set, error item count must be a number").to.be.a.number();
+                }
+            });
         });
-
-        it ("responds with JSON")
-        // , async () => {
-        //     const kickOff = await startExport("/$export?_type=Account");
-        //     const contentLocation = kickOff.headers["content-location"];
-        //     await waitForExport(contentLocation);
-        //     const trxId = contentLocation.split("/").pop();
-        //     const res = await requestPromise("/bulkstatus/" + trxId);
-        //     await cancelExport(trxId);
-        //     expectJsonResponse(res);
-        // });
-
-        it ("the response contains 'transactionTime'")
-        // , async () => {
-        //     const kickOff = await startExport("/$export?_type=Account");
-        //     const contentLocation = kickOff.headers["content-location"];
-        //     const res = await waitForExport(contentLocation);
-        //     const trxId = contentLocation.split("/").pop();
-        //     await cancelExport(trxId);
-        //     // transactionTime - a FHIR instant type that indicates the server's
-        //     // time when the query is run. The response SHOULD NOT include any
-        //     // resources modified after this instant, and SHALL include any
-        //     // matching resources modified up to (and including) this instant.
-        //     // Note: to properly meet these constraints, a FHIR Server might
-        //     // need to wait for any pending transactions to resolve in its
-        //     // database, before starting the export process.
-        //     // expect(res.statusCode).to.equal(200);
-        //     expect(res).to.have.property("transactionTime");
-        //     expect(res.transactionTime).to.be.a("string");
-        //     expect(res.transactionTime).to.match(
-        //         /^\d{4}-\d{2}-\d{2}(T|\s)\d{2}:\d{2}:\d{2}\.\d{4,}([+-]\d{2}:\d{2}|Z)?$/
-        //         // /-?[0-9]{4}(-(0[1-9]|1[0-2])(-(0[0-9]|[1-2][0-9]|3[0-1]))?)?/
-        //     );
-        // });
-
-        it ("the response contains 'request'")
-        // , async () => {
-        //     const kickOff = await startExport("/$export?_type=Account");
-        //     const contentLocation = kickOff.headers["content-location"];
-        //     const res = await waitForExport(contentLocation);
-        //     const trxId = contentLocation.split("/").pop();
-        //     await cancelExport(trxId);
-        //     // the full URI of the original bulk data kick-off request
-        //     expect(res.request).to.equal(
-        //         `http://127.0.0.1:${bulkDataPort}/$export?_type=Account`
-        //     );
-        // });
-
-        it ("the response contains 'requiresAccessToken'")
-        // , async () => {
-        //     const kickOff = await startExport("/$export?_type=Account");
-        //     const contentLocation = kickOff.headers["content-location"];
-        //     const res = await waitForExport(contentLocation);
-        //     const trxId = contentLocation.split("/").pop();
-        //     await cancelExport(trxId);
-        //     expect(res).to.have.property("requiresAccessToken");
-        //     expect(res.requiresAccessToken).to.be.a("boolean");
-        // });
-
-        it ("the response contains 'output[]'")
-        // , async () => {
-        //     const kickOff = await startExport("/$export?_type=Account");
-        //     const contentLocation = kickOff.headers["content-location"];
-        //     const res = await waitForExport(contentLocation);
-        //     const trxId = contentLocation.split("/").pop();
-        //     await cancelExport(trxId);
-        //     // array of bulk data file items with one entry for each generated
-        //     // file. Note: If no resources are returned from the kick-off
-        //     // request, the server SHOULD return an empty array.
-        //     expect(res).to.have.property("output");
-        //     expect(res.output).to.be.an("array");
-        //     expect(res.output.length).to.be.greaterThan(0);
-        //     expect(res.output[0]).to.have.property("type");
-        //     expect(res.output[0]).to.have.property("url");
-        //     expect(res.output[0]).to.have.property("count");
-        //     expect(res.output[0].type).to.equal("Account");
-        //     expect(res.output[0].count).to.equal(10);
-        //     expect(res.output[0].url).to.match(/\?limit=\d+&offset=\d+$/);
-        // });
-
-        it ("the response contains 'error[]'")
-        // , async () => {
-        //     const kickOff = await startExport("/$export?_type=Account");
-        //     const contentLocation = kickOff.headers["content-location"];
-        //     const res = await waitForExport(contentLocation);
-        //     const trxId = contentLocation.split("/").pop();
-        //     await cancelExport(trxId);
-        //     // array of error file items following the same structure as the
-        //     // output array. Note: If no errors occurred, the server SHOULD
-        //     // return an empty array. Note: Only the OperationOutcome resource
-        //     // type is currently supported, so a server MUST generate files in
-        //     // the same format as the bulk data output files that contain
-        //     // OperationOutcome resources.
-        //     expect(res).to.have.property("error");
-        //     expect(res.error).to.be.an("array");
-        // });
 
     });
 
