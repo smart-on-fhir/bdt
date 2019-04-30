@@ -1,4 +1,4 @@
-const { ExportHelper } = require("./lib");
+const { BulkDataClient } = require("./lib");
 
 const exportTypes = [
     {
@@ -29,14 +29,30 @@ module.exports = function(describe, it) {
                 description: 'The Accept header specifies the format of the optional OperationOutcome response ' +
                     'to the kick-off request. Currently, only <code>application/fhir+json</code> is supported.'
             }, async (cfg, api) => {
+                
+                // Skip if not supported
                 if (!cfg[meta.mountPoint]) {
                     return api.setNotSupported(`${meta.name} is not supported by this server`);
                 }
-                const exp = new ExportHelper(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
-                delete exp.requestHeaders.accept;
-                await exp.kickOff();
-                await exp.cancelIfStarted();
-                exp.expect400();
+                
+                const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+                
+                // By default the kickOff method will do a proper request to the
+                // kick-off endpoint, including accept and prefer headers.
+                // We need to remove the accept header for this test.
+                await client.kickOff({
+                    json: false, // Remove the "accept: application/json" header
+                    headers: {
+                        accept: undefined // Remove the "accept: application/fhir+json" header
+                    }
+                });
+
+                // If the server did not return an error as expected, an export
+                // might actually been started. Make sure we cancel that!
+                await client.cancelIfStarted();
+
+                // Finally check that we have got an error response
+                client.expectFailedKickOff();
             });
 
             it ({
@@ -47,14 +63,29 @@ module.exports = function(describe, it) {
                             'The header MUST be set to <b>respond-async</b>. ' +
                             '<a href="https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#headers" target="_blank">Red More</a>'
             }, async (cfg, api) => {
+
+                // Skip if not supported
                 if (!cfg[meta.mountPoint]) {
                     return api.setNotSupported(`${meta.name} is not supported by this server`);
                 }
-                const exp = new ExportHelper(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
-                delete exp.requestHeaders.prefer;
-                await exp.kickOff();
-                await exp.cancelIfStarted();
-                exp.expect400();
+
+                const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+                
+                // By default the kickOff method will do a proper request to the
+                // kick-off endpoint, including accept and prefer headers.
+                // We need to remove the accept header for this test.
+                await client.kickOff({
+                    headers: {
+                        prefer: undefined // Remove the "prefer: respond-async" header
+                    }
+                });
+
+                // If the server did not return an error as expected, an export
+                // might actually been started. Make sure we cancel that!
+                await client.cancelIfStarted();
+
+                // Finally check that we have got an error response
+                client.expectFailedKickOff();
             });
 
             ([
@@ -70,12 +101,19 @@ module.exports = function(describe, it) {
                     if (!cfg[meta.mountPoint]) {
                         return api.setNotSupported(`${meta.name} is not supported by this server`);
                     }
-                    const exp = new ExportHelper(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
-                    exp.url.searchParams.set("_outputFormat", type);
-                    exp.url.searchParams.set("_type", "Patient");
-                    await exp.kickOff();
-                    await exp.cancelIfStarted();
-                    exp.expectSuccess();
+                    const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+
+                    // Set the _outputFormat parameter to the value we need to test
+                    client.url.searchParams.set("_outputFormat", type);
+
+                    // Start an export
+                    await client.kickOff();
+
+                    // Cancel the export immediately
+                    await client.cancelIfStarted();
+
+                    // Verify that we didn't get an error
+                    client.expectSuccessfulKickOff();
                 });
             }));
 
@@ -93,11 +131,21 @@ module.exports = function(describe, it) {
                     if (!cfg[meta.mountPoint]) {
                         return api.setNotSupported(`${meta.name} is not supported by this server`);
                     }
-                    const exp = new ExportHelper(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
-                    exp.url.searchParams.set("_outputFormat", type);
-                    await exp.kickOff();
-                    await exp.cancelIfStarted();
-                    exp.expect400();
+
+                    const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+
+                    // Set the _outputFormat parameter to the value we need to test
+                    client.url.searchParams.set("_outputFormat", type);
+                    
+                    // Start an export
+                    await client.kickOff();
+
+                    // If the server did not return an error as expected, an export
+                    // might actually been started. Make sure we cancel that!
+                    await client.cancelIfStarted();
+
+                    // Finally check that we have got an error response
+                    client.expectFailedKickOff();
                 });
             }));
 
@@ -109,10 +157,21 @@ module.exports = function(describe, it) {
                 if (!cfg[meta.mountPoint]) {
                     return api.setNotSupported(`${meta.name} is not supported by this server`);
                 }
-                const exp = new ExportHelper(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}?_since=0000-60-01`);
-                await exp.kickOff();
-                await exp.cancelIfStarted();
-                exp.expect400();
+
+                const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+
+                // Set the _since parameter to invalid date
+                client.url.searchParams.set("_since", "0000-60-01");
+                
+                // Start an export
+                await client.kickOff();
+
+                // If the server did not return an error as expected, an export
+                // might actually been started. Make sure we cancel that!
+                await client.cancelIfStarted();
+
+                // Finally check that we have got an error response
+                client.expectFailedKickOff();
             });
 
             it ({
@@ -123,10 +182,21 @@ module.exports = function(describe, it) {
                 if (!cfg[meta.mountPoint]) {
                     return api.setNotSupported(`${meta.name} is not supported by this server`);
                 }
-                const exp = new ExportHelper(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}?_since=2057-01-01`);
-                await exp.kickOff();
-                await exp.cancelIfStarted();
-                exp.expect400();
+                
+                const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+
+                // Set the _since parameter to a date that is valid but in the future
+                client.url.searchParams.set("_since", "2057-01-01");
+                
+                // Start an export
+                await client.kickOff();
+
+                // If the server did not return an error as expected, an export
+                // might actually been started. Make sure we cancel that!
+                await client.cancelIfStarted();
+
+                // Finally check that we have got an error response
+                client.expectFailedKickOff();
             });
 
             it ({
@@ -138,10 +208,21 @@ module.exports = function(describe, it) {
                 if (!cfg[meta.mountPoint]) {
                     return api.setNotSupported(`${meta.name} is not supported by this server`);
                 }
-                const exp = new ExportHelper(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}?_type=MissingType`);
-                await exp.kickOff();
-                await exp.cancelIfStarted();
-                exp.expect400();
+                
+                const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+
+                // Set the _type parameter some invalid value
+                client.url.searchParams.set("_type", "MissingType");
+                
+                // Start an export
+                await client.kickOff();
+
+                // If the server did not return an error as expected, an export
+                // might actually been started. Make sure we cancel that!
+                await client.cancelIfStarted();
+
+                // Finally check that we have got an error response
+                client.expectFailedKickOff();
             });
 
             it ({
@@ -153,12 +234,20 @@ module.exports = function(describe, it) {
                 if (!cfg[meta.mountPoint]) {
                     return api.setNotSupported(`${meta.name} is not supported by this server`);
                 }
-                const exp = new ExportHelper(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
-                exp.url.searchParams.set("_type", "Patient");
-                exp.url.searchParams.set("_typeFilter", "Patient?status=active");
-                await exp.kickOff();
-                await exp.cancelIfStarted();
-                exp.expectSuccess();
+
+                const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+                
+                // Set the _typeFilter parameter some "valid-looking" value
+                client.url.searchParams.set("_typeFilter", "Patient?status=active");
+                
+                // Start an export
+                await client.kickOff();
+
+                // Cancel the export immediately
+                await client.cancelIfStarted();
+
+                // Verify that we didn't get an error
+                client.expectSuccessfulKickOff();
             });
 
             it ({
@@ -171,10 +260,17 @@ module.exports = function(describe, it) {
                 if (!cfg[meta.mountPoint]) {
                     return api.setNotSupported(`${meta.name} is not supported by this server`);
                 }
-                const exp = new ExportHelper(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}?_type=Patient`);
-                await exp.kickOff();
-                await exp.cancelIfStarted();
-                exp.expectSuccess();
+
+                const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+                
+                // Start an export
+                await client.kickOff();
+
+                // Cancel the export immediately
+                await client.cancelIfStarted();
+
+                // Verify that we didn't get an error
+                client.expectSuccessfulKickOff();
             });
         });
     });

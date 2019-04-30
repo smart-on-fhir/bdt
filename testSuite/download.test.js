@@ -1,5 +1,5 @@
-const expect           = require("code").expect;
-const { ExportHelper } = require("./lib");
+const expect             = require("code").expect;
+const { BulkDataClient } = require("./lib");
 
 
 module.exports = function(describe, it) {
@@ -20,7 +20,7 @@ module.exports = function(describe, it) {
                 "set to true, the request MUST include a valid access token."
         }, async (cfg, api) => {
             const resourceType = cfg.fastestResource || "Patient";
-            const client = new ExportHelper(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
+            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
             const { body } = await client.getExportResponse();
             if (body.requiresAccessToken) {
                 const response = await client.downloadFileAt(0, true);
@@ -39,7 +39,7 @@ module.exports = function(describe, it) {
             description: "Verifies that files can be downloaded without authorization if the <code>requiresAccessToken</code> field in the complete status body is not set to true"
         }, async (cfg, api) => {
             const resourceType = cfg.fastestResource || "Patient";
-            const client = new ExportHelper(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
+            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
             await client.kickOff();
             await client.waitForExport();
             if (!client.statusResponse.body.requiresAccessToken) {
@@ -57,12 +57,9 @@ module.exports = function(describe, it) {
             id  : "Download-03",
             name: "Replies properly in case of error",
             description: "The server should return HTTP Status Code of 4XX or 5XX"
-        }/*, async (cfg, api) => {
-            const resourceType = cfg.fastestResource || "Patient";
-            const client = new ExportHelper(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
-            await client.downloadFileAt(0);
-            // expect(client.statusResponse.statusCode).to.equal(202);
-        }*/);
+        }/*
+            TODO: Figure out how to produce errors!
+        */);
 
         it ({
             id  : "Download-04",
@@ -76,7 +73,7 @@ module.exports = function(describe, it) {
                 "</ul>"
         }, async (cfg, api) => {
             const resourceType = cfg.fastestResource || "Patient";
-            const client = new ExportHelper(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
+            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
             const resp = await client.downloadFileAt(0);
 
             expect(resp.statusCode).to.equal(200);

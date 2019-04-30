@@ -2,8 +2,31 @@ const request  = require("request");
 const crypto   = require("crypto");
 const jwt      = require("jsonwebtoken");
 const jwkToPem = require("jwk-to-pem");
+const _        = require("lodash");
 const expect   = require("code").expect;
 
+/**
+ * Deletes all the properties of an object that have value equal to the provided
+ * one. This is useful to filter out undefined values for example.
+ * @param {Object} obj The object to modify
+ * @param {*} value The value to look for
+ * @param {Boolean} deep If true the function will walk recursively into nested objects
+ */
+function stripObjectValues(obj, value, deep)
+{
+    for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            const val = obj[key];
+            if (val && typeof val == "object" && deep) {
+                stripObjectValues(obj, value);
+            }
+            if (val === value) {
+                delete obj[key];
+            }
+        }
+    }
+    return obj;
+}
 
 /**
  * A wrapper for the request function. Returns the request object that you can
@@ -100,13 +123,9 @@ async function authorize({ tokenEndpoint, clientId, privateKey, strictSSL })
     return response.body.access_token;
 }
 
-function assert(condition, options) {
-
-}
-
 function expectStatusCode(response, code, prefix = "")
 {
-    expect(response.statusCode, prefix || "response.statusCode must be 401").to.equal(code);
+    expect(response.statusCode, prefix || `response.statusCode must be "${code}"`).to.equal(code);
 }
 
 function expectStatusText(response, text, prefix = "")
@@ -169,7 +188,7 @@ function expectOperationOutcome(response, prefix = "")
     }
 }
 
-class ExportHelper
+class BulkDataClient
 {
     constructor(options, testApi, uri)
     {
@@ -196,22 +215,36 @@ class ExportHelper
         return this.accessToken;
     }
 
-    async kickOff()
+    /**
+     * Starts an export by making a request to the kick-off endpoint. Custom
+     * request options can be passed to override the default ones. If any of
+     * those option has undefined value it will actually remove that property.
+     * For example, ti remove the accept header you can pass
+     * `{ headers: { accept: undefined }}`.
+     * @param {Object} options Custom request options
+     */
+    async kickOff(options)
     {
-        const requestOptions = {
-            uri: this.url.href,
-            json: true,
+        let requestOptions = _.defaultsDeep({
+            uri      : this.url.href,
+            json     : true,
             strictSSL: this.options.strictSSL,
             headers: {
                 accept: "application/fhir+json",
                 prefer: "respond-async"
-            }
-        };
+            },
+            ...options
+        });
 
         if (this.options.requiresAuth) {
             const accessToken = await this.getAccessToken();
             requestOptions.headers.authorization = "Bearer " + accessToken;
         }
+
+        stripObjectValues(requestOptions, undefined, true);
+        // requestOptions         = _.omitBy(requestOptions, val => val === undefined);
+        // requestOptions.headers = _.omitBy(requestOptions.headers, val => val === undefined);
+        // console.log(requestOptions)
 
         this.kickOffRequest = customRequest(requestOptions);
         this.testApi.logRequest(this.kickOffRequest, "Kick-off Request");
@@ -361,18 +394,20 @@ class ExportHelper
         this.testApi.logResponse(this.cancelResponse, "Cancellation Response");
     }
 
-    expect400()
+    /**
+     * Verifies that a request sent to the kick-off endpoint was not successful.
+     */
+    expectFailedKickOff()
     {
         expect(
             this.kickOffResponse.statusCode,
-            "kickOffResponse.statusCode"
-        ).to.equal(400);
-
+            "kickOffResponse.statusCode is expected to be >= 400"
+        ).to.be.above(399);
+        
+        // Some servers return empty status message (regardless of the status code).
+        // This is odd, but we allow it here as it is not critical
         if (this.kickOffResponse.statusMessage) {
-            expect(
-                this.kickOffResponse.statusMessage,
-                "kickOffResponse.statusMessage"
-            ).to.equal("Bad Request");
+            expectStatusText(this.kickOffResponse, "Bad Request", "kickOffResponse.statusMessage");
         }
 
         expectOperationOutcome(
@@ -381,13 +416,22 @@ class ExportHelper
         );
     }
 
-    expectSuccess()
+    /**
+     * Verifies that a request sent to the kick-off endpoint was not successful.
+     */
+    expectSuccessfulKickOff()
     {
         expect(
             this.kickOffResponse.statusCode,
-            "kickOffResponse.statusCode"
+            "kickOffResponse.statusCode is expected to be 202"
         ).to.equal(202);
 
+        expect(
+            this.kickOffResponse.headers,
+            "The kick-off response must include a content-location header"
+        ).to.include("content-location");
+
+        // The body is optional but if set, it must be OperationOutcome
         if (this.kickOffResponse.body) {
             expectOperationOutcome(this.kickOffResponse);
         }
@@ -398,9 +442,10 @@ module.exports = {
     request: customRequest,
     createClientAssertion,
     expectOperationOutcome,
+    expectStatusCode,
     expectUnauthorized,
     expectJson,
     authorize,
     wait,
-    ExportHelper
+    BulkDataClient
 };

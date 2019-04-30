@@ -1,6 +1,9 @@
 const expect           = require("code").expect;
 const moment           = require("moment");
-const { ExportHelper } = require("./lib");
+const {
+    BulkDataClient,
+    expectStatusCode
+} = require("./lib");
 
 
 const REGEXP_INSTANT = new RegExp(
@@ -17,7 +20,7 @@ module.exports = function(describe, it) {
         // After a bulk data request has been started, the client MAY poll the
         // URI provided in the Content-Location header.
 
-        // Note: Clients SHOULD follow an exponential backoff approach when
+        // Note: Clients SHOULD follow an exponential back-off approach when
         // polling for status. Servers SHOULD supply a Retry-After header with
         // a http date or a delay time in seconds. When provided, clients SHOULD
         // use this information to inform the timing of future polling requests.
@@ -42,14 +45,24 @@ module.exports = function(describe, it) {
                 'https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#response---in-progress-status</a>'
         }, async (cfg, api) => {
 
+            // Create a client that would export patients (or whatever the
+            // fastest resource is) modified since the last month
             const resourceType = cfg.fastestResource || "Patient";
-            const client = new ExportHelper(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
+            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
             client.url.searchParams.set(cfg.sinceParam || "_since", moment().subtract(1, "months").format("YYYY-MM-DD"));
 
+            // Start an export
             await client.kickOff();
+
+            // Not that the export should have been started, call the status
+            // endpoint to capture it's response
             await client.status();
+
+            // Then make sure we cancel that export
             await client.cancel();
-            expect(client.statusResponse.statusCode).to.equal(202);
+
+            // Finally check the status code returned by the status endpoint
+            expectStatusCode(client.statusResponse, 202, "the status code returned by the status endpoint must be 202");
         });
 
         it ({
@@ -66,17 +79,9 @@ module.exports = function(describe, it) {
                     "FHIR OperationOutcome resources to indicate what went wrong.</p>" +
                 'See <a target="_blank" href="https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#response---error-status-1">' +
                 'https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#response---error-status-1</a>'
-        }/*, async (cfg, api) => {
-
-            const resourceType = cfg.fastestResource || "Patient";
-            const client = new Export(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
-            client.url.searchParams.set(cfg.sinceParam || "_since", moment().subtract(1, "months").format("YYYY-MM-DD"));
-
-            await client.kickOff();
-            await client.status();
-            await client.cancel();
-            expect(client.statusResponse.statusCode).to.equal(202);
-        }*/);
+        }/*
+            TODO: Figure out how to produce errors!
+        */);
 
         it ({
             id  : "Status-03",
@@ -106,13 +111,16 @@ module.exports = function(describe, it) {
                 "</ul>"
         }, async (cfg, api) => {
 
+            // Create a client that would export patients (or whatever the
+            // fastest resource is) modified since the last month
             const resourceType = cfg.fastestResource || "Patient";
-            const client = new ExportHelper(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
+            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
             client.url.searchParams.set(cfg.sinceParam || "_since", moment().subtract(1, "months").format("YYYY-MM-DD"));
 
+            // Do an actual export (except that we do not download files here)
             await client.kickOff();
             await client.waitForExport();
-            await client.cancel();
+            await client.cancel(); // just in case
 
             const body = client.statusResponse.body;
 
