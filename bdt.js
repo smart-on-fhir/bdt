@@ -2,6 +2,10 @@ const EventEmitter = require("events");
 const glob         = require("glob");
 const path         = require("path");
 
+/**
+ * The root node of the tests structure. This will be augmented when the tests
+ * are loaded.
+ */
 const groups = {
     name    : "__ROOT__",
     type    : "group",
@@ -9,6 +13,10 @@ const groups = {
     children: []
 };
 
+/**
+ * Reference to whatever the current group is. Initially, this is the root node,
+ * meaning that it includes all tests.
+ */
 let currentGroup = groups;
 
 /**
@@ -37,11 +45,19 @@ function describe(name, fn)
     currentGroup = parent;
 }
 
+/**
+ * Register a function to be executed before a test group execution starts.
+ * @param {Function} fn Can return a promise for async stuff
+ */
 function before(fn)
 {
     currentGroup.before = fn;
 }
 
+/**
+ * Register a function to be executed after a test group execution ends.
+ * @param {Function} fn Can return a promise for async stuff
+ */
 function after(fn)
 {
     currentGroup.after = fn;
@@ -73,6 +89,12 @@ function it(name, fn)
     node.path = currentGroup.path === "" ? index + "" : currentGroup.path + "." + index;
 }
 
+/**
+ * Creates and returns a JSON representation of the given branch of the tests
+ * tree. When no node is specified returns a JSON representing the entire
+ * structure.
+ * @param {Object} node 
+ */
 function toJSON(node = groups)
 {
     const out = { name: node.name };
@@ -83,7 +105,9 @@ function toJSON(node = groups)
 }
 
 /**
- * Given a glob pattern, finds all the files that match and executes them.
+ * Given a glob pattern, finds all the files that match and executes them. Those
+ * files must be JS modules that export a function. 
+ * @param {String} pattern A glob pattern to search for test files
  */
 function load(pattern)
 {
@@ -130,6 +154,9 @@ function isPromise(p)
 /**
  * Creates and returns an API that will be passed to each test function
  * when that test is executed.
+ * @param {Object} testNode The test node to manipulate. Note that the node
+ * remains private and the tests can only manipulate it through the API
+ * returned by this function.
  */
 function createTestAPI(testNode)
 {
@@ -145,6 +172,10 @@ function createTestAPI(testNode)
             testNode.status = status;
         },
 
+        /**
+         * Append a warning to the test output
+         * @param {String} message 
+         */
         warn(message)
         {
             testNode.warnings.push(message);
@@ -158,22 +189,29 @@ function createTestAPI(testNode)
         setNotSupported(message = "This test was skipped because " +
             "the server does not support this functionality")
         {
-            // testNode.notSupported = message;
             this.warn(message);
             this.setStatus("not-supported");
         },
 
-        // setWarning(warning)
-        // {
-        //     testNode.warning = warning;
-        //     this.setStatus("warned");
-        // },
-
+        /**
+         * Appends log entry to the test output.
+         * @param {String} name The unique name of this log entry (multiple
+         * entries with the same name override each other)
+         * @param {String} value The text to render
+         */
         decorate(name, value)
         {
             testNode.decorations[name] = value;
         },
 
+        /**
+         * Appends an HTML log entry to the test output.
+         * @param {String} name The unique name of this log entry (multiple
+         * entries with the same name override each other)
+         * @param {String} value The HTML to render
+         * @param {String} className The className of the wrapper in case you
+         * need to set it
+         */
         decorateHTML(name, value, className = "description")
         {
             testNode.decorations[name] = {
@@ -183,6 +221,12 @@ function createTestAPI(testNode)
             };
         },
 
+        /**
+         * Tests can call this to log an http request object. This will be
+         * handled by dedicated request renderer on the frontend.
+         * @param {Request} res The request to log
+         * @param {String} label Give it a custom label if you want
+         */
         logRequest(req, label = "Request")
         {
             const headers = { ...req.headers };
@@ -201,6 +245,12 @@ function createTestAPI(testNode)
             };
         },
 
+        /**
+         * Tests can call this to log an http response object. This will be
+         * handled by dedicated response renderer on the frontend.
+         * @param {Response} res The response to log
+         * @param {String} label Give it a custom label if you want
+         */
         logResponse(res, label = "Response")
         {
             testNode.decorations[label] = {
@@ -214,15 +264,29 @@ function createTestAPI(testNode)
     };
 }
 
-
+/**
+ * The test runner class is simple. It just knows its settings and executes the
+ * given path (recursively) with those settings.
+ */
 class Runner extends EventEmitter
 {
+    /**
+     * Create an instance of the Runner. Any settings passed here will be
+     * remembered and later passed to each executed test.
+     * @param {Object} settings The settings to use when the tests are executed.
+     */
     constructor(settings = {})
     {
         super();
         this.settings = settings;
     }
 
+    /**
+     * Execute the given node recursively. If no node is given executes the root
+     * node (all the tests). If the node is a group, executes all it's children
+     * recursively. If the node is a test (leaf) executes it and stops...
+     * @param {Object} node 
+     */
     async run(node = groups)
     {
         const _node = { ...node };
@@ -277,7 +341,6 @@ class Runner extends EventEmitter
                         message: String(error)
                     };
                 } else {
-                    // _node.error = null;
                     if (_node.warnings.length) {
                         if (_node.status === "loading") {
                             _node.status = "warned";
@@ -285,14 +348,6 @@ class Runner extends EventEmitter
                     } else {
                         _node.status = _node.fn ? "succeeded" : "not-implemented";
                     }
-                    // if (_node.status === "loading") {
-                    //     if (_node.decorations.notSupported) {
-                    //         _node.status  = "not-supported";
-                    //         _node.warning = "Not supported by this server";
-                    //     } else {
-                    //         _node.status = _node.fn ? "succeeded" : "not-implemented";
-                    //     }
-                    // }
                 }
                 this.emit("testEnd", _node);
             };

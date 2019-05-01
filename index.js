@@ -15,11 +15,8 @@ APP
     .option("-l, --list"           , "List loaded structure instead of executing tests")
     .option("-P, --path [path]"    , "Path to the test node to execute (e.g. '0.2' for the third child of the first child of the root node)", "")
     .option("-c, --config [path]"  , "Path to the config file to load. Defaults to './config.js'", "./config.js")
-    // .option("-t, --timeout [ms]"   , "set test-case timeout in milliseconds", 2000)
-    // .option("-w, --watch"          , "watch files for changes")
     .parse(process.argv);
 
-// return console.log(APP);
 
 try {
     Object.assign(settings, require(APP.config));

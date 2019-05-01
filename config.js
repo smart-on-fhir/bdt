@@ -31,8 +31,11 @@ module.exports = {
 
     // While testing we need to attempt downloading at least one resource type.
     // Please enter the resource type that would be fast to export (because
-    // there are not many records of that type). We use "Patient" by default,
-    // just because we presume that it is present on every server.
+    // there are not many records of that type). If the server does not support
+    // system-level export, please make sure this resource type is accessible
+    // through the patient-level or the group-level export endpoint. We use
+    // "Patient" by default, just because we presume that it is present on every
+    // server.
     fastestResource: "ImagingStudy",
 
     // The Private Key as JWK
