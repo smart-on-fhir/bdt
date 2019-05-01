@@ -37,6 +37,16 @@ function describe(name, fn)
     currentGroup = parent;
 }
 
+function before(fn)
+{
+    currentGroup.before = fn;
+}
+
+function after(fn)
+{
+    currentGroup.after = fn;
+}
+
 /**
  * The `it` function that will be made available to tests. It will simply
  * "remember" the test by appending it to the children structure of the parent
@@ -83,7 +93,7 @@ function load(pattern)
         try {
             const suite = require(fullPath);
             if (typeof suite == "function") {
-                suite(describe, it);
+                suite(describe, it, before, after);
             }
         }
         catch (e) {
@@ -228,8 +238,16 @@ class Runner extends EventEmitter
 
             this.emit("groupStart", _node);
 
+            if (_node.before) {
+                await _node.before();
+            }
+
             for (const child of _node.children) {
                 await this.run(child);
+            }
+
+            if (_node.after) {
+                await _node.after();
             }
 
             _node.endedAt = Date.now();
