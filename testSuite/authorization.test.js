@@ -32,12 +32,16 @@ module.exports = function(describe, it) {
             describe(`Kick-off request at the ${name} endpoint`, () => {
                 it ({
                     id  : `Auth-01.${i}.0`,
-                    name: "Requires authorization header",
+                    name: `${name} - requires authorization header`,
                     description: "The server should require authorization header"
                 }, async function(cfg, api) {
 
                     if (!cfg[prop]) {
                         return api.setNotSupported(`${name} is not supported by this server`);
+                    }
+
+                    if (!cfg.requiresAuth) {
+                        return api.setNotSupported(`This server does not require authorization`);
                     }
 
                     const req = await request({
@@ -72,11 +76,15 @@ module.exports = function(describe, it) {
 
                 it ({
                     id  : `Auth-01.${i}.1`,
-                    name: "Rejects expired token"
+                    name: `${name} - rejects expired token`
                 }, async function(cfg, api) {
                     
                     if (!cfg[prop]) {
                         return api.setNotSupported(`${name} is not supported by this server`);
+                    }
+
+                    if (!cfg.requiresAuth) {
+                        return api.setNotSupported(`This server does not require authorization`);
                     }
 
                     const req = request({
@@ -104,10 +112,14 @@ module.exports = function(describe, it) {
 
                 it ({
                     id  : `Auth-01.${i}.2`,
-                    name: "Rejects invalid token"
+                    name: `${name} - rejects invalid token`
                 }, async function(cfg, api) {
                     if (!cfg[prop]) {
                         return api.setNotSupported(`${name} is not supported by this server`);
+                    }
+
+                    if (!cfg.requiresAuth) {
+                        return api.setNotSupported(`This server does not require authorization`);
                     }
                     
                     const req = request({
@@ -755,6 +767,12 @@ module.exports = function(describe, it) {
                 //     error: "invalid_request"
                 // });
             });
+
+            it ({
+                id  : "Auth-20",
+                name: "Authorization using JWKS URL"
+            });
         });
+
     });
 };
