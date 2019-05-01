@@ -2,7 +2,6 @@ const request  = require("request");
 const crypto   = require("crypto");
 const jwt      = require("jsonwebtoken");
 const jwkToPem = require("jwk-to-pem");
-const _        = require("lodash");
 const expect   = require("code").expect;
 const { URL }  = require("url");
 
@@ -65,13 +64,122 @@ function customRequest(options)
     return req;
 }
 
+/**
+ * Simple utility for waiting. Returns a promise that will resolve after @ms
+ * milliseconds.
+ * @param {Number} ms 
+ */
 function wait(ms)
 {
-    return new Promise(resolve => {
-        setTimeout(resolve, ms);
-    });
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Check if the given @response has the desired status @code
+ * @param {Response} response The response to check
+ * @param {Number} code The expected status code
+ * @param {String} message Optional custom message
+ */
+function expectStatusCode(response, code, message = "")
+{
+    expect(
+        response.statusCode,
+        message || `response.statusCode must be "${code}"`
+    ).to.equal(code);
+}
+
+/**
+ * Check if the given @response has the desired status @text
+ * @param {Response} response The response to check
+ * @param {String} text The expected status text
+ * @param {String} message Optional custom message
+ */
+function expectStatusText(response, text, message = "")
+{
+    expect(
+        response.statusMessage,
+        message || `response.statusMessage must be "${text}"`
+    ).to.equal(text);
+}
+
+/**
+ * Check if the given @response has a 401 status code
+ * @param {Response} response The response to check
+ * @param {String} message Optional custom message
+ */
+function expectUnauthorized(response, message = "")
+{
+    expectStatusCode(response, 401, message);
+
+    // Some servers return empty statusMessage
+    // TODO: Decide if we need to do this. Is 401 ok with custom status text?
+    if (response.statusMessage) {
+        expectStatusText(response, "Unauthorized", message);
+    }
+}
+
+/**
+ * Verify that the response is JSON
+ * @param {Response} response The response to check
+ * @param {String} message Optional custom message
+ */
+function expectJson(response, message = "the server must reply with JSON content-type header")
+{
+    expect(response.headers["content-type"] || "", message).to.match(/^application\/json\b/);
+}
+
+/**
+ * Verify that the response body contains an OperationOutcome
+ * @param {Response} response The response to check
+ * @param {String} message Optional custom message
+ */
+function expectOperationOutcome(response, message = "")
+{
+    message = message ? message + " " : message;
+
+    if (!response.body) {
+        throw new Error(
+            message + "Expected the request to return an OperationOutcome but " +
+            "the response has no body."
+        );
+    }
+
+    if (response.headers["content-type"].startsWith("application/xml")) {
+        if (!response.body.match(/^<OperationOutcome\b.*?<\/OperationOutcome>$/)) {
+            throw new Error(
+                message + "Expected the request to return an OperationOutcome"
+            );
+        }
+    }
+    else if (response.headers["content-type"].startsWith("application/json")) {
+        let body;
+        if (typeof response.body == "string") {
+            try {    
+                body = JSON.parse(response.body);
+            } catch (ex) {
+                throw new Error(
+                    message + "Expected the request to return an " + 
+                    "OperationOutcome but the response body cannot be parsed as JSON."
+                );
+            }
+        } else {
+            body = response.body;
+        }
+
+        if (body.resourceType !== "OperationOutcome") {
+            throw new Error(
+                message + "Expected the request to return an OperationOutcome"
+            );
+        }
+    }
+}
+
+/**
+ * Creates an authentication token
+ * @param {Object} claims 
+ * @param {Object} signOptions 
+ * @param {Object} privateKey 
+ */
 function createClientAssertion(claims = {}, signOptions = {}, privateKey)
 {
     let jwtToken = {
@@ -94,101 +202,10 @@ function createClientAssertion(claims = {}, signOptions = {}, privateKey)
     return jwt.sign(jwtToken, jwkToPem(privateKey, { private: true }), _signOptions);
 }
 
-async function authorize({ tokenEndpoint, clientId, privateKey, strictSSL })
-{
-    const { response } = await customRequest({
-        method   : "POST",
-        uri      : tokenEndpoint,
-        json     : true,
-        strictSSL: !!strictSSL,
-        form     : {
-            scope                : "system/*.read",
-            grant_type           : "client_credentials",
-            client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-            client_assertion     : createClientAssertion({
-                aud: tokenEndpoint,
-                iss: clientId,
-                sub: clientId
-            }, {}, privateKey)
-        }
-    }).promise();
-
-    if (!response.body.access_token) {
-        throw new Error(
-            `Unable to authorize. The authorization request returned ${
-                response.statusCode
-            }: "${response.statusMessage}"`
-        );
-    }
-
-    return response.body.access_token;
-}
-
-function expectStatusCode(response, code, prefix = "")
-{
-    expect(response.statusCode, prefix || `response.statusCode must be "${code}"`).to.equal(code);
-}
-
-function expectStatusText(response, text, prefix = "")
-{
-    expect(response.statusMessage, prefix || `response.statusCode must be "${text}"`).to.equal(text);
-}
-
-function expectUnauthorized(response, prefix = "")
-{
-    expectStatusCode(response, 401, prefix);
-
-    if (response.statusMessage) {
-        expectStatusText(response, "Unauthorized", prefix);
-    }
-}
-
-function expectJson(response, prefix = "the server must reply with JSON content-type header")
-{
-    expect(response.headers["content-type"] || "", prefix).to.match(/^application\/json\b/);
-}
-
-function expectOperationOutcome(response, prefix = "")
-{
-    prefix = prefix ? prefix + " " : prefix;
-
-    if (!response.body) {
-        throw new Error(
-            prefix + "Expected the request to return an OperationOutcome but " +
-            "the response has no body."
-        );
-    }
-
-    if (response.headers["content-type"].startsWith("application/xml")) {
-        if (!response.body.match(/^<OperationOutcome\b.*?<\/OperationOutcome>$/)) {
-            throw new Error(
-                prefix + "Expected the request to return an OperationOutcome"
-            );
-        }
-    }
-    else if (response.headers["content-type"].startsWith("application/json")) {
-        let body;
-        if (typeof response.body == "string") {
-            try {    
-                body = JSON.parse(response.body);
-            } catch (ex) {
-                throw new Error(
-                    prefix + "Expected the request to return an " + 
-                    "OperationOutcome but the response body cannot be parsed as JSON."
-                );
-            }
-        } else {
-            body = response.body;
-        }
-
-        if (body.resourceType !== "OperationOutcome") {
-            throw new Error(
-                prefix + "Expected the request to return an OperationOutcome"
-            );
-        }
-    }
-}
-
+/**
+ * Implements all the interactions with a bulk-data server that tests may need
+ * to use. Helps keeping the tests clean and readable.
+ */
 class BulkDataClient
 {
     constructor(options, testApi, uri)
@@ -206,12 +223,77 @@ class BulkDataClient
     }
 
     /**
+     * The purpose of this method is to attach some common properties (like
+     * strictSSL and authorization header) to the request options if needed,
+     * and then make the the request.
+     * @param {Object} options
+     * @param {Boolean} skipAuth If true, the authorization header will NOT be
+     * included, even if the `requiresAuth` property of the server settings is
+     * true.
+     */
+    async request(options = {}, skipAuth = false)
+    {
+        let requestOptions = {
+            strictSSL: this.options.strictSSL,
+            ...options
+        };
+
+        if (this.options.requiresAuth && !skipAuth) {
+            const accessToken = await this.getAccessToken();
+            requestOptions.headers = {
+                ...requestOptions.headers,
+                authorization: "Bearer " + accessToken
+            };
+        }
+
+        stripObjectValues(requestOptions, undefined, true);
+        return customRequest(requestOptions);
+    }
+
+    /**
+     * Makes an authorization request and logs the request and the response.
+     */
+    async authorize()
+    {
+        const request = customRequest({
+            method   : "POST",
+            uri      : this.options.tokenEndpoint,
+            json     : true,
+            strictSSL: !!this.options.strictSSL,
+            form     : {
+                scope                : "system/*.read",
+                grant_type           : "client_credentials",
+                client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+                client_assertion     : createClientAssertion({
+                    aud: this.options.tokenEndpoint,
+                    iss: this.options.clientId,
+                    sub: this.options.clientId
+                }, {}, this.options.privateKey)
+            }
+        });
+
+        this.testApi.logRequest(request, "Authorization Request");
+        const { response } = await request.promise();
+        this.testApi.logResponse(response, "Authorization Response");
+
+        if (!response.body.access_token) {
+            throw new Error(
+                `Unable to authorize. The authorization request returned ${
+                    response.statusCode
+                }: "${response.statusMessage}"`
+            );
+        }
+
+        return response.body.access_token;
+    }
+
+    /**
      * This is an async getter for the access token. 
      */
     async getAccessToken()
     {
         if (!this.accessToken) {
-            this.accessToken = await authorize(this.options);
+            this.accessToken = await this.authorize(this.options);
         }
         return this.accessToken;
     }
@@ -224,36 +306,29 @@ class BulkDataClient
      * `{ headers: { accept: undefined }}`.
      * @param {Object} options Custom request options
      */
-    async kickOff(options)
+    async kickOff(options = {})
     {
-        let requestOptions = _.defaultsDeep({
-            uri      : this.url.href,
-            json     : true,
-            strictSSL: this.options.strictSSL,
+        this.kickOffRequest = await this.request({
+            uri : this.url.href,
+            json: true,
+            ...options,
             headers: {
                 accept: "application/fhir+json",
-                prefer: "respond-async"
-            },
-            ...options
+                prefer: "respond-async",
+                ...options.headers
+            }
         });
-
-        if (this.options.requiresAuth) {
-            const accessToken = await this.getAccessToken();
-            requestOptions.headers.authorization = "Bearer " + accessToken;
-        }
-
-        stripObjectValues(requestOptions, undefined, true);
-        // requestOptions         = _.omitBy(requestOptions, val => val === undefined);
-        // requestOptions.headers = _.omitBy(requestOptions.headers, val => val === undefined);
-        // console.log(requestOptions)
-
-        this.kickOffRequest = customRequest(requestOptions);
         this.testApi.logRequest(this.kickOffRequest, "Kick-off Request");
         const { response } = await this.kickOffRequest.promise();
         this.kickOffResponse = response;
         this.testApi.logResponse(this.kickOffResponse, "Kick-off Response");
     }
 
+    /**
+     * Makes a request to the status endpoint and sets `this.statusRequest` and
+     * `this.statusResponse`. NOTE that this method expects that the kick-off
+     * request has already been made and it will throw otherwise.
+     */
     async status()
     {
         if (!this.kickOffResponse) {
@@ -268,13 +343,9 @@ class BulkDataClient
             );
         }
 
-        this.statusRequest = customRequest({
-            uri      : this.kickOffResponse.headers["content-location"],
-            json     : true,
-            strictSSL: this.options.strictSSL,
-            headers: {
-                authorization: this.kickOffRequest.headers.authorization
-            }
+        this.statusRequest = await this.request({
+            uri : this.kickOffResponse.headers["content-location"],
+            json: true
         });
 
         this.testApi.logRequest(this.statusRequest, "Status Request");
@@ -283,6 +354,12 @@ class BulkDataClient
         this.testApi.logResponse(this.statusResponse, "Status Response");
     }
 
+    /**
+     * Makes multiple requests to the status endpoint until the response code is
+     * 202 (or until an error is returned). NOTE that this method expects that
+     * the kick-off request has already been made and it will throw otherwise.
+     * TODO: Use the retry-after header if available
+     */
     async waitForExport(suffix = 1) {
         if (!this.kickOffResponse) {
             throw new Error(
@@ -296,13 +373,9 @@ class BulkDataClient
             );
         }
 
-        this.statusRequest = customRequest({
-            uri      : this.kickOffResponse.headers["content-location"],
-            json     : true,
-            strictSSL: this.options.strictSSL,
-            headers: {
-                authorization: this.kickOffRequest.headers.authorization
-            }
+        this.statusRequest = await this.request({
+            uri : this.kickOffResponse.headers["content-location"],
+            json: true
         });
 
         if (suffix === 1) {
@@ -312,11 +385,15 @@ class BulkDataClient
         this.statusResponse = response;
         this.testApi.logResponse(this.statusResponse, "Status Response " + suffix);
         if (response.statusCode === 202) {
-            await wait(5000);
+            await wait(Math.min(1000 + 1000 * suffix, 10000));
             return this.waitForExport(suffix + 1);
         }
     }
 
+    /**
+     * Starts an export if not started already and resolves with the response
+     * of the completed status request
+     */
     async getExportResponse() {
         if (!this.statusResponse) {
             await this.kickOff();
@@ -325,37 +402,39 @@ class BulkDataClient
         return this.statusResponse;
     }
 
+    /**
+     * Starts an export and waits for it. Then downloads the file at the given
+     * index. NOTE: this method assumes that the index exists and will throw
+     * otherwise.
+     * @param {Number} index The index of the file in the status list
+     * @param {Boolean} skipAuth If true, the authorization header will NOT be
+     * included, even if the `requiresAuth` property of the server settings is
+     * true. 
+     */
     async downloadFileAt(index, skipAuth = null) {
         await this.kickOff();
         await this.waitForExport();
 
         const fileUrl = this.statusResponse.body.output[index].url;
 
-        const requestOptions = {
+        const req = await this.request({
             uri: fileUrl,
-            strictSSL: this.options.strictSSL,
             json: true,
             gzip: true,
             headers: {
                 accept: "application/fhir+json"
             }
-        };
-
-        if (!skipAuth) {
-            const accessToken = await this.getAccessToken();
-            requestOptions.headers = {
-                ...requestOptions.headers,
-                authorization: "Bearer " + accessToken
-            };
-        }
-
-        const req = customRequest(requestOptions);
+        }, skipAuth);
         this.testApi.logRequest(req, "Download Request");
         const { response } = await req.promise();
         this.testApi.logResponse(response, "Download Response");
         return response;
     }
 
+    /**
+     * Cancels an export by sending a DELETE request to the status endpoint.
+     * If an export has not been started does nothing.
+     */
     async cancelIfStarted()
     {
         if (this.kickOffResponse &&
@@ -365,6 +444,12 @@ class BulkDataClient
         }
     }
 
+    /**
+     * Cancels an export by sending a DELETE request to the status endpoint.
+     * NOTE that this method expects an export to be started and will throw
+     * otherwise. Use `this.cancelIfStarted()` if you are not sure if an export
+     * has been started.
+     */
     async cancel()
     {
         if (!this.kickOffResponse) {
@@ -379,14 +464,10 @@ class BulkDataClient
             );
         }
 
-        this.cancelRequest = customRequest({
-            uri      : this.kickOffResponse.headers["content-location"],
-            method   : "DELETE",
-            json     : true,
-            strictSSL: this.options.strictSSL,
-            headers: {
-                authorization: this.kickOffRequest.headers.authorization
-            }
+        this.cancelRequest = await this.request({
+            uri   : this.kickOffResponse.headers["content-location"],
+            method: "DELETE",
+            json  : true
         });
 
         this.testApi.logRequest(this.cancelRequest, "Cancellation Request");
@@ -446,7 +527,6 @@ module.exports = {
     expectStatusCode,
     expectUnauthorized,
     expectJson,
-    authorize,
     wait,
     BulkDataClient
 };
