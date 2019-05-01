@@ -4,6 +4,7 @@ const jwt      = require("jsonwebtoken");
 const jwkToPem = require("jwk-to-pem");
 const _        = require("lodash");
 const expect   = require("code").expect;
+const { URL }  = require("url");
 
 /**
  * Deletes all the properties of an object that have value equal to the provided

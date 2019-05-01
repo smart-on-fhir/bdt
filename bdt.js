@@ -189,7 +189,7 @@ function createTestAPI(testNode)
             if (headers.authorization) {
                 headers.authorization = headers.authorization.replace(
                     /^\s*(Bearer)\s+.*$/i,
-                    "$1 ⏺⏺⏺⏺⏺⏺"
+                    "$1 ✸✸✸✸✸✸"
                 );
             }
             testNode.decorations[label] = {

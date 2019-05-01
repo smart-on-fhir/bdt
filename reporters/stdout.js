@@ -17,32 +17,32 @@ const INDENT_STRING = "  ";
 const log = console.log;
 
 function icon(node) {
-    if (node.type == "group")
-        return "⏺".grey;
+    if (node.type === "group")
+        return "●".grey;
 
-    if (node.status == "succeeded")
+    if (node.status === "succeeded")
         return "✔".green;
 
-    if (node.status == "failed")
+    if (node.status === "failed")
         return "✘".red;
 
-    if (node.status == "waiting")
-        return "⏳".blue;
+    if (node.status === "waiting")
+        return "◔".blue;
 
-    if (node.status == "not-implemented")
-        return "⛔".grey;
+    if (node.status === "not-implemented")
+        return "⊖".grey;
 
-    if (node.status == "not-supported")
+    if (node.status === "not-supported")
         return "✘".grey;
 
     return " ";
 }
 
 function text(node) {
-    if (node.status == "not-implemented") {
+    if (node.status === "not-implemented") {
         return node.name.grey;
     }
-    if (node.status == "not-supported") {
+    if (node.status === "not-supported") {
         return node.name.grey;
     }
     return node.name;
@@ -53,7 +53,7 @@ function getColorForDuration(duration) {
         return "red";
     }
 
-    if (duration > DURATION_MEDIUM) {
+    if (duration >= DURATION_MEDIUM) {
         return "yellow";
     }
 
@@ -94,8 +94,11 @@ function formatDuration(ms) {
 
 function duration(node) {
     const dur   = node.endedAt - node.startedAt;
-    const color = getColorForDuration(dur);
-    return `(${formatDuration(dur)})`[color];
+    if (dur >= DURATION_MEDIUM) {
+        const color = getColorForDuration(dur);
+        return `(${formatDuration(dur)})`[color];
+    }
+    return "";
 }
 
 function indent(depth = 0) {
@@ -204,21 +207,21 @@ module.exports = function StdoutReporter()
     function onTestEnd(node) {
         count += 1;
         log(`${indent(depth)} ${icon(node)} ${text(node)} ${duration(node)}`);
-        if (node.status == "failed") {
+        if (node.status === "failed") {
             failed += 1;
             if (node.description) {
                 log(`${indent(depth + 1)} ${"├─".grey} ${
                     parseHTML(node.description, `${indent(depth + 1)} ${"│ ".grey} `)
                 }`);    
             }
-            log(`${indent(depth + 1)} ${"└⮞".grey} ${node.error.message.red}`);
+            log(`${indent(depth + 1)} ${"└▶".grey} ${node.error.message.red}`);
         }
         else {
-            if (node.status == "not-implemented") {
+            if (node.status === "not-implemented") {
                 notImplemented += 1;
             }
             else {
-                if (node.status == "not-supported") {
+                if (node.status === "not-supported") {
                     notSupported += 1;
                 }
                 else {
@@ -226,7 +229,7 @@ module.exports = function StdoutReporter()
                     if (node.warnings.length) {
                         warnings += node.warnings.length;
                         node.warnings.forEach(w => {
-                            log(`${indent(depth + 1)} ${"❗".yellow} ${w}`);
+                            log(`${indent(depth + 1)} ${"! ".yellow.bold} ${w}`);
                         })
                     }
                 }
