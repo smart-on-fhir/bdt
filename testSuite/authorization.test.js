@@ -1,5 +1,4 @@
 const { expect } = require("code");
-// const { expectStatusCode } = require("../assertions");
 const {
     request,
     expectUnauthorized,
