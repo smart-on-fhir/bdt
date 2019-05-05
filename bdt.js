@@ -64,6 +64,24 @@ function after(fn)
 }
 
 /**
+ * Register a function to be executed before a test execution starts.
+ * @param {Function} fn Can return a promise for async stuff
+ */
+function beforeEach(fn)
+{
+    currentGroup.beforeEach = fn;
+}
+
+/**
+ * Register a function to be executed after a test execution ends.
+ * @param {Function} fn Can return a promise for async stuff
+ */
+function afterEach(fn)
+{
+    currentGroup.afterEach = fn;
+}
+
+/**
  * The `it` function that will be made available to tests. It will simply
  * "remember" the test by appending it to the children structure of the parent
  * group element.
@@ -117,7 +135,7 @@ function load(pattern)
         try {
             const suite = require(fullPath);
             if (typeof suite == "function") {
-                suite(describe, it, before, after);
+                suite(describe, it, before, after, beforeEach, afterEach);
             }
         }
         catch (e) {
@@ -296,6 +314,8 @@ class Runner extends EventEmitter
 
         if (_node.type === "group") {
 
+            currentGroup = _node;
+
             if (isRoot) {
                 this.emit("start");
             }
@@ -352,13 +372,15 @@ class Runner extends EventEmitter
                 this.emit("testEnd", _node);
             };
 
-            
+            if (currentGroup.beforeEach) {
+                await currentGroup.beforeEach();
+            }
 
             try {
                 if (typeof _node.fn == "function") {
                     const p = _node.fn.call(_node, this.settings, api);
                     if (isPromise(p)) {
-                        return p.then(() => next()).catch(next);
+                        await p.then(() => next()).catch(next);
                     }
                 }
                 else {
@@ -368,6 +390,10 @@ class Runner extends EventEmitter
                 }
             } catch (ex) {
                 next(ex);
+            } finally {
+                if (currentGroup.afterEach) {
+                    await currentGroup.afterEach();
+                }
             }
         }
     }
