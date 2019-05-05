@@ -2,7 +2,7 @@ const expect             = require("code").expect;
 const { BulkDataClient } = require("./lib");
 
 
-module.exports = function(describe, it) {
+module.exports = function(describe, it, before, after, beforeEach, afterEach) {
 
     function createClient(cfg, api)
     {
@@ -19,6 +19,11 @@ module.exports = function(describe, it) {
     }
 
     describe("Download Endpoint", () => {
+
+        before(() => console.log(">"));
+        after(() => console.log("<"));
+        beforeEach(() => console.log(" ->"));
+        afterEach(() => console.log(" <-"));
 
         // Using the URIs supplied by the FHIR server in the Complete Status response body,
         // a client MAY download the generated bulk data files (one or more per resource type)
@@ -125,7 +130,43 @@ module.exports = function(describe, it) {
             name: "Rejects a download if the client scopes do not cover that resource type",
             "description": "If the download endpoint requires authorization, it should also " +
                 "verify that the client has been granted access to the resource type that it " +
-                "attempts to download"
+                "attempts to download. This test makes an export and then it re-authorizes before " +
+                "downloading the first file, so that the download request is made with a token " +
+                "that does not provide access to the downloaded resource."
+        }, async (cfg, api) => {
+
+            // Create a client to download the fastest resource.
+            let pathName = cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint;
+
+            if (!pathName) {
+                return api.setNotSupported(`No export endpoints configured`);
+            }
+
+            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${pathName}?_type=Patient`);
+
+            // Do an export using the full access scopes
+            const resp = await client.getExportResponse();
+
+            if (!client.statusResponse.body.requiresAccessToken) {
+                return api.decorateHTML(
+                    "NOTE",
+                    "<div>This test was not executed because the <code>requiresAccessToken</code> field in the complete status body was NOT set to <code>true</code>.</div>"
+                );
+            }
+
+            // Once the export is done and before the actual download,
+            // re-authorize with less scopes so that we can test if the
+            // download endpoint evaluates scopes
+            await client.getAccessToken({
+                force        : true,
+                scope        : "system/Observation.read",
+                requestLabel : "Authorization Request 2",
+                responseLabel: "Authorization Response 2"
+            });
+
+            const resp2 = await client.downloadFile(resp.body.output[0].url);
+
+            expect(resp2.statusCode, "Download should fail if the client does not have proper scopes").to.be.above(399);
         });
     });
 

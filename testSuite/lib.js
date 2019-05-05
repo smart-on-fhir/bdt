@@ -252,8 +252,10 @@ class BulkDataClient
 
     /**
      * Makes an authorization request and logs the request and the response.
+     * @param {Object} options
+     * @param {String} options.scope Scopes to request (default "system/*.read")
      */
-    async authorize()
+    async authorize({ scope, requestLabel, responseLabel })
     {
         const request = customRequest({
             method   : "POST",
@@ -261,7 +263,7 @@ class BulkDataClient
             json     : true,
             strictSSL: !!this.options.strictSSL,
             form     : {
-                scope                : "system/*.read",
+                scope                : scope || "system/*.read",
                 grant_type           : "client_credentials",
                 client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
                 client_assertion     : createClientAssertion({
@@ -272,9 +274,9 @@ class BulkDataClient
             }
         });
 
-        this.testApi.logRequest(request, "Authorization Request");
+        this.testApi.logRequest(request, requestLabel || "Authorization Request");
         const { response } = await request.promise();
-        this.testApi.logResponse(response, "Authorization Response");
+        this.testApi.logResponse(response, responseLabel || "Authorization Response");
 
         if (!response.body.access_token) {
             throw new Error(
@@ -289,11 +291,15 @@ class BulkDataClient
 
     /**
      * This is an async getter for the access token. 
+     * @param {Object} options
+     * @param {Boolean} options.force Set to true to make the client re-authorize,
+     * even if it currently has an access token
+     * @param {String} options.scope Scopes to request (default "system/*.read")
      */
-    async getAccessToken()
+    async getAccessToken(options = {})
     {
-        if (!this.accessToken) {
-            this.accessToken = await this.authorize(this.options);
+        if (!this.accessToken || options.force) {
+            this.accessToken = await this.authorize(options);
         }
         return this.accessToken;
     }
@@ -414,9 +420,20 @@ class BulkDataClient
     async downloadFileAt(index, skipAuth = null) {
         await this.kickOff();
         await this.waitForExport();
-
         const fileUrl = this.statusResponse.body.output[index].url;
+        return await this.downloadFile(fileUrl, skipAuth);
+    }
 
+    /**
+     * Starts an export and waits for it. Then downloads the file at the given
+     * index. NOTE: this method assumes that the index exists and will throw
+     * otherwise.
+     * @param {Number} index The index of the file in the status list
+     * @param {Boolean} skipAuth If true, the authorization header will NOT be
+     * included, even if the `requiresAuth` property of the server settings is
+     * true. 
+     */
+    async downloadFile(fileUrl, skipAuth = null) {
         const req = await this.request({
             uri: fileUrl,
             json: true,
