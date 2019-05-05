@@ -120,6 +120,13 @@ module.exports = function(describe, it) {
             }
         });
 
+        it ({
+            id  : "Download-05",
+            name: "Rejects a download if the client scopes do not cover that resource type",
+            "description": "If the download endpoint requires authorization, it should also " +
+                "verify that the client has been granted access to the resource type that it " +
+                "attempts to download"
+        });
     });
 
 };

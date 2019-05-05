@@ -115,7 +115,6 @@ module.exports = function(describe, it) {
             // fastest resource is) modified since the last month
             const resourceType = cfg.fastestResource || "Patient";
             const client = new BulkDataClient(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
-            client.url.searchParams.set(cfg.sinceParam || "_since", moment().subtract(1, "months").format("YYYY-MM-DD"));
 
             // Do an actual export (except that we do not download files here)
             await client.kickOff();
