@@ -305,7 +305,7 @@ class Runner extends EventEmitter
      * recursively. If the node is a test (leaf) executes it and stops...
      * @param {Object} node 
      */
-    async run(node = groups)
+    async run(node = groups, indirect)
     {
         const _node = { ...node };
         const isRoot = _node.name === "__ROOT__";
@@ -327,7 +327,7 @@ class Runner extends EventEmitter
             }
 
             for (const child of _node.children) {
-                await this.run(child);
+                await this.run(child, true);
             }
 
             if (_node.after) {
@@ -372,6 +372,10 @@ class Runner extends EventEmitter
                 this.emit("testEnd", _node);
             };
 
+            if (!indirect && currentGroup.before) {
+                await currentGroup.before();
+            }
+
             if (currentGroup.beforeEach) {
                 await currentGroup.beforeEach();
             }
@@ -393,6 +397,10 @@ class Runner extends EventEmitter
             } finally {
                 if (currentGroup.afterEach) {
                     await currentGroup.afterEach();
+                }
+
+                if (!indirect && currentGroup.after) {
+                    await currentGroup.after();
                 }
             }
         }

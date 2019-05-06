@@ -20,10 +20,29 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
 
     describe("Download Endpoint", () => {
 
-        before(() => console.log(">"));
-        after(() => console.log("<"));
-        beforeEach(() => console.log(" ->"));
-        afterEach(() => console.log(" <-"));
+        // let CLIENT;
+
+        // function getClient(cfg, api)
+        // {
+        //     if (!CLIENT) {
+        //         // Create a client to download the fastest resource.
+        //         let pathName = cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint;
+
+        //         if (!pathName) {
+        //             api.setNotSupported(`No export endpoints configured`);
+        //             return null;
+        //         }
+
+        //         const resourceType = cfg.fastestResource || "Patient";
+        //         CLIENT = new BulkDataClient(cfg, api, `${cfg.baseURL}${pathName}?_type=${resourceType}`);
+        //     }
+        //     return CLIENT;
+        // }   
+
+        // before(() => console.log(">"));
+        // after(() => console.log("<"));
+        // beforeEach(() => console.log(" ->"));
+        // afterEach(() => console.log(" <-"));
 
         // Using the URIs supplied by the FHIR server in the Complete Status response body,
         // a client MAY download the generated bulk data files (one or more per resource type)
