@@ -4,7 +4,10 @@ const {
     expectUnauthorized,
     expectOperationOutcome,
     expectJson,
-    createClientAssertion
+    createClientAssertion,
+    createJWKS,
+    expectStatusCode,
+    authenticate
 } = require("./lib");
 
 
@@ -46,7 +49,7 @@ module.exports = function(describe, it) {
                     const req = await request({
                         uri: `${cfg.baseURL}${cfg[prop]}`,
                         json: true,
-                        strictSSL: false,
+                        strictSSL: cfg.strictSSL,
                         headers: {
                             prefer: "respond-async",
                             accept: "application/fhir+json"
@@ -89,7 +92,7 @@ module.exports = function(describe, it) {
                     const req = request({
                         uri: `${cfg.baseURL}${cfg[prop]}`,
                         json: true,
-                        strictSSL: false,
+                        strictSSL: cfg.strictSSL,
                         headers: {
                             prefer: "respond-async",
                             accept: "application/fhir+json",
@@ -124,7 +127,7 @@ module.exports = function(describe, it) {
                     const req = request({
                         uri: `${cfg.baseURL}${cfg[prop]}`,
                         json: true,
-                        strictSSL: false,
+                        strictSSL: cfg.strictSSL,
                         headers: {
                             prefer: "respond-async",
                             accept: "application/fhir+json",
@@ -159,7 +162,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     headers: {
                         "Content-type": "application/json"
                     }
@@ -197,7 +200,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form     : {
                         scope                : "system/*.read",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
@@ -225,7 +228,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form     : {
                         scope                : "system/*.read",
                         grant_type           : "test-grant_type-value",
@@ -254,7 +257,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form: {
                         scope           : "system/*.read",
                         grant_type      : "client_credentials",
@@ -283,7 +286,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form: {
                         scope                : "system/*.read",
                         grant_type           : "client_credentials",
@@ -348,7 +351,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form: {
                         scope                : "system/*.read",
                         grant_type           : "client_credentials",
@@ -379,7 +382,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form: {
                         scope                : "system/*.read",
                         grant_type           : "client_credentials",
@@ -448,7 +451,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form: {
                         grant_type           : "client_credentials",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
@@ -479,7 +482,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form: {
                         scope                : "",
                         grant_type           : "client_credentials",
@@ -511,7 +514,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form: {
                         scope                : "launch fhirUser system/Patient.read",
                         grant_type           : "client_credentials",
@@ -550,7 +553,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form: {
                         scope                : "system/Patient.*",
                         grant_type           : "client_credentials",
@@ -579,7 +582,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form: {
                         scope                : "system/Patient.unknownAction",
                         grant_type           : "client_credentials",
@@ -618,7 +621,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form: {
                         scope                : "system/*.read",
                         grant_type           : "client_credentials",
@@ -647,7 +650,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form: {
                         scope                : "system/UnknownResource.read",
                         grant_type           : "client_credentials",
@@ -686,7 +689,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form: {
                         grant_type           : "client_credentials",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
@@ -724,7 +727,7 @@ module.exports = function(describe, it) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     json     : true,
-                    strictSSL: false,
+                    strictSSL: cfg.strictSSL,
                     form: {
                         grant_type           : "client_credentials",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
@@ -769,7 +772,110 @@ module.exports = function(describe, it) {
 
             it ({
                 id  : "Auth-20",
-                name: "Authorization using JWKS URL"
+                name: "Authorization using JWKS URL and ES384 keys",
+                description: "Verify that the server supports JWKS URL authorization using ES384 keys. This would also prove " +
+                    "that JWK keys rotation works because this test will create new key, every time it is executed."
+            }, async (cfg, api) => {
+
+                if (cfg.cli) {
+                    return api.setNotSupported(`This test cannot be executed in CLI`);
+                }
+
+                if (!cfg.jwksUrlAuth || !cfg.jwksUrl) {
+                    return api.setNotSupported(`This server is not configured to support authorization using JWKS URL`);
+                }
+
+                const jwks = await createJWKS("ES384");
+                const privateKey = jwks.keys.find(k => k.key_ops.indexOf("sign") > -1);
+                const publicKey  = jwks.keys.find(k => k.key_ops.indexOf("verify") > -1);
+
+                const token = createClientAssertion({
+                    aud: cfg.tokenEndpoint,
+                    iss: cfg.clientId,
+                    sub: cfg.clientId
+                }, {
+                    header: {
+                        jku: cfg.jwksUrl
+                    }
+                }, privateKey);
+
+                const authorizationRequest = authenticate(cfg.tokenEndpoint, {
+                    client_assertion: token
+                });
+
+                // Make a special call to our API that will temporarily override
+                // the public key of this server that is hosted at cfg.jwksUrl
+                await request({
+                    uri : `${cfg.jwksUrl}/override`,
+                    json: true,
+                    strictSSL: cfg.strictSSL,
+                    method: "POST",
+                    form: {
+                        serverId: cfg.id,
+                        publicKey: JSON.stringify(publicKey)
+                    }
+                }).promise();
+                
+                api.logRequest(authorizationRequest, "Authorization Request");
+                const { response } = await authorizationRequest.promise();
+                api.logResponse(response, "Authorization Response");
+
+                expectStatusCode(response, 200, "The client should get 200 response code from the authorization request");
+                expectJson(response, "The client should get a JSON response from the authorization request");
+            });
+
+            it ({
+                id  : "Auth-21",
+                name: "Authorization using JWKS URL and RS384 keys",
+                description: "Verify that the server supports JWKS URL authorization using RS384 keys. This would also prove " +
+                    "that JWK keys rotation works because this test will create new key, every time it is executed."
+            }, async (cfg, api) => {
+
+                if (cfg.cli) {
+                    return api.setNotSupported(`This test cannot be executed in CLI`);
+                }
+
+                if (!cfg.jwksUrlAuth || !cfg.jwksUrl) {
+                    return api.setNotSupported(`This server is not configured to support authorization using JWKS URL`);
+                }
+
+                const jwks = await createJWKS("RS384");
+                const privateKey = jwks.keys.find(k => k.key_ops.indexOf("sign") > -1);
+                const publicKey  = jwks.keys.find(k => k.key_ops.indexOf("verify") > -1);
+
+                const token = createClientAssertion({
+                    aud: cfg.tokenEndpoint,
+                    iss: cfg.clientId,
+                    sub: cfg.clientId
+                }, {
+                    header: {
+                        jku: cfg.jwksUrl
+                    }
+                }, privateKey);
+
+                const authorizationRequest = authenticate(cfg.tokenEndpoint, {
+                    client_assertion: token
+                });
+
+                // Make a special call to our API that will temporarily override
+                // the public key of this server that is hosted at cfg.jwksUrl
+                await request({
+                    uri : `${cfg.jwksUrl}/override`,
+                    json: true,
+                    strictSSL: cfg.strictSSL,
+                    method: "POST",
+                    form: {
+                        serverId : cfg.id,
+                        publicKey: JSON.stringify(publicKey)
+                    }
+                }).promise();
+
+                api.logRequest(authorizationRequest, "Authorization Request");
+                const { response } = await authorizationRequest.promise();
+                api.logResponse(response, "Authorization Response");
+
+                expectStatusCode(response, 200, "The client should get 200 response code from the authorization request");
+                expectJson(response, "The client should get a JSON response from the authorization request");
             });
         });
 

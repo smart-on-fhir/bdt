@@ -4,6 +4,36 @@ const jwt      = require("jsonwebtoken");
 const jwkToPem = require("jwk-to-pem");
 const expect   = require("code").expect;
 const { URL }  = require("url");
+const jwk      = require("jwk-lite");
+
+
+/**
+ * Generates a JWKS containing a public and a private key pair
+ * @param {"RS384"|"ES384"} alg The algorithm to use
+ */
+function createJWKS(alg = "RS384") {
+    alg = String(alg || "").toUpperCase();
+    if (["RS384", "ES384"].indexOf(alg) === -1) {
+        alg = "RS384";
+    }
+
+    return jwk.generateKey(alg).then(result => {
+        return Promise.all([
+            jwk.exportKey(result.publicKey),
+            jwk.exportKey(result.privateKey)
+        ]).then(keys => {
+            let out = { keys: [...keys] };
+            let kid = crypto.randomBytes(16).toString("hex");
+            out.keys.forEach(key => {
+                key.kid = kid;
+                if (!key.alg) {
+                    key.alg = alg;
+                }
+            });
+            return out;
+        });
+    });
+}
 
 /**
  * Deletes all the properties of an object that have value equal to the provided
@@ -200,6 +230,21 @@ function createClientAssertion(claims = {}, signOptions = {}, privateKey)
     };
 
     return jwt.sign(jwtToken, jwkToPem(privateKey, { private: true }), _signOptions);
+}
+
+function authenticate(tokenUrl, postBody) {
+    return customRequest({
+        method: "POST",
+        url   : tokenUrl,
+        json  : true,
+        form  : {
+            scope: "system/*.*",
+            grant_type: "client_credentials",
+            client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+            // client_assertion: signedToken,
+            ...postBody
+        }
+    });
 }
 
 /**
@@ -545,5 +590,7 @@ module.exports = {
     expectUnauthorized,
     expectJson,
     wait,
-    BulkDataClient
+    BulkDataClient,
+    createJWKS,
+    authenticate
 };
