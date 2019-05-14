@@ -34,12 +34,12 @@ module.exports = function(describe, it) {
             describe(`Kick-off request at the ${name} endpoint`, () => {
                 it ({
                     id  : `Auth-01.${i}.0`,
-                    name: `${name} - requires authorization header`,
-                    description: "The server should require authorization header"
+                    name: `Requires authorization header`,
+                    description: `The server should require authorization header at the ${name} endpoint`
                 }, async function(cfg, api) {
 
                     if (!cfg[prop]) {
-                        return api.setNotSupported(`${name} is not supported by this server`);
+                        return api.setNotSupported(`The ${name} is not supported by this server`);
                     }
 
                     if (!cfg.requiresAuth) {
@@ -78,11 +78,12 @@ module.exports = function(describe, it) {
 
                 it ({
                     id  : `Auth-01.${i}.1`,
-                    name: `${name} - rejects expired token`
+                    name: `Rejects expired token`,
+                    description: `The server should reject expired tokens at the ${name} endpoint`
                 }, async function(cfg, api) {
                     
                     if (!cfg[prop]) {
-                        return api.setNotSupported(`${name} is not supported by this server`);
+                        return api.setNotSupported(`The ${name} is not supported by this server`);
                     }
 
                     if (!cfg.requiresAuth) {
@@ -114,10 +115,11 @@ module.exports = function(describe, it) {
 
                 it ({
                     id  : `Auth-01.${i}.2`,
-                    name: `${name} - rejects invalid token`
+                    name: `Rejects invalid token`,
+                    description: `The server should reject invalid tokens at the ${name} endpoint`
                 }, async function(cfg, api) {
                     if (!cfg[prop]) {
-                        return api.setNotSupported(`${name} is not supported by this server`);
+                        return api.setNotSupported(`The ${name} is not supported by this server`);
                     }
 
                     if (!cfg.requiresAuth) {
@@ -445,7 +447,7 @@ module.exports = function(describe, it) {
             it ({
                 id  : `Auth-11`,
                 name: "Requires scope",
-                description: ""
+                description: "The server should reject requests to the token endpoint that do not specify a scope"
             }, async (cfg, api) => {
                 const req = request({
                     method   : "POST",
@@ -476,7 +478,7 @@ module.exports = function(describe, it) {
             it ({
                 id  : `Auth-12`,
                 name: "Rejects empty scope",
-                description: ""
+                description: "The server should reject requests to the token endpoint that are requesting an empty scope"
             }, async (cfg, api) => {
                 const req = request({
                     method   : "POST",
@@ -533,7 +535,8 @@ module.exports = function(describe, it) {
 
                 expect(
                     response.statusCode,
-                    "response.statusCode must be 400, 401 or 403 if the scope is not valid"
+                    "Response.statusCode must be between 400 and 403 if the scope is not valid. " +
+                    "In this case we expect scopes like \"launch\" or \"fhirUser\" to be rejected."
                 ).to.be.within(400, 403);
 
                 // expect(
@@ -669,7 +672,8 @@ module.exports = function(describe, it) {
 
                 expect(
                     response.statusCode,
-                    "response.statusCode must be 400, 401 or 403 if the scope is not valid"
+                    "Response.statusCode must be between 400 and 403 if the scope is not valid. " +
+                    "In this case we expect scopes like \"system/UnknownResource.read\" to be rejected."
                 ).to.be.within(400, 403);
 
                 // expect(
@@ -683,7 +687,10 @@ module.exports = function(describe, it) {
             it ({
                 id  : `Auth-18`,
                 name: "validates the jku token header",
-                description: ""
+                description: "When present, the <code>jky</code> authentication JWT header should match a value " +
+                    "that the client supplied to the FHIR server at client registration time. This test " +
+                    "attempts to authorize using <code>test-bad-jku</code> as <code>jky</code> header value and " +
+                    "expects that to produce an error."
             }, async (cfg, api) => {
                 const req = await request({
                     method   : "POST",

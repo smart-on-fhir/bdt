@@ -157,7 +157,7 @@ module.exports = function(describe, it) {
             // array of bulk data file items with one entry for each generated
             // file. Note: If no resources are returned from the kick-off
             // request, the server SHOULD return an empty array.
-            expect(body, "the response contains 'output'").to.include("output");
+            expect(body, "the response contains an 'output' array").to.include("output");
             expect(body.output, "the 'output' property must be an array").to.be.an.array();
 
             body.output.forEach(item => {
@@ -189,7 +189,7 @@ module.exports = function(describe, it) {
             // type is currently supported, so a server MUST generate files in
             // the same format as the bulk data output files that contain
             // OperationOutcome resources.
-            expect(body, "the response contains 'error'").to.include("error");
+            expect(body, "the response contains an 'error' array").to.include("error");
             expect(body.output, "the 'error' property must be an array").to.be.an.array();
 
             body.error.forEach(item => {

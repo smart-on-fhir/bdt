@@ -545,7 +545,7 @@ class BulkDataClient
     {
         expect(
             this.kickOffResponse.statusCode,
-            "kickOffResponse.statusCode is expected to be >= 400"
+            "The kick-off request was expected to fail"
         ).to.be.above(399);
         
         // Some servers return empty status message (regardless of the status code).
@@ -567,7 +567,7 @@ class BulkDataClient
     {
         expect(
             this.kickOffResponse.statusCode,
-            "kickOffResponse.statusCode is expected to be 202"
+            "The kick-off request was expected to succeed and return a 202 status code"
         ).to.equal(202);
 
         expect(
