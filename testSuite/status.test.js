@@ -41,8 +41,8 @@ module.exports = function(describe, it) {
             id  : "Status-01",
             name: "Responds with 202 for active transaction IDs",
             description: "<p>The status endpoint should return <b>202</b> status code until the export is completed.</p>" +
-                'See <a target="_blank" href="https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#response---in-progress-status">' +
-                'https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#response---in-progress-status</a>'
+                'See <a target="_blank" href="https://github.com/HL7/bulk-data/blob/master/spec/export/index.md#response---in-progress-status">' +
+                'https://github.com/HL7/bulk-data/blob/master/spec/export/index.md#response---in-progress-status</a>'
         }, async (cfg, api) => {
 
             // Create a client that would export patients (or whatever the
@@ -77,8 +77,8 @@ module.exports = function(describe, it) {
                     "the Response.error array of the completion response MUST be populated " +
                     "(see below) with one or more files in ndjson format containing " +
                     "FHIR OperationOutcome resources to indicate what went wrong.</p>" +
-                'See <a target="_blank" href="https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#response---error-status-1">' +
-                'https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#response---error-status-1</a>'
+                'See <a target="_blank" href="https://github.com/HL7/bulk-data/blob/master/spec/export/index.md#response---error-status-1">' +
+                'https://github.com/HL7/bulk-data/blob/master/spec/export/index.md#response---error-status-1</a>'
         }/*
             TODO: Figure out how to produce errors!
         */);

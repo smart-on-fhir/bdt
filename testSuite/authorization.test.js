@@ -198,6 +198,11 @@ module.exports = function(describe, it) {
                 description: "The server should reply with 400 Bad Request if the " +
                     "grant_type parameter is not sent by the client."
             }, async (cfg, api) => {
+
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
+
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -226,6 +231,9 @@ module.exports = function(describe, it) {
                 description: "The server should reply with 400 Bad Request if the " +
                     "grant_type parameter is not <code>client_credentials</code>."
             }, async (cfg, api) => {
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -255,6 +263,9 @@ module.exports = function(describe, it) {
                 description: "The server should reply with 400 Bad Request if the " +
                     "client_assertion_type parameter is not sent by the client."
             }, async (cfg, api) => {
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -284,6 +295,9 @@ module.exports = function(describe, it) {
                     "client_assertion_type parameter is not equal to <code>" +
                     "urn:ietf:params:oauth:client-assertion-type:jwt-bearer</code>"
             }, async (cfg, api) => {
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -349,6 +363,9 @@ module.exports = function(describe, it) {
                 description: `The <code>aud</code> claim of the authentication JWT must be the ` +
                     `authorization server's "token URL" (the same URL to which this authentication JWT will be posted)`
             }, async (cfg, api) => {
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -380,6 +397,9 @@ module.exports = function(describe, it) {
                 name: "Validates authenticationToken.iss",
                 description: "The <code>iss</code> claim of the authentication JWT must equal the registered <code>client_id</code>"
             }, async (cfg, api) => {
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -418,6 +438,9 @@ module.exports = function(describe, it) {
                 name: "Only accept registered client IDs",
                 description: "Verify that clients can't use random client id"
             }, async (cfg, api) => {
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -449,6 +472,9 @@ module.exports = function(describe, it) {
                 name: "Requires scope",
                 description: "The server should reject requests to the token endpoint that do not specify a scope"
             }, async (cfg, api) => {
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -480,6 +506,9 @@ module.exports = function(describe, it) {
                 name: "Rejects empty scope",
                 description: "The server should reject requests to the token endpoint that are requesting an empty scope"
             }, async (cfg, api) => {
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -512,6 +541,9 @@ module.exports = function(describe, it) {
                 name: "Validates scopes",
                 description: "This test verifies that only valid system scopes are accepted by the server"
             }, async (cfg, api) => {
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -552,6 +584,9 @@ module.exports = function(describe, it) {
                 name: "Supports wildcard action scopes",
                 description: "Verifies that scopes like <code>system/Patient.*</code> are supported"
             }, async (cfg, api) => {
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -581,6 +616,9 @@ module.exports = function(describe, it) {
                 name: "Rejects unknown action scopes",
                 description: "Verifies that scopes like <code>system/Patient.unknownAction</code> are rejected"
             }, async (cfg, api) => {
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -620,6 +658,9 @@ module.exports = function(describe, it) {
                 name: "Supports wildcard resource scopes",
                 description: "Verifies that scopes like <code>system/*.read</code> are supported"
             }, async (cfg, api) => {
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -649,6 +690,9 @@ module.exports = function(describe, it) {
                 name: "Rejects unknown resource scopes",
                 description: "Verifies that scopes like <code>system/UnknownResource.read</code> are rejected"
             }, async (cfg, api) => {
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -686,12 +730,15 @@ module.exports = function(describe, it) {
 
             it ({
                 id  : `Auth-18`,
-                name: "validates the jku token header",
+                name: "validates the jku token header",
                 description: "When present, the <code>jky</code> authentication JWT header should match a value " +
                     "that the client supplied to the FHIR server at client registration time. This test " +
                     "attempts to authorize using <code>test-bad-jku</code> as <code>jky</code> header value and " +
                     "expects that to produce an error."
             }, async (cfg, api) => {
+                if (!cfg.privateKey) {
+                    return api.setNotSupported(`No privateKey configuration found for this server`);
+                }
                 const req = await request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
