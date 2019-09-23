@@ -465,7 +465,12 @@ class BulkDataClient
     async downloadFileAt(index, skipAuth = null) {
         await this.kickOff();
         await this.waitForExport();
-        const fileUrl = this.statusResponse.body.output[index].url;
+        let fileUrl;
+        try {
+            fileUrl = this.statusResponse.body.output[index].url;
+        } catch (e) {
+            throw new Error(`No file was found at "output[${index}]" in the status response.`);
+        }
         return await this.downloadFile(fileUrl, skipAuth);
     }
 
