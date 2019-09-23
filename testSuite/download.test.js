@@ -130,7 +130,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                 lines.forEach((line, i) => {
                     if (!line) {
                         api.decorateHTML("eol-warning", i === lines.length - 1 ?
-                            '<div class="warning">The NDJSON file eds with new line. This could confuse some parsers.</div>' :
+                            '<div class="warning">The NDJSON file ends with new line. This could confuse some parsers.</div>' :
                             '<div class="warning">The NDJSON file contains empty lines. This could confuse some parsers.</div>'
                         , "warning");
                     } else {
