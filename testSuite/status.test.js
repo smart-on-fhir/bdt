@@ -48,7 +48,7 @@ module.exports = function(describe, it) {
             // Create a client that would export patients (or whatever the
             // fastest resource is) modified since the last month
             const resourceType = cfg.fastestResource || "Patient";
-            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
+            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}/$export?_type=${resourceType}`);
             client.url.searchParams.set(cfg.sinceParam || "_since", moment().subtract(1, "months").format("YYYY-MM-DD"));
 
             // Start an export
@@ -112,9 +112,9 @@ module.exports = function(describe, it) {
         }, async (cfg, api) => {
 
             // Create a client that would export patients (or whatever the
-            // fastest resource is) modified since the last month
+            // fastest resource is) modified in the last month
             const resourceType = cfg.fastestResource || "Patient";
-            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}/Patient/$export?_type=${resourceType}`);
+            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}/$export?_type=${resourceType}`);
 
             // Do an actual export (except that we do not download files here)
             await client.kickOff();
