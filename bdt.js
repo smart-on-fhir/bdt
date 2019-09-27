@@ -297,6 +297,12 @@ class Runner extends EventEmitter
     {
         super();
         this.settings = settings;
+        this.canceled = false;
+    }
+
+    cancel()
+    {
+        this.canceled = true;
     }
 
     /**
@@ -328,6 +334,9 @@ class Runner extends EventEmitter
 
             for (const child of _node.children) {
                 await this.run(child, true);
+                if (this.canceled) {
+                    break;
+                }
             }
 
             if (_node.after) {
