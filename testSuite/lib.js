@@ -47,8 +47,8 @@ function stripObjectValues(obj, value, deep)
     for (const key in obj) {
         if (obj.hasOwnProperty(key)) {
             const val = obj[key];
-            if (deep && val && typeof val == "object") {
-                stripObjectValues(obj, value, deep);
+            if (deep && val && typeof val == "object" && val !== obj) {
+                stripObjectValues(obj, value);
             }
             if (val === value) {
                 delete obj[key];
