@@ -17,8 +17,13 @@
     "jsonwebtoken": "^8.5.0",
     "jwk-lite": "^0.1.2",
     "jwk-to-pem": "^2.0.1",
+    "markdown-it": "^11.0.0",
     "moment": "^2.24.0",
     "request": "^2.88.0",
     "sax": "^1.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.10",
+    "@types/request": "^2.48.5"
   }
 }

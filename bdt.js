@@ -1,6 +1,6 @@
-const EventEmitter = require("events");
-const glob         = require("glob");
-const path         = require("path");
+const { EventEmitter } = require("events");
+const glob             = require("glob");
+const path             = require("path");
 
 /**
  * The root node of the tests structure. This will be augmented when the tests
@@ -156,7 +156,7 @@ function getPath(path = "")
         return groups;
     }
     return path.split(".").reduce(
-        (out, i) => out && out.children ? out.children[i * 1] : undefined,
+        (out, i) => out && out.children ? out.children[+i] : undefined,
         groups
     );
 }
@@ -266,7 +266,7 @@ function createTestAPI(testNode)
         /**
          * Tests can call this to log an http response object. This will be
          * handled by dedicated response renderer on the frontend.
-         * @param {Response} res The response to log
+         * @param {*} res The response to log
          * @param {String} label Give it a custom label if you want
          */
         logResponse(res, label = "Response")
@@ -311,7 +311,7 @@ class Runner extends EventEmitter
      * recursively. If the node is a test (leaf) executes it and stops...
      * @param {Object} node 
      */
-    async run(node = groups, indirect)
+    async run(node = groups, indirect = false)
     {
         const _node = { ...node };
         const isRoot = _node.name === "__ROOT__";

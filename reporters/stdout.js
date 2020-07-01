@@ -1,6 +1,7 @@
 require("colors");
 
 const sax = require("sax");
+const md  = require("markdown-it")();
 
 
 // Every test that takes more than DURATION_MEDIUM (but less then DURATION_SLOW)
@@ -30,7 +31,7 @@ function icon(node) {
         return "◔".blue;
 
     if (node.status === "not-implemented")
-        return "⊖".grey;
+        return "⛔".grey;
 
     if (node.status === "not-supported")
         return "✘".grey;
@@ -109,60 +110,118 @@ function indent(depth = 0) {
     return out;
 }
 
+function wrap(str, linePrefix = "", maxLen = 80) {
+    const lines = [];
+    const max = maxLen - linePrefix.length;
+    const words = str.split(/\s+/);
+    let line = words.shift();
+
+    while (words.length) {
+        const word = words.shift();
+        if (line.length + word.length + 1 <= max) {
+            line += " " + word;
+        } else {
+            lines.push(line);
+            line = word;
+        }
+    }
+
+    if (line) {
+        lines.push(line)  
+    }
+
+    return lines.join("\n" + linePrefix);
+}
+
 function parseHTML(html, linePrefix = "\t") {
-    const parser = sax.parser(
-        false, // strict
-        {
-            // Boolean. Whether or not to trim text and comment nodes.
-            trim: false,
 
-            // Boolean. If true, then turn any whitespace into a single space.
-            normalize: true,
-
-            // Boolean. If true, then lowercase tag names and attribute names in
-            // loose mode, rather than upper-casing them.
-            lowercase: true,
-
-            // Boolean. If true, then namespaces are supported.
-            xmlns: false,
-
-            // Boolean. If false, then don't track line/col/position.
-            position: true,
-
-            // Boolean. If true, only parse predefined XML entities
-            // (&amp;, &apos;, &gt;, &lt;, and &quot;)
-            strictEntities: true
+    function render(tokens, context = {}) {
+        let out = "";
+        for (const token of tokens) {
+            if (token.children) {
+                out += render(token.children);
+            }
+            else {
+                // console.log(token.type)
+                switch (token.type) {
+                    case "text":
+                        if (context.linkHref) {
+                            context.linkText = token.content;
+                        } else {
+                            out += wrap(token.content, linePrefix);
+                        }
+                        break;
+                    case "code_inline":
+                        out += '\u001b[1m' + wrap(token.content, linePrefix) + '\u001b[22m';
+                        break;
+                    case "strong_open":
+                        out += '\u001b[1m';
+                        break;
+                    case "strong_close":
+                        out += '\u001b[22m';
+                        break;
+                    case "em_open":
+                        out += '\u001b[3m';
+                        break;
+                    case "em_close":
+                        out += '\u001b[23m';
+                        break;
+                    case "paragraph_open":
+                    case "paragraph_close":
+                    case "bullet_list_close":
+                    case "bullet_list_open":
+                    case "list_item_close":
+                        break;
+                    case "list_item_open":
+                        out += "\n" + linePrefix + '- ';
+                        break;
+                    case "link_open":
+                        // console.log(token)
+                        const href = token.attrs.find(a => a[0] == "href");
+                        if (href) {
+                            context.linkHref = href[1];
+                            // out += href[1];
+                        }
+                        break;
+                    case "link_close":
+                        if (context.linkText && context.linkText === context.linkHref) {
+                            out += '\u001b[34m' + wrap(context.linkText, linePrefix) + '\u001b[39m';
+                        }
+                        else {
+                            if (context.linkText) {
+                                out += wrap(context.linkText, linePrefix);
+                            }
+                            if (context.linkHref && context.linkHref !== context.linkText) {
+                                out += context.linkText ? ": " : "";
+                                out += '\u001b[34m';
+                                out += context.linkHref;
+                                out += '\u001b[39m';
+                            }
+                        }
+                        if (context.linkText) {
+                            delete context.linkText;
+                        }
+                        if (context.linkHref) {
+                            delete context.linkHref;
+                        }
+                        break;
+                    case "fence":
+                        out += "\n" + linePrefix + token.content.split("\n").join("\n" + linePrefix);
+                        break;
+                    case "softbreak":
+                        out += "\n" + linePrefix;
+                        break;
+                    default:
+                        console.log(`Unknown token type ${token.type}`);
+                        out += token.content;
+                        break;
+                }
+            }
         }
-    );
-    let out = "";
-    
-    const map = {
-        b   : { prefix: '\u001b[1m' , suffix: '\u001b[22m' }, // bold
-        i   : { prefix: '\u001b[3m' , suffix: '\u001b[23m' }, // italic
-        a   : { prefix: '\u001b[34m', suffix: '\u001b[39m' }, // blue
-        code: { prefix: '\u001b[1m' , suffix: '\u001b[22m' }, // bold
-        li  : { prefix: "\n" + linePrefix + "* " }
-    };
+        return out;
+    }
 
-    parser.ontext = function(t) {
-        out += t;
-    };
-
-    parser.onopentag = function (node) {
-        const meta = map[node.name];
-        if (meta && meta.prefix) {
-            out += meta.prefix;
-        }
-    };
-
-    parser.onclosetag = function (tagName) {
-        const meta = map[tagName];
-        if (meta && meta.suffix) {
-            out += meta.suffix;
-        }
-    };
-    parser.write("<div>" + html + "</div>").close();
-    return out;
+    return render(md.parse(html));
 }
 
 module.exports = function StdoutReporter()
@@ -214,7 +273,7 @@ module.exports = function StdoutReporter()
                     parseHTML(node.description, `${indent(depth + 1)} ${"│ ".grey} `)
                 }`);    
             }
-            log(`${indent(depth + 1)} ${"└▶".grey} ${node.error.message.red}`);
+            log(`${indent(depth + 1)} ${"└──⯈".grey} ${node.error.message.red}`);
         }
         else {
             if (node.status === "not-implemented") {
