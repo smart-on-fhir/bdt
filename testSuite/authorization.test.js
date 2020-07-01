@@ -158,7 +158,7 @@ module.exports = function(describe, it) {
                 description: "After generating an authentication JWT, the client " +
                     "requests a new access token via HTTP POST to the FHIR " + 
                     "authorization server's token endpoint URL, using content-type " +
-                    "<code>application/x-www-form-urlencoded</code>."
+                    "`application/x-www-form-urlencoded`."
             }, async (cfg, api) => {
                 const req = request({
                     method   : "POST",
@@ -196,7 +196,7 @@ module.exports = function(describe, it) {
                 id  : `Auth-03`,
                 name: "The 'grant_type' parameter must be present",
                 description: "The server should reply with 400 Bad Request if the " +
-                    "grant_type parameter is not sent by the client."
+                    "`grant_type parameter` is not sent by the client."
             }, async (cfg, api) => {
 
                 if (!cfg.privateKey) {
@@ -229,7 +229,7 @@ module.exports = function(describe, it) {
                 id  : `Auth-04`,
                 name: 'The "grant_type" must equal "client_credentials"',
                 description: "The server should reply with 400 Bad Request if the " +
-                    "grant_type parameter is not <code>client_credentials</code>."
+                    "`grant_type parameter` is not `client_credentials`."
             }, async (cfg, api) => {
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
@@ -261,7 +261,7 @@ module.exports = function(describe, it) {
                 id  : `Auth-05`,
                 name: 'The "client_assertion_type" must be present',
                 description: "The server should reply with 400 Bad Request if the " +
-                    "client_assertion_type parameter is not sent by the client."
+                    "`client_assertion_type` parameter is not sent by the client."
             }, async (cfg, api) => {
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
@@ -292,8 +292,8 @@ module.exports = function(describe, it) {
                 id  : `Auth-06`,
                 name: 'The "client_assertion_type" must be jwt-bearer',
                 description: "The server should reply with 400 Bad Request if the " +
-                    "client_assertion_type parameter is not equal to <code>" +
-                    "urn:ietf:params:oauth:client-assertion-type:jwt-bearer</code>"
+                    "`client_assertion_type` parameter is not equal to " +
+                    "`urn:ietf:params:oauth:client-assertion-type:jwt-bearer`."
             }, async (cfg, api) => {
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
@@ -360,8 +360,9 @@ module.exports = function(describe, it) {
             it ({
                 id  : `Auth-08`,
                 name: "Validates authenticationToken.aud",
-                description: `The <code>aud</code> claim of the authentication JWT must be the ` +
-                    `authorization server's "token URL" (the same URL to which this authentication JWT will be posted)`
+                description: "The `aud` claim of the authentication JWT must be the " +
+                    "authorization server's \"token URL\" (the same URL to which " +
+                    "this authentication JWT will be posted)."
             }, async (cfg, api) => {
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
@@ -395,7 +396,7 @@ module.exports = function(describe, it) {
             it ({
                 id  : `Auth-09`,
                 name: "Validates authenticationToken.iss",
-                description: "The <code>iss</code> claim of the authentication JWT must equal the registered <code>client_id</code>"
+                description: "The `iss` claim of the authentication JWT must equal the registered `client_id`"
             }, async (cfg, api) => {
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
@@ -582,7 +583,7 @@ module.exports = function(describe, it) {
             it ({
                 id  : `Auth-14`,
                 name: "Supports wildcard action scopes",
-                description: "Verifies that scopes like <code>system/Patient.*</code> are supported"
+                description: "Verifies that scopes like `system/Patient.*` are supported"
             }, async (cfg, api) => {
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
@@ -614,7 +615,7 @@ module.exports = function(describe, it) {
             it ({
                 id  : `Auth-15`,
                 name: "Rejects unknown action scopes",
-                description: "Verifies that scopes like <code>system/Patient.unknownAction</code> are rejected"
+                description: "Verifies that scopes like `system/Patient.unknownAction` are rejected"
             }, async (cfg, api) => {
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
@@ -656,7 +657,7 @@ module.exports = function(describe, it) {
             it ({
                 id  : `Auth-16`,
                 name: "Supports wildcard resource scopes",
-                description: "Verifies that scopes like <code>system/*.read</code> are supported"
+                description: "Verifies that scopes like `system/*.read` are supported"
             }, async (cfg, api) => {
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
@@ -688,7 +689,7 @@ module.exports = function(describe, it) {
             it ({
                 id  : `Auth-17`,
                 name: "Rejects unknown resource scopes",
-                description: "Verifies that scopes like <code>system/UnknownResource.read</code> are rejected"
+                description: "Verifies that scopes like `system/UnknownResource.read` are rejected"
             }, async (cfg, api) => {
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
@@ -731,9 +732,9 @@ module.exports = function(describe, it) {
             it ({
                 id  : `Auth-18`,
                 name: "validates the jku token header",
-                description: "When present, the <code>jky</code> authentication JWT header should match a value " +
+                description: "When present, the `jky` authentication JWT header should match a value " +
                     "that the client supplied to the FHIR server at client registration time. This test " +
-                    "attempts to authorize using <code>test-bad-jku</code> as <code>jky</code> header value and " +
+                    "attempts to authorize using `test-bad-jku` as `jky` header value and " +
                     "expects that to produce an error."
             }, async (cfg, api) => {
                 if (!cfg.privateKey) {

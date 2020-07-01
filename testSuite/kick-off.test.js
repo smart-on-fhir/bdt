@@ -27,7 +27,7 @@ module.exports = function(describe, it) {
                 id  : `${meta.idPrefix}-01`,
                 name: "Requires Accept header",
                 description: 'The Accept header specifies the format of the optional OperationOutcome response ' +
-                    'to the kick-off request. Currently, only <code>application/fhir+json</code> is supported.'
+                    'to the kick-off request. Currently, only `application/fhir+json` is supported.'
             }, async (cfg, api) => {
                 
                 // Skip if not supported
@@ -58,10 +58,10 @@ module.exports = function(describe, it) {
             it ({
                 id  : `${meta.idPrefix}-02`,
                 name: "Requires Prefer header to equal respond-async",
-                description: 'The <b>Prefer</b> request header is required and specifies ' +
+                description: 'The **Prefer** request header is required and specifies ' +
                             'whether the response is immediate or asynchronous. ' +
-                            'The header MUST be set to <b>respond-async</b>. ' +
-                            '<a href="https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#headers" target="_blank">Red More</a>'
+                            'The header MUST be set to **respond-async**. ' +
+                            '[Red More](https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#headers).'
             }, async (cfg, api) => {
 
                 // Skip if not supported
@@ -96,7 +96,7 @@ module.exports = function(describe, it) {
                 it ({
                     id  : `${meta.idPrefix}-03.${i}`,
                     name: `Accepts _outputFormat=${type}`,
-                    description: `Verifies that the server accepts <code>${type}</code> as <b>_outputFormat</b> parameter`
+                    description: `Verifies that the server accepts \`${type}\` as **_outputFormat** parameter`
                 }, async (cfg, api) => {
                     if (!cfg[meta.mountPoint]) {
                         return api.setNotSupported(`${meta.name} is not supported by this server`);
@@ -125,8 +125,8 @@ module.exports = function(describe, it) {
                 it ({
                     id  : `${meta.idPrefix}-04.${i}`,
                     name: `Rejects unsupported format "_outputFormat=${type}"`,
-                    description: `This tests if the server rejects <code>_outputFormat=${type}</code> ` +
-                        `parameter, even though <code>${type}</code> is valid mime type.`
+                    description: `This tests if the server rejects \`_outputFormat=${type}\` ` +
+                        `parameter, even though \`${type}\` is valid mime type.`
                 }, async (cfg, api) => {
                     if (!cfg[meta.mountPoint]) {
                         return api.setNotSupported(`${meta.name} is not supported by this server`);
@@ -152,7 +152,7 @@ module.exports = function(describe, it) {
             it ({
                 id  : `${meta.idPrefix}-05`,
                 name: "Rejects _since={invalid date} parameter",
-                description: "The server should reject exports if the <code>_since</code> parameter is not a valid date"
+                description: "The server should reject exports if the `_since` parameter is not a valid date"
             }, async (cfg, api) => {
                 if (!cfg[meta.mountPoint]) {
                     return api.setNotSupported(`${meta.name} is not supported by this server`);
@@ -177,7 +177,7 @@ module.exports = function(describe, it) {
             it ({
                 id  : `${meta.idPrefix}-06`,
                 name: "Rejects _since={future date} parameter",
-                description: "The server should reject exports if the <code>_since</code> parameter is a date in the future"
+                description: "The server should reject exports if the `_since` parameter is a date in the future"
             }, async (cfg, api) => {
                 if (!cfg[meta.mountPoint]) {
                     return api.setNotSupported(`${meta.name} is not supported by this server`);
@@ -202,7 +202,7 @@ module.exports = function(describe, it) {
             it ({
                 id  : `${meta.idPrefix}-07`,
                 name: "Validates the _type parameter",
-                description: "Verifies that the request is rejected if the <code>_type</code> " +
+                description: "Verifies that the request is rejected if the `_type` " +
                     "contains invalid resource type"
             }, async (cfg, api) => {
                 if (!cfg[meta.mountPoint]) {
@@ -228,7 +228,7 @@ module.exports = function(describe, it) {
             it ({
                 id  : `${meta.idPrefix}-08`,
                 name: "Accepts the _typeFilter parameter",
-                description: "The <code>_typeFilter</code> parameter is optional so the servers " +
+                description: "The `_typeFilter` parameter is optional so the servers " +
                     "should not reject it, even if they don't support it"
             }, async (cfg, api) => {
                 if (!cfg[meta.mountPoint]) {
@@ -254,8 +254,8 @@ module.exports = function(describe, it) {
                 id  : `${meta.idPrefix}-09`,
                 name: "Response - Success",
                 description: "Verifies that the server starts an export if called with valid parameters. " +
-                    "The status code must be <code>202 Accepted</code> and a <code>Content-Location</code> " +
-                    "header must be returned. The response body should be either empty, or a JSON OperationOutcome."
+                    "The status code must be `202 Accepted` and a `Content-Location` header must be " +
+                    "returned. The response body should be either empty, or a JSON OperationOutcome."
             }, async (cfg, api) => {
                 if (!cfg[meta.mountPoint]) {
                     return api.setNotSupported(`${meta.name} is not supported by this server`);

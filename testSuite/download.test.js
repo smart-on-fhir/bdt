@@ -54,7 +54,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
         it ({
             id  : "Download-01",
             name: "Requires valid access token if the requiresAccessToken field in the status body is true",
-            description: "If the <code>requiresAccessToken</code> field in the Complete Status body is " +
+            description: "If the `requiresAccessToken` field in the Complete Status body is " +
                 "set to true, the request MUST include a valid access token."
         }, async (cfg, api) => {
 
@@ -79,7 +79,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
         it ({
             id  : "Download-02",
             name: "Does not require access token if the requiresAccessToken field in the status body is not true",
-            description: "Verifies that files can be downloaded without authorization if the <code>requiresAccessToken</code> field in the complete status body is not set to true"
+            description: "Verifies that files can be downloaded without authorization if the `requiresAccessToken` field in the complete status body is not set to true"
         }, async (cfg, api) => {
             // Create a client to download the fastest resource.
             const client = createClient(cfg, api);
@@ -109,13 +109,12 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
         it ({
             id  : "Download-04",
             name: "Generates valid file response",
-            description: "Runs a set of assertions to verify that:<ul>" +
-                "<li>The server returns HTTP status of <b>200 OK</b></li>" +
-                "<li>The server returns a <code>Content-Type</code> header that matches the file format being delivered. " +
-                    "For files in ndjson format, MUST be <code>application/fhir+ndjson</code></li>" +
-                "<li>The response body is valid FHIR <b>ndjson</b> (unless other format is requested)</li>" +
-                "<li>An <code>Accept</code> header might be sent (optional, defaults to <code>application/fhir+ndjson</code>)</li>" +
-                "</ul>"
+            description: "Runs a set of assertions to verify that:\n" +
+                "- The server returns HTTP status of **200 OK**.\n" +
+                "- The server returns a `Content-Type` header that matches the file format being delivered. " +
+                    "For files in ndjson format, MUST be `application/fhir+ndjson`.\n" +
+                "- The response body is valid FHIR **ndjson** (unless other format is requested).\n" +
+                "- An `Accept` header might be sent (optional, defaults to `application/fhir+ndjson`)."
         }, async (cfg, api) => {
             const client = createClient(cfg, api);
             if (client) {
@@ -147,7 +146,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
         it ({
             id  : "Download-05",
             name: "Rejects a download if the client scopes do not cover that resource type",
-            "description": "If the download endpoint requires authorization, it should also " +
+            description: "If the download endpoint requires authorization, it should also " +
                 "verify that the client has been granted access to the resource type that it " +
                 "attempts to download. This test makes an export and then it re-authorizes before " +
                 "downloading the first file, so that the download request is made with a token " +

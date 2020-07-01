@@ -12,6 +12,7 @@ const jwk      = require("jwk-lite");
  * @param {"RS384"|"ES384"} alg The algorithm to use
  */
 function createJWKS(alg = "RS384") {
+    // @ts-ignore
     alg = String(alg || "").toUpperCase();
     if (["RS384", "ES384"].indexOf(alg) === -1) {
         alg = "RS384";
@@ -48,7 +49,7 @@ function stripObjectValues(obj, value, deep)
         if (obj.hasOwnProperty(key)) {
             const val = obj[key];
             if (deep && val && typeof val == "object" && val !== obj) {
-                stripObjectValues(obj, value);
+                stripObjectValues(val, value, deep);
             }
             if (val === value) {
                 delete obj[key];
@@ -298,7 +299,9 @@ class BulkDataClient
     /**
      * Makes an authorization request and logs the request and the response.
      * @param {Object} options
-     * @param {String} options.scope Scopes to request (default "system/*.read")
+     * @param {String} [options.scope] Scopes to request (default "system/*.read")
+     * @param {String} [options.requestLabel] A label for this request to be rendered in UI. Defaults to "Authorization Request"
+     * @param {String} [options.responseLabel] A label for the response to be rendered in UI. Defaults to "Authorization Response"
      */
     async authorize({ scope, requestLabel, responseLabel })
     {
@@ -337,9 +340,9 @@ class BulkDataClient
     /**
      * This is an async getter for the access token. 
      * @param {Object} options
-     * @param {Boolean} options.force Set to true to make the client re-authorize,
+     * @param {Boolean} [options.force] Set to true to make the client re-authorize,
      * even if it currently has an access token
-     * @param {String} options.scope Scopes to request (default "system/*.read")
+     * @param {String} [options.scope] Scopes to request (default "system/*.read")
      */
     async getAccessToken(options = {})
     {
@@ -478,8 +481,8 @@ class BulkDataClient
      * Starts an export and waits for it. Then downloads the file at the given
      * index. NOTE: this method assumes that the index exists and will throw
      * otherwise.
-     * @param {Number} index The index of the file in the status list
-     * @param {Boolean} skipAuth If true, the authorization header will NOT be
+     * @param {string} fileUrl The index of the file in the status list
+     * @param {boolean} skipAuth If true, the authorization header will NOT be
      * included, even if the `requiresAuth` property of the server settings is
      * true. 
      */

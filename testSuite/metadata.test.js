@@ -39,13 +39,14 @@ module.exports = function(describe, it) {
             it ({
                 id  : `CapabilityStatement-${++count}`,
                 name: "The CapabilityStatement instantiates the bulk-data CapabilityStatement",
-                description: "To declare conformance with this IG, a server <b>should</b> include " +
-                    "the following URL in its own <code>CapabilityStatement.instantiates</code>: " +
-                    '<a target="_blank" href="https://build.fhir.org/ig/HL7/bulk-data/CapabilityStatement-bulk-data.html">' +
-                    "http://hl7.org/fhir/uv/bulkdata/CapabilityStatement/bulk-data</a>. The <code>CapabilityStatement</code> " +
-                    'should contain something like:<pre>"instantiates": [\n' +
+                description: "To declare conformance with this IG, a server should include " +
+                    "the following URL in its own CapabilityStatement.instantiates:\n\n" +
+                    "[http://hl7.org/fhir/uv/bulkdata/CapabilityStatement/bulk-data]" +
+                    "(http://www.hl7.org/fhir/bulk-data/CapabilityStatement-bulk-data.html).\n\n" +
+                    "The CapabilityStatement should contain something like:\n" +
+                    "```json\n\"instantiates\": [\n" +
                     '    "http://hl7.org/fhir/uv/bulkdata/CapabilityStatement/bulk-data"\n' +
-                    "]</pre>"
+                    "]\n```"
             }, async(cfg, api) => {
                 const response = await fetchConformance(cfg, api);
 
@@ -70,14 +71,14 @@ module.exports = function(describe, it) {
                 id  : `CapabilityStatement-${++count}`,
                 name: 'Includes the token endpoint in the CapabilityStatement',
                 description: "If a server requires SMART on FHIR authorization " +
-                    "for access, its metadata <b>must</b> support automated discovery " +
-                    "of OAuth2 endpoints by including a “complex” extension " +
+                    "for access, its metadata **must** support automated discovery " +
+                    "of OAuth2 endpoints by including a \"complex\" extension " +
                     "(that is, an extension with multiple components inside) " +
-                    "on the <code>CapabilityStatement.rest.security</code> " +
-                    "element. Any time a client sees this extension, it must " +
-                    "be prepared to authorize using SMART’s OAuth2-based protocol." +
-                    "<br/> This test is expecting to find the in CapabilityStatement " +
-                    'an entry like:<pre>"rest": [\n' +
+                    "on the `CapabilityStatement.rest.security` element. Any " +
+                    "time a client sees this extension, it must be prepared to " +
+                    "authorize using SMART's OAuth2-based protocol.\n" +
+                    "This test is expecting to find the in `CapabilityStatement` " +
+                    'an entry like:\n```"rest": [\n' +
                     '  {\n' +
                     '    "mode": "server",\n' +
                     '    "security": {\n' +
@@ -94,19 +95,20 @@ module.exports = function(describe, it) {
                     '      ]\n' +
                     '    }\n' +
                     '  }\n' +
-                    ']</pre>' +
+                    ']\n```\n' +
                     'Having a CapabilityStatement is optional for bulk data servers, ' +
                     'unless they are also FHIR servers (which they typically are). ' +
-                    'However, missing a CapabilityStatement will generate a warning here. '
-            }, async (cfg, api) => {
-                function throwOrWarn(msg) {
-                    if (cfg.requiresAuth) {
-                        throw new Error(msg);
-                    } else {
-                        api.warn(msg);
-                    }
-                }
-                
+                    'However, missing a CapabilityStatement will generate a warning here.'
+
+                    // The top-level extension uses the URL http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris, with the following internal components:
+
+                    // Component	Required?	Description
+                    // authorize	required	valueUri indicating the OAuth2 "authorize" endpoint for this FHIR server.
+                    // token	required	valueUri indicating the OAuth2 "token" endpoint for this FHIR server.
+                    // register	optional	valueUri indicating the OAuth2 dynamic registration endpoint for this FHIR server, if supported.
+                    // manage	optional	valueUri indicating the user-facing authorization management workflow entry point for this FHIR server. Overview in this presentation.
+            }, async(cfg, api) => {
+
                 const response = await fetchConformance(cfg, api);
                 
                 // Having a CapabilityStatement is optional for bulk data servers
