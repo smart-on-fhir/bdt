@@ -33,12 +33,13 @@ module.exports = function(describe, it) {
                 id  : `CapabilityStatement-01`,
                 name: "The CapabilityStatement instantiates the bulk-data CapabilityStatement",
                 description: "To declare conformance with this IG, a server should include " +
-                    "the following URL in its own CapabilityStatement.instantiates: " +
-                    '<a target="_blank" href="http://www.hl7.org/fhir/bulk-data/CapabilityStatement-bulk-data.html">' +
-                    "http://hl7.org/fhir/uv/bulkdata/CapabilityStatement/bulk-data</a>. The CapabilityStatement " +
-                    'should contain something like:<pre>"instantiates": [\n' +
+                    "the following URL in its own CapabilityStatement.instantiates:\n\n" +
+                    "[http://hl7.org/fhir/uv/bulkdata/CapabilityStatement/bulk-data]" +
+                    "(http://www.hl7.org/fhir/bulk-data/CapabilityStatement-bulk-data.html).\n\n" +
+                    "The CapabilityStatement should contain something like:\n" +
+                    "```json\n\"instantiates\": [\n" +
                     '    "http://hl7.org/fhir/uv/bulkdata/CapabilityStatement/bulk-data"\n' +
-                    "]</pre>"
+                    "]\n```"
             }, async(cfg, api) => {
                 const response = await fetchConformance(cfg, api);
                 try {
@@ -55,11 +56,11 @@ module.exports = function(describe, it) {
                 name: 'Test the CapabilityStatement',
                 description: "If a server requires SMART on FHIR authorization " +
                     "for access, its metadata must support automated discovery " +
-                    "of OAuth2 endpoints by including a “complex” extension " +
+                    "of OAuth2 endpoints by including a \"complex\" extension " +
                     "(that is, an extension with multiple components inside) " +
-                    "on the <code>CapabilityStatement.rest.security</code> " +
-                    "element. Any time a client sees this extension, it must " +
-                    "be prepared to authorize using SMART’s OAuth2-based protocol."
+                    "on the `CapabilityStatement.rest.security` element. Any " +
+                    "time a client sees this extension, it must be prepared to " +
+                    "authorize using SMART's OAuth2-based protocol."
 
                     // The top-level extension uses the URL http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris, with the following internal components:
 
