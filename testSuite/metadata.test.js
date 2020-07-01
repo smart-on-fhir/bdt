@@ -125,14 +125,14 @@ module.exports = function(describe, it) {
                         return e.url === "http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris";
                     }).extension;
                 } catch (ex) {
-                    return throwOrWarn(`Unable to find security extensions at "${cfg.baseURL}/metadata"`);
+                    throw new Error(`Unable to find security extensions at "${cfg.baseURL}/metadata"`);
                 }
 
                 // If a CapabilityStatement was found and if the server requires
                 // authorization, then the token endpoint MUST be defined.
                 const extToken = extensions.find(e => e.url === "token");
                 if (!extToken || !extToken.valueUri) {
-                    throwOrWarn(`Unable to find the "token" endpoint in the conformance statement`);
+                    throw new Error(`Unable to find the "token" endpoint in the conformance statement`);
                 }
             });
 
