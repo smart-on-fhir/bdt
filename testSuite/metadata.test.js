@@ -108,7 +108,6 @@ module.exports = function(describe, it) {
                     // register	optional	valueUri indicating the OAuth2 dynamic registration endpoint for this FHIR server, if supported.
                     // manage	optional	valueUri indicating the user-facing authorization management workflow entry point for this FHIR server. Overview in this presentation.
             }, async(cfg, api) => {
-                throw "test";
                 const response = await fetchConformance(cfg, api);
                 
                 // Having a CapabilityStatement is optional for bulk data servers
