@@ -78,7 +78,7 @@ module.exports = function(describe, it) {
                     "time a client sees this extension, it must be prepared to " +
                     "authorize using SMART's OAuth2-based protocol.\n" +
                     "This test is expecting to find the in `CapabilityStatement` " +
-                    'an entry like:\n```"rest": [\n' +
+                    'an entry like:\n```\n"rest": [\n' +
                     '  {\n' +
                     '    "mode": "server",\n' +
                     '    "security": {\n' +
@@ -108,7 +108,7 @@ module.exports = function(describe, it) {
                     // register	optional	valueUri indicating the OAuth2 dynamic registration endpoint for this FHIR server, if supported.
                     // manage	optional	valueUri indicating the user-facing authorization management workflow entry point for this FHIR server. Overview in this presentation.
             }, async(cfg, api) => {
-
+                throw "test";
                 const response = await fetchConformance(cfg, api);
                 
                 // Having a CapabilityStatement is optional for bulk data servers
@@ -142,7 +142,7 @@ module.exports = function(describe, it) {
                     id  : `CapabilityStatement-${count + i + 1}`,
                     name: `Check if "${type}" operation is defined in the CapabilityStatement`,
                     description: "This test expects to find in the CapabilityStatement " +
-                        'an entry like:<pre>"rest": [\n' +
+                        'an entry like:\n```\n"rest": [\n' +
                         '  {\n' +
                         '    "operation": [\n' +
                         '      {\n' +
@@ -150,7 +150,7 @@ module.exports = function(describe, it) {
                         '      }\n' +
                         '    ]\n' +
                         '  }\n' +
-                        ']</pre>'
+                        ']\n```'
                 }, async(cfg, api) => {
                     const response = await fetchConformance(cfg, api);
 
@@ -180,8 +180,8 @@ module.exports = function(describe, it) {
                 id: "WellKnownSmartConfiguration-1",
                 name: "Includes token_endpoint definition",
                 description: 'This test verifies that the server provides a ' +
-                    '<code>/.well-known/smart-configuration</code> and that ' +
-                    'a <code>token_endpoint</code> property is declared ' +
+                    '`/.well-known/smart-configuration` and that ' +
+                    'a `token_endpoint` property is declared ' +
                     'within that file.'
             }, async(cfg, api) => {
                 const json = await fetchWellKnownSmartConfiguration(cfg, api);
