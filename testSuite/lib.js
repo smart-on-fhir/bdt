@@ -107,7 +107,7 @@ function wait(ms)
 
 /**
  * Check if the given @response has the desired status @code
- * @param {Response} response The response to check
+ * @param {request.Response} response The response to check
  * @param {Number} code The expected status code
  * @param {String} message Optional custom message
  */
@@ -121,7 +121,7 @@ function expectStatusCode(response, code, message = "")
 
 /**
  * Check if the given @response has the desired status @text
- * @param {Response} response The response to check
+ * @param {request.Response} response The response to check
  * @param {String} text The expected status text
  * @param {String} message Optional custom message
  */
@@ -135,7 +135,7 @@ function expectStatusText(response, text, message = "")
 
 /**
  * Check if the given @response has a 401 status code
- * @param {Response} response The response to check
+ * @param {request.Response} response The response to check
  * @param {String} message Optional custom message
  */
 function expectUnauthorized(response, message = "")
@@ -151,7 +151,7 @@ function expectUnauthorized(response, message = "")
 
 /**
  * Verify that the response is JSON
- * @param {Response} response The response to check
+ * @param {request.Response} response The response to check
  * @param {String} message Optional custom message
  */
 function expectJson(response, message = "the server must reply with JSON content-type header")
@@ -161,7 +161,7 @@ function expectJson(response, message = "the server must reply with JSON content
 
 /**
  * Verify that the response body contains an OperationOutcome
- * @param {Response} response The response to check
+ * @param {request.Response} response The response to check
  * @param {String} message Optional custom message
  */
 function expectOperationOutcome(response, message = "")
@@ -339,10 +339,12 @@ class BulkDataClient
 
     /**
      * This is an async getter for the access token. 
-     * @param {Object} options
-     * @param {Boolean} [options.force] Set to true to make the client re-authorize,
+     * @param {object} options
+     * @param {boolean} [options.force] Set to true to make the client re-authorize,
      * even if it currently has an access token
-     * @param {String} [options.scope] Scopes to request (default "system/*.read")
+     * @param {string} [options.scope] Scopes to request (default "system/*.read")
+     * @param {string} [options.requestLabel]
+     * @param {string} [options.responseLabel]
      */
     async getAccessToken(options = {})
     {
