@@ -153,6 +153,12 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                 "that does not provide access to the downloaded resource."
         }, async (cfg, api) => {
 
+            if (cfg.clientSecret) {
+                return api.setNotSupported(
+                    `This test is not not applicable for servers using basic authentication`
+                );
+            }
+
             // Create a client to download the fastest resource.
             let pathName = cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint;
 
