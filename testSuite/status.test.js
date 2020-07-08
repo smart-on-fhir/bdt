@@ -56,7 +56,7 @@ module.exports = function(describe, it) {
 
             const url = `${cfg.baseURL}${endPoint}?_type=${resourceType}`;
             const client = new BulkDataClient(cfg, api, url);
-            client.url.searchParams.set(cfg.sinceParam || "_since", moment().subtract(1, "months").format("YYYY-MM-DD"));
+            client.url.searchParams.set(cfg.sinceParam || "_since", moment().subtract(1, "months").format("YYYY-MM-DDTHH:mm:ssZ"));
 
             // Start an export
             await client.kickOff();
