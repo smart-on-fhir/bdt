@@ -323,7 +323,7 @@ class BulkDataClient
             ...options
         };
 
-        if (this.options.requiresAuth && !skipAuth) {
+        if (this.options.authType && this.options.authType != "none" && this.options.requiresAuth && !skipAuth) {
             const accessToken = await this.getAccessToken();
             requestOptions.headers = {
                 ...requestOptions.headers,
@@ -373,7 +373,14 @@ class BulkDataClient
      */
     async authorize({ scope, requestLabel, responseLabel })
     {
-        if (this.options.clientSecret) {
+        if (this.options.authType == "none") {
+            throw new Error('Unable to authorize! This server does not support authentication (according to the "authType" option).');
+        }
+
+        if (this.options.authType == "client-credentials") {
+            if (!this.options.clientSecret) {
+                throw new Error('Unable to authorize! A "clientSecret" option is needed for client-credentials authentication.')
+            }
             return await this.authorizeWithCredentials({
                 requestLabel,
                 responseLabel

@@ -38,6 +38,10 @@ module.exports = function(describe, it) {
                     description: `The server should require authorization header at the ${name} endpoint`
                 }, async function(cfg, api) {
 
+                    if (cfg.authType == "none") {
+                        return api.setNotSupported(`This server does not support authorization`);
+                    }
+
                     if (!cfg[prop]) {
                         return api.setNotSupported(`The ${name} is not supported by this server`);
                     }
@@ -163,10 +167,8 @@ module.exports = function(describe, it) {
                     "`application/x-www-form-urlencoded`."
             }, async (cfg, api) => {
 
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
 
                 const req = request({
@@ -208,10 +210,8 @@ module.exports = function(describe, it) {
                     "`grant_type parameter` is not sent by the client."
             }, async (cfg, api) => {
 
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
 
                 if (!cfg.privateKey) {
@@ -246,10 +246,8 @@ module.exports = function(describe, it) {
                 description: "The server should reply with 400 Bad Request if the " +
                     "`grant_type parameter` is not `client_credentials`."
             }, async (cfg, api) => {
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
 
                 if (!cfg.privateKey) {
@@ -286,10 +284,8 @@ module.exports = function(describe, it) {
                     "`client_assertion_type` parameter is not sent by the client."
             }, async (cfg, api) => {
 
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
 
                 if (!cfg.privateKey) {
@@ -325,10 +321,8 @@ module.exports = function(describe, it) {
                     "`urn:ietf:params:oauth:client-assertion-type:jwt-bearer`."
             }, async (cfg, api) => {
 
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
 
                 if (!cfg.privateKey) {
@@ -365,10 +359,8 @@ module.exports = function(describe, it) {
                     "other then a JWT, the server will detect it and reject the request."
             }, async (cfg, api) => {
 
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
 
                 const req = request({
@@ -407,10 +399,8 @@ module.exports = function(describe, it) {
                     "authorization server's \"token URL\" (the same URL to which " +
                     "this authentication JWT will be posted)."
             }, async (cfg, api) => {
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
 
                 if (!cfg.privateKey) {
@@ -447,10 +437,8 @@ module.exports = function(describe, it) {
                 name: "Validates authenticationToken.iss",
                 description: "The `iss` claim of the authentication JWT must equal the registered `client_id`"
             }, async (cfg, api) => {
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
 
                 if (!cfg.privateKey) {
@@ -494,10 +482,8 @@ module.exports = function(describe, it) {
                 name: "Only accept registered client IDs",
                 description: "Verify that clients can't use random client id"
             }, async (cfg, api) => {
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
 
                 if (!cfg.privateKey) {
@@ -534,10 +520,8 @@ module.exports = function(describe, it) {
                 name: "Requires scope",
                 description: "The server should reject requests to the token endpoint that do not specify a scope"
             }, async (cfg, api) => {
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
 
                 if (!cfg.privateKey) {
@@ -574,10 +558,8 @@ module.exports = function(describe, it) {
                 name: "Rejects empty scope",
                 description: "The server should reject requests to the token endpoint that are requesting an empty scope"
             }, async (cfg, api) => {
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
 
                 if (!cfg.privateKey) {
@@ -615,10 +597,8 @@ module.exports = function(describe, it) {
                 name: "Validates scopes",
                 description: "This test verifies that only valid system scopes are accepted by the server"
             }, async (cfg, api) => {
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
@@ -663,10 +643,8 @@ module.exports = function(describe, it) {
                 name: "Supports wildcard action scopes",
                 description: "Verifies that scopes like `system/Patient.*` are supported"
             }, async (cfg, api) => {
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
@@ -700,10 +678,8 @@ module.exports = function(describe, it) {
                 name: "Rejects unknown action scopes",
                 description: "Verifies that scopes like `system/Patient.unknownAction` are rejected"
             }, async (cfg, api) => {
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
@@ -747,10 +723,8 @@ module.exports = function(describe, it) {
                 name: "Supports wildcard resource scopes",
                 description: "Verifies that scopes like `system/*.read` are supported"
             }, async (cfg, api) => {
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
@@ -784,9 +758,9 @@ module.exports = function(describe, it) {
                 name: "Rejects unknown resource scopes",
                 description: "Verifies that scopes like `system/UnknownResource.read` are rejected"
             }, async (cfg, api) => {
-                if (cfg.clientSecret) {
+                if (cfg.authType == "client-credentials") {
                     return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
+                        `This test is not not applicable for servers using client-credentials authentication`
                     );
                 }
                 if (!cfg.privateKey) {
@@ -835,10 +809,8 @@ module.exports = function(describe, it) {
                     "attempts to authorize using `test-bad-jku` as `jky` header value and " +
                     "expects that to produce an error."
             }, async (cfg, api) => {
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
@@ -881,10 +853,8 @@ module.exports = function(describe, it) {
                     "request that is completely valid, except that the authentication token " +
                     "is signed with unknown private key."
             }, async (cfg, api) => {
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
                 const req = await request({
                     method   : "POST",
@@ -940,10 +910,8 @@ module.exports = function(describe, it) {
                     "that JWK keys rotation works because this test will create new key, every time it is executed."
             }, async (cfg, api) => {
 
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
 
                 if (cfg.cli) {
@@ -1000,10 +968,8 @@ module.exports = function(describe, it) {
                     "that JWK keys rotation works because this test will create new key, every time it is executed."
             }, async (cfg, api) => {
 
-                if (cfg.clientSecret) {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using basic authentication`
-                    );
+                if (cfg.authType != "backend-services") {
+                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                 }
 
                 if (cfg.cli) {

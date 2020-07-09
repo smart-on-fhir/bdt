@@ -31,7 +31,7 @@ module.exports = {
 
     // The BCDA API does support group-level export but we don't know what
     // group IDs are available
-    groupExportEndpoint: "",
+    groupExportEndpoint: "/Group/all/$export",
 
     // While testing we need to attempt downloading at least one resource type.
     // Please enter the resource type that would be fast to export (because

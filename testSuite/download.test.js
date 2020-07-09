@@ -153,9 +153,9 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                 "that does not provide access to the downloaded resource."
         }, async (cfg, api) => {
 
-            if (cfg.clientSecret) {
+            if (cfg.authType == "client-credentials") {
                 return api.setNotSupported(
-                    `This test is not not applicable for servers using basic authentication`
+                    `This test is not not applicable for servers using client-credentials authentication`
                 );
             }
 
