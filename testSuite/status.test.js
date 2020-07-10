@@ -139,14 +139,14 @@ module.exports = function(describe, it) {
                 // If expires header is present, make sure it is in the future.
                 const expires = moment(client.statusResponse.headers["expires"]).utc(true);
                 const now     = moment().utc(true).format();
-                expect(expires.diff(now, "seconds") > 0, "The expires header should be a date in the future").to.be.true();
+                expect(expires.diff(now, "seconds") > 0, "The expires header of the status response should be a date in the future").to.be.true();
 
                 // Note that the above assertion might be unreliable due to small time differences between
                 // the host machine that executes the tests and the server. For that reason we also check if
                 // the server returns a "time" header and if so, we verify that "expires" is after "time".
                 if (client.statusResponse.headers["date"]) {
                     const date = moment(client.statusResponse.headers["date"]).utc(true);
-                    expect(expires.diff(date, "seconds") > 0, "The expires header should be a date after the one in the date header").to.be.true();
+                    expect(expires.diff(date, "seconds") > 0, "The expires header of the status response should be a date after the one in the date header").to.be.true();
                 }
             }
 
