@@ -6,6 +6,9 @@ module.exports = {
     // REQUIRED: The full URL of the server to which we can append "/$export".
     baseURL: "https://sandbox.bcda.cms.gov/api/v1",
 
+    // REQUIRED. Can be "backend-services", "client-credentials" or "none".
+    authType: "client-credentials",
+
     // REQUIRED: The full URL of the token endpoint
     tokenEndpoint: "https://sandbox.bcda.cms.gov/auth/token",
 
