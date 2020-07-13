@@ -224,7 +224,7 @@ module.exports = function(describe, it) {
                     json     : true,
                     strictSSL: cfg.strictSSL,
                     form     : {
-                        scope                : "system/*.read",
+                        scope                : cfg.scope || "system/*.read",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
                         client_assertion     : createClientAssertion({}, {}, cfg.privateKey)
                     }
@@ -260,7 +260,7 @@ module.exports = function(describe, it) {
                     json     : true,
                     strictSSL: cfg.strictSSL,
                     form     : {
-                        scope                : "system/*.read",
+                        scope                : cfg.scope || "system/*.read",
                         grant_type           : "test-grant_type-value",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
                         client_assertion     : createClientAssertion({}, {}, cfg.privateKey)
@@ -297,7 +297,7 @@ module.exports = function(describe, it) {
                     json     : true,
                     strictSSL: cfg.strictSSL,
                     form: {
-                        scope           : "system/*.read",
+                        scope           : cfg.scope || "system/*.read",
                         grant_type      : "client_credentials",
                         client_assertion: createClientAssertion({}, {}, cfg.privateKey)
                     }
@@ -334,7 +334,7 @@ module.exports = function(describe, it) {
                     json     : true,
                     strictSSL: cfg.strictSSL,
                     form: {
-                        scope                : "system/*.read",
+                        scope                : cfg.scope || "system/*.read",
                         grant_type           : "client_credentials",
                         client_assertion_type: "test-client_assertion_type-value",
                         client_assertion     : createClientAssertion({}, {}, cfg.privateKey)
@@ -412,7 +412,7 @@ module.exports = function(describe, it) {
                     json     : true,
                     strictSSL: cfg.strictSSL,
                     form: {
-                        scope                : "system/*.read",
+                        scope                : cfg.scope || "system/*.read",
                         grant_type           : "client_credentials",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
                         client_assertion     : createClientAssertion({
@@ -450,7 +450,7 @@ module.exports = function(describe, it) {
                     json     : true,
                     strictSSL: cfg.strictSSL,
                     form: {
-                        scope                : "system/*.read",
+                        scope                : cfg.scope || "system/*.read",
                         grant_type           : "client_credentials",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
                         client_assertion     : createClientAssertion({
@@ -735,7 +735,7 @@ module.exports = function(describe, it) {
                     json     : true,
                     strictSSL: cfg.strictSSL,
                     form: {
-                        scope                : "system/*.read",
+                        scope                : cfg.scope || "system/*.read",
                         grant_type           : "client_credentials",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
                         client_assertion     : createClientAssertion({
@@ -823,7 +823,7 @@ module.exports = function(describe, it) {
                     form: {
                         grant_type           : "client_credentials",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-                        scope                : "system/*.read",
+                        scope                : cfg.scope || "system/*.read",
                         client_assertion     : createClientAssertion({
                             aud: cfg.tokenEndpoint,
                             iss: cfg.clientId,
@@ -864,7 +864,7 @@ module.exports = function(describe, it) {
                     form: {
                         grant_type           : "client_credentials",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-                        scope                : "system/*.read",
+                        scope                : cfg.scope || "system/*.read",
                         client_assertion     : createClientAssertion({
                             aud: cfg.tokenEndpoint,
                             iss: cfg.clientId,

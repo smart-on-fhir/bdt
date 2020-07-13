@@ -393,7 +393,7 @@ class BulkDataClient
             json     : true,
             strictSSL: !!this.options.strictSSL,
             form     : {
-                scope                : scope || "system/*.read",
+                scope                : scope || this.options.scope || "system/*.read",
                 grant_type           : "client_credentials",
                 client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
                 client_assertion     : createClientAssertion({
