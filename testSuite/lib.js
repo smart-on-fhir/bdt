@@ -115,7 +115,7 @@ function expectStatusCode(response, code, message = "")
 {
     expect(
         response.statusCode,
-        message || `response.statusCode must be "${code}"`
+        message || `response.statusCode must be "${code}". ${getResponseError(response)}`
     ).to.equal(code);
 }
 
@@ -129,7 +129,7 @@ function expectStatusText(response, text, message = "")
 {
     expect(
         response.statusMessage,
-        message || `response.statusMessage must be "${text}"`
+        message || `response.statusMessage must be "${text}". ${getResponseError(response)}`
     ).to.equal(text);
 }
 
