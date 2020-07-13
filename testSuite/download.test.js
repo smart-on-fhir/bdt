@@ -1,5 +1,5 @@
 const expect             = require("code").expect;
-const { BulkDataClient } = require("./lib");
+const { BulkDataClient, getResponseError } = require("./lib");
 
 
 module.exports = function(describe, it, before, after, beforeEach, afterEach) {
@@ -64,7 +64,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                 const { body } = await client.getExportResponse();
                 if (body.requiresAccessToken) {
                     const response = await client.downloadFileAt(0, true);
-                    expect(response.statusCode).to.be.above(399);
+                    expect(response.statusCode, getResponseError(response)).to.be.above(399);
                 } else {
                     api.decorateHTML(
                         "NOTE",
@@ -88,7 +88,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                 await client.waitForExport();
                 if (!client.statusResponse.body.requiresAccessToken) {
                     const response = await client.downloadFileAt(0, true);
-                    expect(response.statusCode).to.be.below(400);
+                    expect(response.statusCode, getResponseError(response)).to.be.below(400);
                 } else {
                     api.decorateHTML(
                         "NOTE",
@@ -120,9 +120,9 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
             if (client) {
                 const resp = await client.downloadFileAt(0);
 
-                expect(resp.statusCode).to.equal(200);
-                expect(resp.headers["content-type"]).to.equal("application/fhir+ndjson");
-                expect(resp.body).to.not.be.empty();
+                expect(resp.statusCode, getResponseError(resp)).to.equal(200);
+                expect(resp.headers["content-type"], getResponseError(resp)).to.equal("application/fhir+ndjson");
+                expect(resp.body, getResponseError(resp)).to.not.be.empty();
 
                 const lines = resp.body.split(/\r?\n/);
                 
@@ -190,7 +190,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
 
             const resp2 = await client.downloadFile(resp.body.output[0].url);
 
-            expect(resp2.statusCode, "Download should fail if the client does not have proper scopes").to.be.above(399);
+            expect(resp2.statusCode, `Download should fail if the client does not have proper scopes. ${getResponseError(resp2)}`).to.be.above(399);
         });
     });
 

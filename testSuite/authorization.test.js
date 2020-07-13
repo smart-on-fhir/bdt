@@ -7,7 +7,8 @@ const {
     createClientAssertion,
     createJWKS,
     expectStatusCode,
-    authenticate
+    authenticate,
+    getResponseError
 } = require("./lib");
 
 
@@ -189,7 +190,7 @@ module.exports = function(describe, it) {
                 expect(
                     response.statusCode,
                     "response.statusCode must be >=400 if another content-type " +
-                    "request header is sent"
+                    `request header is sent. ${getResponseError(response)}`
                 ).to.be.above(399);
 
                 // If an error is encountered during the authentication process,
@@ -236,7 +237,7 @@ module.exports = function(describe, it) {
 
                 expect(
                     response.statusCode,
-                    "response.statusCode must be 400 or 401 if grant_type is not sent"
+                    `response.statusCode must be 400 or 401 if grant_type is not sent. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
             });
 
@@ -273,7 +274,7 @@ module.exports = function(describe, it) {
 
                 expect(
                     response.statusCode,
-                    "response.statusCode must be 400 or 401 if grant_type is not sent"
+                    `response.statusCode must be 400 or 401 if grant_type is not sent. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
             });
 
@@ -309,7 +310,7 @@ module.exports = function(describe, it) {
 
                 expect(
                     response.statusCode,
-                    "response.statusCode must be 400 or 401 if grant_type is not sent"
+                    `response.statusCode must be 400 or 401 if grant_type is not sent. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
             });
 
@@ -348,7 +349,7 @@ module.exports = function(describe, it) {
                 expect(
                     response.statusCode,
                     "response.statusCode must be 400 or 401 if client_assertion_type " +
-                    "is not valid"
+                    `is not valid. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
             });
 
@@ -381,7 +382,7 @@ module.exports = function(describe, it) {
 
                 expect(
                     response.statusCode,
-                    "response.statusCode must be 400 or 401 if the client_assertion is not a valid JWT"
+                    `response.statusCode must be 400 or 401 if the client_assertion is not a valid JWT. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
 
                 // expect(
@@ -428,7 +429,7 @@ module.exports = function(describe, it) {
 
                 expect(
                     response.statusCode,
-                    "response.statusCode must be 400 or 401 if the aud claim is not valid"
+                    `response.statusCode must be 400 or 401 if the aud claim is not valid. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
             });
 
@@ -466,7 +467,7 @@ module.exports = function(describe, it) {
 
                 expect(
                     response.statusCode,
-                    "response.statusCode must be 400 or 401 if the iss claim is not valid"
+                    `response.statusCode must be 400 or 401 if the iss claim is not valid. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
 
                 // expect(
@@ -511,7 +512,7 @@ module.exports = function(describe, it) {
 
                 expect(
                     response.statusCode,
-                    "response.statusCode must be 400 or 401 if the scope is not set"
+                    `response.statusCode must be 400 or 401 if the scope is not set. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
             });
 
@@ -549,7 +550,7 @@ module.exports = function(describe, it) {
 
                 expect(
                     response.statusCode,
-                    "response.statusCode must be 400, 401 or 403 if the scope is not set"
+                    `response.statusCode must be 400, 401 or 403 if the scope is not set. ${getResponseError(response)}`
                 ).to.be.within(400, 403);
             });
 
@@ -588,7 +589,7 @@ module.exports = function(describe, it) {
 
                 expect(
                     response.statusCode,
-                    "response.statusCode must be 400, 401 or 403 if the scope is empty"
+                    `response.statusCode must be 400, 401 or 403 if the scope is empty. ${getResponseError(response)}`
                 ).to.be.within(400, 403);
             });
 
@@ -627,7 +628,8 @@ module.exports = function(describe, it) {
                 expect(
                     response.statusCode,
                     "Response.statusCode must be between 400 and 403 if the scope is not valid. " +
-                    "In this case we expect scopes like \"launch\" or \"fhirUser\" to be rejected."
+                    "In this case we expect scopes like \"launch\" or \"fhirUser\" to be rejected" +
+                    getResponseError(response)
                 ).to.be.within(400, 403);
 
                 // expect(
@@ -670,7 +672,7 @@ module.exports = function(describe, it) {
                 const { response } = await req.promise();
                 api.logResponse(response);
 
-                expect(response.statusCode).to.equal(200);
+                expect(response.statusCode, getResponseError(response)).to.equal(200);
             });
 
             it ({
@@ -707,7 +709,7 @@ module.exports = function(describe, it) {
 
                 expect(
                     response.statusCode,
-                    "response.statusCode must be 400, 401 or 403 if the scope is not valid"
+                    `response.statusCode must be 400, 401 or 403 if the scope is not valid. ${getResponseError(response)}`
                 ).to.be.within(400, 403);
 
                 // expect(
@@ -750,7 +752,7 @@ module.exports = function(describe, it) {
                 const { response } = await req.promise();
                 api.logResponse(response);
 
-                expect(response.statusCode).to.equal(200);
+                expect(response.statusCode, getResponseError(response)).to.equal(200);
             });
 
             it ({
@@ -790,7 +792,8 @@ module.exports = function(describe, it) {
                 expect(
                     response.statusCode,
                     "Response.statusCode must be between 400 and 403 if the scope is not valid. " +
-                    "In this case we expect scopes like \"system/UnknownResource.read\" to be rejected."
+                    "In this case we expect scopes like \"system/UnknownResource.read\" to be rejected" +
+                    getResponseError(response)
                 ).to.be.within(400, 403);
 
                 // expect(
@@ -842,7 +845,7 @@ module.exports = function(describe, it) {
 
                 expect(
                     response.statusCode,
-                    "response.statusCode must be 400 or 401 if the jku is incorrect"
+                    `response.statusCode must be 400 or 401 if the jku is incorrect. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
             });
 
@@ -892,7 +895,7 @@ module.exports = function(describe, it) {
                 expect(
                     response.statusCode,
                     "response.statusCode must be 400 or 401 if the token is not signed " +
-                    "with the correct private key"
+                    `with the correct private key. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
 
                 // expect(

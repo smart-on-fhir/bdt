@@ -115,7 +115,7 @@ function expectStatusCode(response, code, message = "")
 {
     expect(
         response.statusCode,
-        message || `response.statusCode must be "${code}". ${getResponseError(response)}`
+        `${message || `response.statusCode must be "${code}"`}. ${getResponseError(response)}`
     ).to.equal(code);
 }
 
@@ -129,7 +129,7 @@ function expectStatusText(response, text, message = "")
 {
     expect(
         response.statusMessage,
-        message || `response.statusMessage must be "${text}". ${getResponseError(response)}`
+        `${message || `response.statusMessage must be "${text}"`}. ${getResponseError(response)}`
     ).to.equal(text);
 }
 
@@ -156,7 +156,7 @@ function expectUnauthorized(response, message = "")
  */
 function expectJson(response, message = "the server must reply with JSON content-type header")
 {
-    expect(response.headers["content-type"] || "", message).to.match(/^application\/json\b/);
+    expect(response.headers["content-type"] || "", message + "." + getResponseError(response)).to.match(/^application\/json\b/);
 }
 
 /**
@@ -638,7 +638,7 @@ class BulkDataClient
     {
         expect(
             this.kickOffResponse.statusCode,
-            "The kick-off request was expected to fail"
+            `The kick-off request was expected to fail. ${getResponseError(this.kickOffResponse)}`
         ).to.be.above(399);
         
         // Some servers return empty status message (regardless of the status code).
@@ -660,12 +660,12 @@ class BulkDataClient
     {
         expect(
             this.kickOffResponse.statusCode,
-            "The kick-off request was expected to succeed and return a 202 status code"
+            `The kick-off request was expected to succeed and return a 202 status code. ${getResponseError(this.kickOffResponse)}`
         ).to.equal(202);
 
         expect(
             this.kickOffResponse.headers,
-            "The kick-off response must include a content-location header"
+            `The kick-off response must include a content-location header. ${getResponseError(this.kickOffResponse)}`
         ).to.include("content-location");
 
         // The body is optional but if set, it must be OperationOutcome
