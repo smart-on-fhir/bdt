@@ -179,17 +179,22 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
             }
 
             // Once the export is done and before the actual download,
-            // re-authorize with less scopes so that we can test if the
+            // re-authorize with other scopes so that we can test if the
             // download endpoint evaluates scopes
-            await client.getAccessToken({
-                force        : true,
-                scope        : "system/Observation.read",
-                requestLabel : "Authorization Request 2",
-                responseLabel: "Authorization Response 2"
-            });
+            try {
+                await client.getAccessToken({
+                    force        : true,
+                    scope        : "system/Observation.read",
+                    requestLabel : "Authorization Request 2",
+                    responseLabel: "Authorization Response 2"
+                });
+            } catch (ex) {
+                // perhaps authorizing with system/Observation.read was not
+                // possible. In such case ignore the test instead of failing
+                return api.setNotSupported(`This test is not supported because re-authorizing with "system/Observation.read" did not succeed. ${ex}`);
+            }
 
             const resp2 = await client.downloadFile(resp.body.output[0].url);
-
             expect(resp2.statusCode, `Download should fail if the client does not have proper scopes. ${getResponseError(resp2)}`).to.be.above(399);
         });
     });
