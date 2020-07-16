@@ -3,6 +3,14 @@ module.exports = {
     // REQUIRED: The full URL of the server to which we can append "/$export".
     baseURL: "https://bulk-data.smarthealthit.org/eyJlcnIiOiIiLCJwYWdlIjoxMDAwMCwiZHVyIjoxMCwidGx0IjoxNSwibSI6MX0/fhir",
 
+    // REQUIRED. Can be "backend-services", "client-credentials" or "none".
+    // - If "none" no authorization will be performed and all the authorization
+    //   tests will be skipped.
+    // - If "client-credentials" most of the authorization tests will be skipped.
+    // - If "backend-services" (default) all tests will be executed. `jwks` or
+    //   `jwksUrl` auth must be supported in this case.
+    authType: "backend-services",
+
     // REQUIRED: The full URL of the token endpoint
     tokenEndpoint: "https://bulk-data.smarthealthit.org/auth/token",
 
