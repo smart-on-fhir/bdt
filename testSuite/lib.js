@@ -5,6 +5,7 @@ const jwkToPem = require("jwk-to-pem");
 const expect   = require("code").expect;
 const { URL }  = require("url");
 const jwk      = require("jwk-lite");
+const util     = require("util");
 
 
 /**
@@ -267,17 +268,18 @@ function getResponseError(resp)
             if (typeof resp.body == "object") {
                 json = resp.body;
             }
+
             if (json.resourceType == "OperationOutcome") {
                 msg += "; " + json.issue.map(i => i.details.text).join("; ");
             }
             else {
-                msg += "; " + JSON.stringify(json);
+                msg += "; " + truncate(util.inspect(json), 500);
             }
         }
-        if (type.match(/^text\//i)) {
+        else if (type.match(/^text\//i)) {
             let txt = String(resp.body).trim();
             if (txt != resp.statusMessage) {
-                msg += "; " + resp.body;
+                msg += "; " + truncate(resp.body, 500);
             }
         }
     } catch (_) {
@@ -285,6 +287,14 @@ function getResponseError(resp)
     }
 
     return msg;
+}
+
+function truncate(str, maxLength = 5) {
+    if (str.length <= maxLength) {
+        return str;
+    }
+    let middle = Math.floor(maxLength / 2);
+    return str.substr(0, middle) + "..." + str.substr(-middle);
 }
 
 /**
