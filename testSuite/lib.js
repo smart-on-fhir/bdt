@@ -215,7 +215,7 @@ function expectOperationOutcome(response, message = "")
 function createClientAssertion(claims = {}, signOptions = {}, privateKey)
 {
     let jwtToken = {
-        exp: Date.now() / 1000 + 300, // 5 min
+        exp: Math.round(Date.now() / 1000) + 300, // 5 min
         jti: crypto.randomBytes(32).toString("hex"),
         ...claims
     };
@@ -586,7 +586,7 @@ class BulkDataClient
             json: true,
             gzip: true,
             headers: {
-                accept: "application/fhir+json"
+                accept: "application/fhir+ndjson"
             }
         }, skipAuth);
         this.testApi.logRequest(req, "Download Request");
