@@ -140,6 +140,7 @@ function parseHTML(html, linePrefix = "\t") {
 
     function render(tokens, context = {}) {
         let out = "";
+        let olCounter = 0;
         for (const token of tokens) {
             if (token.children) {
                 out += render(token.children);
@@ -176,7 +177,7 @@ function parseHTML(html, linePrefix = "\t") {
                     case "list_item_close":
                         break;
                     case "list_item_open":
-                        out += "\n" + linePrefix + '- ';
+                        out += "\n" + linePrefix + (olCounter ? `${olCounter++}.` : "-") + ' ';
                         break;
                     case "link_open":
                         // console.log(token)
@@ -213,6 +214,13 @@ function parseHTML(html, linePrefix = "\t") {
                         break;
                     case "softbreak":
                         out += "\n" + linePrefix;
+                        break;
+                    case "ordered_list_open":
+                        olCounter = 1;
+                        break;
+                    case "ordered_list_close":
+                        olCounter = 0;
+                        out += `\n${linePrefix}`;
                         break;
                     default:
                         console.log(`Unknown token type ${token.type}`);
