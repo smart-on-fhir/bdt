@@ -1,5 +1,6 @@
-const expect             = require("code").expect;
-const { BulkDataClient, getResponseError } = require("./lib");
+const expect   = require("code").expect;
+const isBase64 = require('is-base64');
+const { BulkDataClient, getResponseError, request } = require("./lib");
 
 
 module.exports = function(describe, it, before, after, beforeEach, afterEach) {
@@ -197,6 +198,156 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
             const resp2 = await client.downloadFile(resp.body.output[0].url);
             expect(resp2.statusCode, `Download should fail if the client does not have proper scopes. ${getResponseError(resp2)}`).to.be.above(399);
         });
-    });
 
+        it ({
+            id  : "Download-06",
+            name: "Supports binary file attachments in DocumentReference resources",
+            description: "This test verifies that:\n" +
+                "1. The server can export `DocumentReference` resources (if available)\n" +
+                "2. If `DocumentReference` attachments contain a `data` property it should be `base64Binary`\n" +
+                "3. If `DocumentReference` attachments contain an `url` property it should be an absolute url\n" +
+                "4. The attachment url should be downloadable\n" +
+                "5. If `requiresAccessToken` is set to true in the status response, then the attachment url " +
+                "should NOT be downloadable without an access token.\n\nSee: " +
+                "[https://github.com/HL7/bulk-data/blob/master/spec/export/index.md#attachments]" +
+                "(https://github.com/HL7/bulk-data/blob/master/spec/export/index.md#attachments)"
+        }, async (cfg, api) => {
+            
+            let pathName = cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint;
+
+            if (!pathName) {
+                api.setNotSupported(`No export endpoints configured`);
+                return null;
+            }
+
+            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${pathName}?_type=DocumentReference`);
+
+            // We don't know if the server supports DocumentReference export so
+            // we just give it a try
+            await client.kickOff();
+            if (client.kickOffResponse.statusCode !== 202 || !client.kickOffResponse.headers["content-location"]) {
+                return api.setNotSupported(`Unable to export DocumentReference resources. Perhaps the server does not support that.`);
+            }
+
+            // If we got here, it mans the kick-off was successful. We now have
+            // to wait for the export to complete
+            await client.waitForExport();
+
+            // Inspect and validate the export response
+            expect(client.statusResponse.body.output, "The output property of the status response must be an array").to.be.an.array();
+
+            // If DocumentReference is supported but there is nothing to export
+            // then we have no choice but to skip the test
+            if (!client.statusResponse.body.output.length) {
+                return api.setNotSupported(`No DocumentReference resources found on this server`);
+            }
+
+            const skipAuth = !client.statusResponse.body.requiresAccessToken;
+
+            // We do not test every single attachment! We only check one specified
+            // by url and one that is inline (if any of these are found);
+            
+            // toggled to true after the first url is found
+            let urlChecked = false;
+
+            // toggled to true after the first inline attachment is found
+            let inlineChecked = false;
+
+            for (let entry of client.statusResponse.body.output) {
+
+                // Download each DocumentReference file
+                const resp = await client.downloadFile(entry.url, skipAuth);
+
+                expect(resp.statusCode, getResponseError(resp)).to.equal(200);
+                expect(resp.headers["content-type"], getResponseError(resp)).to.equal("application/fhir+ndjson");
+                expect(resp.body, getResponseError(resp)).to.not.be.empty();
+
+                const lines = resp.body.split(/\r?\n/);
+
+                for (let line of lines) {
+                    // skip empty lines
+                    if (!line.trim()) {
+                        continue;
+                    }
+
+                    let documentReference;
+                    try {
+                        documentReference = JSON.parse(line);
+                    } catch (ex) {
+                        throw new Error(`Failed to parse DocumentReference line from NDJSON: ${ex.message}`);
+                    }
+
+                    // If resources in an output file contain elements of the type Attachment,
+                    // servers SHALL populate the Attachment.contentType code as well as either
+                    // the data element or the url element. The url element SHALL be an absolute
+                    // url that can be de-referenced to the attachment's content.
+                    let i = -1;
+                    for (let item of documentReference.content) {
+                        i++;
+                        expect(item.attachment.contentType, "The contentType property of attachments must be specified").to.not.be.empty();
+                        
+                        if (item.attachment.data && item.attachment.url) {
+                            throw new Error("Either attachment.data or attachment.url should be specified, but not both.");
+                        }
+
+                        if (!item.attachment.data && !item.attachment.url) {
+                            throw new Error("Either attachment.data or attachment.url should be specified.");
+                        }
+
+                        if (!inlineChecked && item.attachment.data) {
+                            inlineChecked = true;
+                            // verify base64Binary
+                            const valid = isBase64(item.attachment.data, {
+                                allowMime      : true,
+                                mimeRequired   : false,
+                                allowEmpty     : false,
+                                paddingRequired: true
+                            });
+                            if (!valid) {
+                                throw new Error(
+                                    `Found invalid base64Binary data at documentReference.content[${i}].attachment.data`
+                                );
+                            }
+                        }
+                        
+                        if (!urlChecked && item.attachment.url) {
+                            
+                            // verify url
+                            const isAbsolute = String(item.attachment.url).search(/https?\:\/\/.+/) === 0;
+                            if (!isAbsolute) {
+                                throw new Error(`The attachment url property must be an absolute URL. Found "${item.attachment.url}".`);
+                            }
+
+                            urlChecked = true;
+
+                            // try to download the attachment
+                            let file;
+
+                            // omit authentication if the server requires it to
+                            // verify that the file cannot be downloaded
+                            if (!skipAuth) {
+                                let failed;
+                                try {
+                                    await client.request({ url: item.attachment.url }, true);
+                                    failed = false;
+                                } catch {
+                                    failed = true;
+                                }
+                                if (!failed) {
+                                    throw new Error(
+                                        `The attachment at ${item.attachment.url} should not be downloadable without authentication.`
+                                    );
+                                }
+                            }
+                            
+                            // now actually download it. Don't parse it though,
+                            // just verify that it is downloadable
+                            await request({ url: item.attachment.url }).promise();
+                            // console.log(`Successfully downloaded ${item.attachment.url}`);
+                        }
+                    }
+                }
+            }
+        });
+    });
 };
