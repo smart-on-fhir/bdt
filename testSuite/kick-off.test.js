@@ -161,7 +161,7 @@ module.exports = function(describe, it) {
                 const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
 
                 // Set the _since parameter to invalid date
-                client.url.searchParams.set("_since", "0000-60-01");
+                client.url.searchParams.set("_since", "0000-60-01T30:70:80+05:00");
                 
                 // Start an export
                 await client.kickOff();
@@ -186,7 +186,7 @@ module.exports = function(describe, it) {
                 const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
 
                 // Set the _since parameter to a date that is valid but in the future
-                client.url.searchParams.set("_since", "2057-01-01");
+                client.url.searchParams.set("_since", "2057-01-01T00:00:00+05:00");
                 
                 // Start an export
                 await client.kickOff();
