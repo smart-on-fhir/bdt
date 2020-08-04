@@ -155,9 +155,20 @@ function expectUnauthorized(response, message = "")
  * @param {request.Response} response The response to check
  * @param {String} message Optional custom message
  */
-function expectJson(response, message = "the server must reply with JSON content-type header")
+function expectJson(
+    response,
+    message = "the server must reply with JSON content-type header (" +
+        "application/json, application/json+fhir or application/fhir+json)"
+)
 {
-    expect(response.headers["content-type"] || "", message + "." + getResponseError(response)).to.match(/^application\/json\b/);
+    expect(
+        [
+            "application/json",
+            "application/json+fhir",
+            "application/fhir+json"
+        ],
+        message + "." + getResponseError(response)
+    ).to.include(String(response.headers["content-type"] || "").toLowerCase());
 }
 
 /**
