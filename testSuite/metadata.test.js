@@ -136,60 +136,142 @@ module.exports = function(describe, it) {
                 }
             });
 
-            [
-                {
-                    operation: "export",
-                    pref     : "systemExportEndpoint"
-                },
-                {
-                    operation: "patient-export",
-                    pref     : "patientExportEndpoint"
-                },
-                {
-                    operation: "group-export",
-                    pref     : "groupExportEndpoint"
+            it ({
+                id  : `CapabilityStatement-${++count}`,
+                name: `Check if "export" operation is defined in the CapabilityStatement`,
+                description: "This test expects to find in the CapabilityStatement " +
+                    'an entry like:\n```\n"rest": [\n' +
+                    '  {\n' +
+                    '    "operation": [\n' +
+                    '      {\n' +
+                    '        "name" : "export",\n' +
+                    '        "definition": "..."\n' +
+                    '      }\n' +
+                    '    ]\n' +
+                    '  }\n' +
+                    ']\n```'
+            }, async(cfg, api) => {
+                const response = await fetchConformance(cfg, api);
+
+                // Having a CapabilityStatement is optional for bulk data servers
+                // (unless they are also FHIR servers, which they typically are).
+                // However, missing a CapabilityStatement will generate a warning.
+                if (response.statusCode === 404) {
+                    return api.warn(`No capability statement found at "${cfg.baseURL}/metadata"`);
                 }
-            ].forEach((meta, i) => {
-                it ({
-                    id  : `CapabilityStatement-${count + i + 1}`,
-                    name: `Check if "${meta.operation}" operation is defined in the CapabilityStatement`,
-                    description: "This test expects to find in the CapabilityStatement " +
-                        'an entry like:\n```\n"rest": [\n' +
-                        '  {\n' +
-                        '    "operation": [\n' +
-                        '      {\n' +
-                        `        "name" : "${meta.operation}"\n` +
-                        '      }\n' +
-                        '    ]\n' +
-                        '  }\n' +
-                        ']\n```'
-                }, async(cfg, api) => {
-                    const response = await fetchConformance(cfg, api);
 
-                    // Having a CapabilityStatement is optional for bulk data servers
-                    // (unless they are also FHIR servers, which they typically are).
-                    // However, missing a CapabilityStatement will generate a warning.
-                    if (response.statusCode === 404) {
-                        return api.warn(`No capability statement found at "${cfg.baseURL}/metadata"`);
-                    }
+                // If the server has not declared that it supports this type of
+                // export, then skip the test
+                if (!String(cfg.systemExportEndpoint || "").trim()) {
+                    return api.setNotSupported(`The "export" operation is not supported by this server`);
+                }
 
-                    // If the server has not declared that it supports this type of
-                    // export, then skip the test
-                    if (!String(cfg[meta.pref] || "").trim()) {
-                        return api.setNotSupported(`The "${meta.operation}" operation is not supported by this server`);
+                // If a CapabilityStatement was found, then the export
+                // operations MUST be defined.
+                try {
+                    let operation = response.body.rest[0].operation.find(e => e.name === "export");
+                    if (!operation) {
+                        throw new Error();
                     }
-    
-                    // If a CapabilityStatement was found, then the export
-                    // operations MUST be defined.
-                    try {
-                        let operation = response.body.rest[0].operation.find(e => e.name === meta.operation);
-                        if (!operation) {
-                            throw new Error();
-                        }
-                    } catch (ex) {
-                        throw new Error(`Unable to find "${meta.operation}" operation at "${cfg.baseURL}/metadata"`);
+                } catch (ex) {
+                    throw new Error(`Unable to find "export" operation at "${cfg.baseURL}/metadata"`);
+                }
+            });
+
+            it ({
+                id  : `CapabilityStatement-${++count}`,
+                name: `Check if "patient-export" operation is defined in the CapabilityStatement`,
+                description: "This test expects to find in the CapabilityStatement " +
+                    'an entry like:\n```\n"rest": [\n' +
+                    '  {\n' +
+                    '    "resource": [\n' +
+                    '      {\n' +
+                    '        "type": "Patient",\n' +
+                    '        "operation": [\n' +
+                    '          {\n' +
+                    '            "name" : "patient-export",\n' +
+                    '            "definition": "..."\n' +
+                    '          }\n' +
+                    '        ]\n' +
+                    '      }\n' +
+                    '    ]\n' +
+                    '  }\n' +
+                    ']\n```'
+            }, async(cfg, api) => {
+                const response = await fetchConformance(cfg, api);
+
+                // Having a CapabilityStatement is optional for bulk data servers
+                // (unless they are also FHIR servers, which they typically are).
+                // However, missing a CapabilityStatement will generate a warning.
+                if (response.statusCode === 404) {
+                    return api.warn(`No capability statement found at "${cfg.baseURL}/metadata"`);
+                }
+
+                // If the server has not declared that it supports this type of
+                // export, then skip the test
+                if (!String(cfg.patientExportEndpoint || "").trim()) {
+                    return api.setNotSupported(`The "patient-export" operation is not supported by this server`);
+                }
+
+                // If a CapabilityStatement was found, then the export
+                // operations MUST be defined.
+                try {
+                    let patient = response.body.rest[0].resource.find(r => r.type.toLowerCase() == "patient");
+                    let operation = patient.operation.find(e => e.name === "patient-export");
+                    if (!operation) {
+                        throw new Error();
                     }
-                });
+                } catch (ex) {
+                    throw new Error(`Unable to find "export" operation at "${cfg.baseURL}/metadata"`);
+                }
+            });
+
+            it ({
+                id  : `CapabilityStatement-${++count}`,
+                name: `Check if "group-export" operation is defined in the CapabilityStatement`,
+                description: "This test expects to find in the CapabilityStatement " +
+                'an entry like:\n```\n"rest": [\n' +
+                '  {\n' +
+                '    "resource": [\n' +
+                '      {\n' +
+                '        "type": "Group",\n' +
+                '        "operation": [\n' +
+                '          {\n' +
+                '            "name" : "group-export",\n' +
+                '            "definition": "..."\n' +
+                '          }\n' +
+                '        ]\n' +
+                '      }\n' +
+                '    ]\n' +
+                '  }\n' +
+                ']\n```'
+            }, async(cfg, api) => {
+                const response = await fetchConformance(cfg, api);
+
+                // Having a CapabilityStatement is optional for bulk data servers
+                // (unless they are also FHIR servers, which they typically are).
+                // However, missing a CapabilityStatement will generate a warning.
+                if (response.statusCode === 404) {
+                    return api.warn(`No capability statement found at "${cfg.baseURL}/metadata"`);
+                }
+
+                // If the server has not declared that it supports this type of
+                // export, then skip the test
+                if (!String(cfg.groupExportEndpoint || "").trim()) {
+                    return api.setNotSupported(`The "group-export" operation is not supported by this server`);
+                }
+
+                // If a CapabilityStatement was found, then the export
+                // operations MUST be defined.
+                try {
+                    let group = response.body.rest[0].resource.find(r => r.type.toLowerCase() == "group");
+                    let operation = group.operation.find(e => e.name === "group-export");
+                    if (!operation) {
+                        throw new Error();
+                    }
+                } catch (ex) {
+                    throw new Error(`Unable to find "group-export" operation at "${cfg.baseURL}/metadata"`);
+                }
             });
         });
 
