@@ -53,9 +53,10 @@ module.exports = function(describe, it) {
             { prop: "patientExportEndpoint", name: "patient-level export" },
             { prop: "groupExportEndpoint"  , name: "group-level export" }
         ].forEach(({ prop, name }, i) => {
+            let y = 0;
             describe(`Kick-off request at the ${name} endpoint`, () => {
                 it ({
-                    id  : `Auth-01.${i}.0`,
+                    id  : `Auth-01.${i}.${y++}`,
                     name: `Requires authorization header`,
                     description: `The server should require authorization header at the ${name} endpoint`
                 }, async function(cfg, api) {
@@ -102,57 +103,57 @@ module.exports = function(describe, it) {
                     }
                 });
 
-                it ({
-                    id  : `Auth-01.${i}.1`,
-                    name: `Rejects expired token`,
-                    description: `The server should reject expired tokens at the ${name} endpoint`
-                }, async function(cfg, api) {
+                // it ({
+                //     id  : `Auth-01.${i}.${y++}`,
+                //     name: `Rejects expired token`,
+                //     description: `The server should reject expired tokens at the ${name} endpoint`
+                // }, async function(cfg, api) {
 
-                    if (cfg.authType != "backend-services") {
-                        return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                    }
+                //     if (cfg.authType != "backend-services") {
+                //         return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
+                //     }
                     
-                    if (!cfg[prop]) {
-                        return api.setNotSupported(`The ${name} is not supported by this server`);
-                    }
+                //     if (!cfg[prop]) {
+                //         return api.setNotSupported(`The ${name} is not supported by this server`);
+                //     }
 
-                    if (!cfg.requiresAuth) {
-                        return api.setNotSupported(`This server does not require authorization`);
-                    }
+                //     if (!cfg.requiresAuth) {
+                //         return api.setNotSupported(`This server does not require authorization`);
+                //     }
 
-                    const expiredToken = createClientAssertion({
-                        exp: Math.floor(Date.now() / 1000) - 300, // 5 min ago
-                        aud: cfg.tokenEndpoint,
-                        iss: cfg.clientId,
-                        sub: cfg.clientId
-                    }, {}, cfg.privateKey);
+                //     const expiredToken = createClientAssertion({
+                //         exp: Math.floor(Date.now() / 1000) - 300, // 5 min ago
+                //         aud: cfg.tokenEndpoint,
+                //         iss: cfg.clientId,
+                //         sub: cfg.clientId
+                //     }, {}, cfg.privateKey);
 
-                    const req = request({
-                        uri: `${cfg.baseURL}${cfg[prop]}`,
-                        json: true,
-                        strictSSL: cfg.strictSSL,
-                        headers: {
-                            prefer: "respond-async",
-                            accept: "application/fhir+json",
-                            authorization: "Bearer " + expiredToken
-                        }
-                    });
+                //     const req = request({
+                //         uri: `${cfg.baseURL}${cfg[prop]}`,
+                //         json: true,
+                //         strictSSL: cfg.strictSSL,
+                //         headers: {
+                //             prefer: "respond-async",
+                //             accept: "application/fhir+json",
+                //             authorization: "Bearer " + expiredToken
+                //         }
+                //     });
 
-                    api.logRequest(req);
-                    const { response } = await req.promise();
-                    // console.log(JSON.stringify(response.body, null, 4));
-                    api.logResponse(response);
-                    expectUnauthorized(response);
-                    try {
-                        expectJson(response);
-                    } catch (ex) {
-                        api.warn("The server does not respond with JSON regardless of the accept header!");
-                    }
-                    expectOperationOutcome(response, "In case of error, the response body must be an OperationOutcome");
-                });
+                //     api.logRequest(req);
+                //     const { response } = await req.promise();
+                //     console.log(JSON.stringify(response.body, null, 4), expiredToken);
+                //     api.logResponse(response);
+                //     expectUnauthorized(response);
+                //     try {
+                //         expectJson(response);
+                //     } catch (ex) {
+                //         api.warn("The server does not respond with JSON regardless of the accept header!");
+                //     }
+                //     expectOperationOutcome(response, "In case of error, the response body must be an OperationOutcome");
+                // });
 
                 it ({
-                    id  : `Auth-01.${i}.2`,
+                    id  : `Auth-01.${i}.${y++}`,
                     name: `Rejects invalid token`,
                     description: `The server should reject invalid tokens at the ${name} endpoint`
                 }, async function(cfg, api) {
@@ -173,7 +174,19 @@ module.exports = function(describe, it) {
                         aud: cfg.tokenEndpoint,
                         iss: "intentionally messed up",
                         sub: "intentionally messed up"
-                    }, {}, cfg.privateKey);
+                    }, {}, {
+                        "kty": "EC",
+                        "crv": "P-384",
+                        "d": "FGmEYZ4VVZYZwf06fJOs7owJlnEP56PZ1a_06EGcIFrorC1wvkCBttBjb4EGxyyT",
+                        "x": "Vh657ochrYmEtHLHxoxvyOCRsmi4vahzWWB7-FOYSnFV0FhfsNwveCaO-8os72Am",
+                        "y": "gSF2QwRqBHXxjOQhZtIc0iLdEnBlidPUkF5BGJfHmF967bPgMZHL9fOWgkIZd6IX",
+                        "key_ops": [
+                            "sign"
+                        ],
+                        "ext": true,
+                        "kid": "6cdff3dc149ed8c4bde5cf6f68fe31e4",
+                        "alg": "ES384"
+                    });
                     
                     const req = request({
                         uri: `${cfg.baseURL}${cfg[prop]}`,
