@@ -23,10 +23,10 @@ const {
 //   "access_token": "",
 //   "iat": 1548900000 // Wed Jan 30 2019 21:00:00 GMT-0500 (Eastern Standard Time)
 // }
-const EXPIRED_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZS" +
-    "I6InN5c3RlbS8qLioiLCJ0b2tlbl90eXBlIjoiYmVhcmVyIiwiZXhwaXJlc19pbiI6NjAwLC" +
-    "JhY2Nlc3NfdG9rZW4iOiIiLCJpYXQiOjE1NDg5MDAwMDB9.R4cr28kxx9V4mzu8sJ5fg7zGq" +
-    "I-A5R77v5BhDuN-7jc";
+// const EXPIRED_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZS" +
+//     "I6InN5c3RlbS8qLioiLCJ0b2tlbl90eXBlIjoiYmVhcmVyIiwiZXhwaXJlc19pbiI6NjAwLC" +
+//     "JhY2Nlc3NfdG9rZW4iOiIiLCJpYXQiOjE1NDg5MDAwMDB9.R4cr28kxx9V4mzu8sJ5fg7zGq" +
+//     "I-A5R77v5BhDuN-7jc";
 
 // {
 //   "alg": "HS256",
@@ -39,13 +39,10 @@ const EXPIRED_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZS" +
 //   "access_token": "",
 //   "iat": 1548900000 // Wed Jan 30 2019 21:00:00 GMT-0500 (Eastern Standard Time)
 // }
-const WRONG_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6" +
-    "InN5c3RlbS8qLioiLCJ0b2tlbl90eXBlIjoiYmVhcmVyIiwiZXhwaXJlc19pbiI6NjAwLCJh" +
-    "Y2Nlc3NfdG9rZW4iOiIiLCJpYXQiOjE1NDg5MDAwMDB9.er7H4904s8yMlaOmGLPxJzq7Z-i" +
-    "fSrDuHccVuijgWr4";
-    
-    // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6InN5c3RlbS8qLioiLCJ0b2tlbl90eXBlIjoiYmVhcmVyIiwiZXhwaXJlc19pbiI6NjAwLCJhY2Nlc3NfdG9rZW4iOiIiLCJpYXQiOjE1NDg5MDAwMDB9.R4cr28kxx9V4mzu8sJ5fg7zGqI-A5R77v5BhDuN-7jc"
-    // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6InN5c3RlbS8qLioiLCJ0b2tlbl90eXBlIjoiYmVhcmVyIiwiZXhwaXJlc19pbiI6NjAwLCJhY2Nlc3NfdG9rZW4iOiIiLCJpYXQiOjE1NDg5MDAwMDB9.R4cr28kxx9V4mzu8sJ5fg7zGqI-A5R77v5BhDuN-7jc"
+// const WRONG_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6" +
+//     "InN5c3RlbS8qLioiLCJ0b2tlbl90eXBlIjoiYmVhcmVyIiwiZXhwaXJlc19pbiI6NjAwLCJh" +
+//     "Y2Nlc3NfdG9rZW4iOiIiLCJpYXQiOjE1NDg5MDAwMDB9.er7H4904s8yMlaOmGLPxJzq7Z-i" +
+//     "fSrDuHccVuijgWr4";
 
 module.exports = function(describe, it) {
     describe("Authorization", () => {
@@ -110,6 +107,10 @@ module.exports = function(describe, it) {
                     name: `Rejects expired token`,
                     description: `The server should reject expired tokens at the ${name} endpoint`
                 }, async function(cfg, api) {
+
+                    if (cfg.authType != "backend-services") {
+                        return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
+                    }
                     
                     if (!cfg[prop]) {
                         return api.setNotSupported(`The ${name} is not supported by this server`);
@@ -119,49 +120,12 @@ module.exports = function(describe, it) {
                         return api.setNotSupported(`This server does not require authorization`);
                     }
 
-                    const tokenRequest = await request({
-                        method   : "POST",
-                        uri      : cfg.tokenEndpoint,
-                        json     : true,
-                        strictSSL: cfg.strictSSL,
-                        form: {
-                            grant_type           : "client_credentials",
-                            client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-                            scope                : cfg.scope || "system/*.read",
-                            client_assertion     : createClientAssertion({
-                                aud: cfg.tokenEndpoint,
-                                iss: cfg.clientId,
-                                sub: cfg.clientId
-                            }, {}, cfg.privateKey)
-                        }
-                    });
-
-
-                    const { response: tokenResponse } = await tokenRequest.promise()
-                    console.log(tokenResponse.body)
-
                     const expiredToken = createClientAssertion({
                         exp: Math.floor(Date.now() / 1000) - 300, // 5 min ago
-                        // aud: cfg.tokenEndpoint,
-                        // iss: cfg.clientId,
-                        // sub: cfg.clientId
-                    }, {}, 
-                        // cfg.privateKey
-                        {
-                            "kty": "EC",
-                            "crv": "P-384",
-                            "d"  : "cVT-RW48vfIcBku9ccKpm0mU_gPFT8zj6GeVKMSgo2cAZEtutKv_HdmgwL1mJT0q",
-                            "x"  : "bqzUWQxnyv-O_lsCLS_ciNlspf4SzmYytx7_SmXNUYlGxfEs6HvfeIE2cofS3pBZ",
-                            "y"  : "djY7yFzDoevoxvniLufjbMEBI8tOYjyWH5Spbcm_R8syFIFro89C84Apz_47fAhX",
-                            "key_ops": [
-                                "sign"
-                            ],
-                            "ext": true,
-                            "kid": "cce12207a49fd90a7db42dc7cb9b8621",
-                            "alg": "ES384"
-                    });
-
-                    console.log(expiredToken);
+                        aud: cfg.tokenEndpoint,
+                        iss: cfg.clientId,
+                        sub: cfg.clientId
+                    }, {}, cfg.privateKey);
 
                     const req = request({
                         uri: `${cfg.baseURL}${cfg[prop]}`,
@@ -170,14 +134,13 @@ module.exports = function(describe, it) {
                         headers: {
                             prefer: "respond-async",
                             accept: "application/fhir+json",
-                            // authorization: "Bearer " + EXPIRED_ACCESS_TOKEN,
                             authorization: "Bearer " + expiredToken
                         }
                     });
 
                     api.logRequest(req);
                     const { response } = await req.promise();
-                    console.log(JSON.stringify(response.body, null, 4));
+                    // console.log(JSON.stringify(response.body, null, 4));
                     api.logResponse(response);
                     expectUnauthorized(response);
                     try {
@@ -193,6 +156,11 @@ module.exports = function(describe, it) {
                     name: `Rejects invalid token`,
                     description: `The server should reject invalid tokens at the ${name} endpoint`
                 }, async function(cfg, api) {
+
+                    if (cfg.authType != "backend-services") {
+                        return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
+                    }
+
                     if (!cfg[prop]) {
                         return api.setNotSupported(`The ${name} is not supported by this server`);
                     }
@@ -200,6 +168,12 @@ module.exports = function(describe, it) {
                     if (!cfg.requiresAuth) {
                         return api.setNotSupported(`This server does not require authorization`);
                     }
+
+                    const invalidToken = createClientAssertion({
+                        aud: cfg.tokenEndpoint,
+                        iss: "intentionally messed up",
+                        sub: "intentionally messed up"
+                    }, {}, cfg.privateKey);
                     
                     const req = request({
                         uri: `${cfg.baseURL}${cfg[prop]}`,
@@ -208,12 +182,13 @@ module.exports = function(describe, it) {
                         headers: {
                             prefer: "respond-async",
                             accept: "application/fhir+json",
-                            authorization: "Bearer " + WRONG_ACCESS_TOKEN
+                            authorization: "Bearer " + invalidToken
                         }
                     });
 
                     api.logRequest(req);
                     const { response } = await req.promise();
+                    // console.log(JSON.stringify(response.body, null, 4));
                     api.logResponse(response);
                     expectUnauthorized(response);
                     try {
