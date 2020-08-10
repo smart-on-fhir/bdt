@@ -349,5 +349,38 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                 }
             }
         });
+
+        it ({
+            id  : "Download-07",
+            name: "Requesting deleted files returns 404 responses",
+            description: "If the export has been completed, a server MAY send a DELETE request " +
+                "to the status endpoint as a signal that a client is done retrieving files and " +
+                "that it is safe for the sever to remove those from storage. Following the " +
+                "delete request, when subsequent requests are made to the download location, " +
+                "the server SHALL return a 404 error and an associated FHIR OperationOutcome in JSON format."
+        }, async (cfg, api) => {
+            
+            let pathName = cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint;
+
+            if (!pathName) {
+                api.setNotSupported(`No export endpoints configured`);
+                return null;
+            }
+
+            const client = createClient(cfg, api);
+            if (client) {
+                const resp = await client.downloadFileAt(0);
+
+                expect(resp.statusCode, getResponseError(resp)).to.equal(200);
+
+                await client.cancel();
+
+                let fileUrl = client.statusResponse.body.output[0].url;
+
+                const resp2 = await client.downloadFile(fileUrl);
+
+                expect(resp2.statusCode, getResponseError(resp2)).to.equal(404);
+            }
+        });
     });
 };

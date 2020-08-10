@@ -2,7 +2,8 @@ const expect           = require("code").expect;
 const moment           = require("moment");
 const {
     BulkDataClient,
-    expectStatusCode
+    expectStatusCode,
+    expectOperationOutcome
 } = require("./lib");
 
 
@@ -230,6 +231,51 @@ module.exports = function(describe, it) {
                     expect(item.count, "if set, error item count must be a number").to.be.a.number();
                 }
             });
+        });
+
+        it ({
+            id  : `Status-04`,
+            name: "Exports can be canceled",
+            description: "After a bulk data request has been started, a client MAY send a **DELETE** " +
+                "request to the URL provided in the `Content-Location` header to cancel the request. " +
+                "Following the delete request, when subsequent requests are made to the polling location, " +
+                "the server SHALL return a 404 error and an associated FHIR OperationOutcome in JSON format."
+        }, async (cfg, api) => {
+
+            const endPoint = cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint;
+
+            if (!endPoint) {
+                return api.setNotSupported(`No export endpoints defined in configuration`);
+            }
+
+            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${endPoint}`);
+            
+            // Start an export
+            await client.kickOff();
+
+            // Cancel the export immediately
+            await client.cancelIfStarted();
+
+            // Verify that we didn't get an error
+            client.expectSuccessfulKickOff();
+
+            if (client.cancelResponse.statusCode < 200 || client.cancelResponse.statusCode >= 300) {
+                return api.setNotSupported(`DELETE requests to the status endpoint are not supported by this server`);
+            }
+
+            const cancelRequest = await client.request({
+                uri   : client.kickOffResponse.headers["content-location"],
+                method: "DELETE",
+                json  : true
+            });
+
+            const { response } = await cancelRequest.promise();
+
+            const msg = "Following the delete request, when subsequent requests are " +
+                "made to the polling location, the server SHALL return a 404 " +
+                "error and an associated FHIR OperationOutcome in JSON format";
+            expectStatusCode(response, 404, msg);
+            expectOperationOutcome(response, msg);
         });
 
     });
