@@ -168,7 +168,7 @@ function expectJson(
             "application/fhir+json"
         ],
         message + "." + getResponseError(response)
-    ).to.include(String(response.headers["content-type"] || "").toLowerCase());
+    ).to.include(String(response.headers["content-type"] || "").toLowerCase().split(";").shift());
 }
 
 /**
