@@ -99,13 +99,13 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
             }
         });
 
-        it ({
-            id  : "Download-03",
-            name: "Replies properly in case of error",
-            description: "The server should return HTTP Status Code of 4XX or 5XX"
-        }/*
-            TODO: Figure out how to produce errors!
-        */);
+        // it ({
+        //     id  : "Download-03",
+        //     name: "Replies properly in case of error",
+        //     description: "The server should return HTTP Status Code of 4XX or 5XX"
+        // }/*
+        //     TODO: Figure out how to produce errors!
+        // */);
 
         it ({
             id  : "Download-04",

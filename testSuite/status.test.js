@@ -73,22 +73,22 @@ module.exports = function(describe, it) {
             expectStatusCode(client.statusResponse, 202, "the status code returned by the status endpoint must be 202");
         });
 
-        it ({
-            id  : "Status-02",
-            name: "Replies properly in case of error",
-            description: "Runs a set of assertions to verify that:\n" +
-                "- The returned HTTP status code is 5XX\n" +
-                "- The server returns a FHIR OperationOutcome resource in JSON format\n\n" +
-                "Note that even if some of the requested resources cannot successfully be exported, " +
-                "the overall export operation MAY still succeed. In this case, " +
-                "the Response.error array of the completion response MUST be populated " +
-                "(see below) with one or more files in ndjson format containing " +
-                "FHIR OperationOutcome resources to indicate what went wrong.\n" +
-                'See [https://github.com/HL7/bulk-data/blob/master/spec/export/index.md#response---error-status-1]' +
-                '(https://github.com/HL7/bulk-data/blob/master/spec/export/index.md#response---error-status-1).'
-        }/*
-            TODO: Figure out how to produce errors!
-        */);
+        // it ({
+        //     id  : "Status-02",
+        //     name: "Replies properly in case of error",
+        //     description: "Runs a set of assertions to verify that:\n" +
+        //         "- The returned HTTP status code is 5XX\n" +
+        //         "- The server returns a FHIR OperationOutcome resource in JSON format\n\n" +
+        //         "Note that even if some of the requested resources cannot successfully be exported, " +
+        //         "the overall export operation MAY still succeed. In this case, " +
+        //         "the Response.error array of the completion response MUST be populated " +
+        //         "(see below) with one or more files in ndjson format containing " +
+        //         "FHIR OperationOutcome resources to indicate what went wrong.\n" +
+        //         'See [https://github.com/HL7/bulk-data/blob/master/spec/export/index.md#response---error-status-1]' +
+        //         '(https://github.com/HL7/bulk-data/blob/master/spec/export/index.md#response---error-status-1).'
+        // }/*
+        //     TODO: Figure out how to produce errors!
+        // */);
 
         it ({
             id  : "Status-03",
