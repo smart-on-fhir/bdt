@@ -366,7 +366,7 @@ module.exports = function(describe, it) {
                         parameter: [
                             {
                                 name: "_since",
-                                valueString: "0000-60-01T30:70:80+05:00"
+                                valueInstant: "0000-60-01T30:70:80+05:00"
                             }
                         ]
                     }
@@ -432,7 +432,7 @@ module.exports = function(describe, it) {
                         parameter: [
                             {
                                 name: "_since",
-                                valueString: "2057-01-01T00:00:00+05:00"
+                                valueInstant: "2057-01-01T00:00:00+05:00"
                             }
                         ]
                     }
