@@ -46,23 +46,17 @@ module.exports = function(describe, it) {
                 '(https://github.com/HL7/bulk-data/blob/master/spec/export/index.md#response---in-progress-status).'
         }, async (cfg, api) => {
 
-            // Create a client that would export patients (or whatever the
-            // fastest resource is) modified since the last month
-            const resourceType = cfg.fastestResource || "Patient";
-            const endPoint = cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint;
-
-            if (!endPoint) {
-                return api.setNotSupported(`No export endpoints defined in configuration`);
-            }
-
-            const url = `${cfg.baseURL}${endPoint}?_type=${resourceType}`;
-            const client = new BulkDataClient(cfg, api, url);
-            client.url.searchParams.set(cfg.sinceParam || "_since", moment().subtract(1, "months").format("YYYY-MM-DDTHH:mm:ssZ"));
+            const client = new BulkDataClient(cfg, api);
 
             // Start an export
-            await client.kickOff();
+            await client.kickOff({
+                params: {
+                    _type : cfg.fastestResource || "Patient",
+                    _since: moment().subtract(1, "day").format("YYYY-MM-DDTHH:mm:ssZ")
+                }
+            });
 
-            // Not that the export should have been started, call the status
+            // Note that the export should have been started, call the status
             // endpoint to capture it's response
             await client.status();
 
@@ -72,23 +66,6 @@ module.exports = function(describe, it) {
             // Finally check the status code returned by the status endpoint
             expectStatusCode(client.statusResponse, 202, "the status code returned by the status endpoint must be 202");
         });
-
-        // it ({
-        //     id  : "Status-02",
-        //     name: "Replies properly in case of error",
-        //     description: "Runs a set of assertions to verify that:\n" +
-        //         "- The returned HTTP status code is 5XX\n" +
-        //         "- The server returns a FHIR OperationOutcome resource in JSON format\n\n" +
-        //         "Note that even if some of the requested resources cannot successfully be exported, " +
-        //         "the overall export operation MAY still succeed. In this case, " +
-        //         "the Response.error array of the completion response MUST be populated " +
-        //         "(see below) with one or more files in ndjson format containing " +
-        //         "FHIR OperationOutcome resources to indicate what went wrong.\n" +
-        //         'See [https://github.com/HL7/bulk-data/blob/master/spec/export/index.md#response---error-status-1]' +
-        //         '(https://github.com/HL7/bulk-data/blob/master/spec/export/index.md#response---error-status-1).'
-        // }/*
-        //     TODO: Figure out how to produce errors!
-        // */);
 
         it ({
             id  : "Status-03",
@@ -113,19 +90,17 @@ module.exports = function(describe, it) {
             // Create a client that would export patients (or whatever the
             // fastest resource is) modified in the last month
             const resourceType = cfg.fastestResource || "Patient";
-            const endPoint = cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint;
-
-            if (!endPoint) {
-                return api.setNotSupported(`No export endpoints defined in configuration`);
-            }
-
-            const url = `${cfg.baseURL}${endPoint}?_type=${resourceType}`;
-            const client = new BulkDataClient(cfg, api, url);
+            
+            const client = new BulkDataClient(cfg, api);
 
             // Do an actual export (except that we do not download files here)
-            await client.kickOff();
+            await client.kickOff({
+                params: {
+                    _type: resourceType
+                }
+            });
             await client.waitForExport();
-            await client.cancel(); // just in case
+            await client.cancel();
 
             const body = client.statusResponse.body;
 
@@ -162,7 +137,7 @@ module.exports = function(describe, it) {
 
             // the full URI of the original bulk data kick-off request
             expect(body, "the response contains 'request'").to.include("request");
-            expect(body.request, "the 'request' property must contain the kick-off URL").to.equal(client.url.href);
+            expect(body.request, "the 'request' property must contain the kick-off URL").to.equal(client.kickOffRequest.href);
 
             // requiresAccessToken - boolean value of true or false indicating whether downloading the generated
             // files requires a bearer access token. Value MUST be true if both the file server and the FHIR API
@@ -242,13 +217,7 @@ module.exports = function(describe, it) {
                 "the server SHALL return a 404 error and an associated FHIR OperationOutcome in JSON format."
         }, async (cfg, api) => {
 
-            const endPoint = cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint;
-
-            if (!endPoint) {
-                return api.setNotSupported(`No export endpoints defined in configuration`);
-            }
-
-            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${endPoint}`);
+            const client = new BulkDataClient(cfg, api);
             
             // Start an export
             await client.kickOff();

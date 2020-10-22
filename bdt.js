@@ -100,7 +100,7 @@ function it(name, fn)
 {
     let node = {
         type: "test",
-        name,
+        minVersion: "1.0",
         fn
     };
 
@@ -178,6 +178,18 @@ function getPath(path = "")
 function isPromise(p)
 {
     return (p && typeof p.catch == "function" && typeof p.then == "function");
+}
+
+function versionCheck(vA, vB)
+{
+    let a = String(vA || "1.0").trim().split(/\s*\.\s*/);
+    let b = String(vB || "1.0").trim().split(/\s*\.\s*/);
+    while(a.length && b.length) {
+        if (+(a.shift()) > +(b.shift())) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /**
@@ -327,6 +339,14 @@ class Runner extends EventEmitter
         const _node = { ...node };
         const isRoot = _node.name === "__ROOT__";
 
+        if (!versionCheck(_node.minVersion, this.settings.version || "1.0")) {
+            return;
+        }
+
+        if (_node.maxVersion && !versionCheck(this.settings.version || "1.0", _node.maxVersion)) {
+            return;
+        }
+
         _node.startedAt = Date.now();
 
         if (_node.type === "group") {
@@ -391,6 +411,15 @@ class Runner extends EventEmitter
                 }
                 this.emit("testEnd", _node);
             };
+
+
+            if (typeof _node.notSupported == "function") {
+                const check = _node.notSupported(this.settings);
+                if (check !== false) {
+                    api.setNotSupported(check || "This test is not supported by this server");
+                    return next();
+                }
+            }
 
             if (!indirect && currentGroup.before) {
                 await currentGroup.before();

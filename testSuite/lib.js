@@ -316,9 +316,12 @@ class BulkDataClient
 {
     constructor(options, testApi, uri)
     {
+        if (!options.baseURL) {
+            throw new Error("A baseURL option is required");
+        }
         this.options         = options;
         this.testApi         = testApi;
-        this.url             = new URL(uri);
+        this.url             = options.baseURL.replace(/\/*$/, "/");
         this.kickOffRequest  = null;
         this.kickOffResponse = null;
         this.statusRequest   = null;
@@ -465,14 +468,88 @@ class BulkDataClient
      */
     async kickOff(options = {})
     {
+        const { params, type, ...rest } = options;
+
+        let path;
+        if (type == "system") {
+            path = this.options.systemExportEndpoint;
+            if (!path) {
+                throw new Error("No systemExportEndpoint defined in configuration");
+            }
+        } else if (type == "patient") {
+            path = this.options.patientExportEndpoint;
+            if (!path) {
+                throw new Error("No patientExportEndpoint defined in configuration");
+            }
+        } else if (type == "group") {
+            path = this.options.groupExportEndpoint;
+            if (!path) {
+                throw new Error("No groupExportEndpoint defined in configuration");
+            }
+        } else {
+            path = this.options.systemExportEndpoint ||
+                   this.options.patientExportEndpoint ||
+                   this.options.groupExportEndpoint;
+            if (!path) {
+                throw new Error("No export endpoints defined in configuration")
+            }
+        }
+
+        const url = new URL(path, this.url);
+
+        
+        if (params && typeof params == "object") {
+            if (rest.method == "POST") {
+                rest.body = {
+                    resourceType: "Parameters",
+                    parameter: []
+                };
+                for (const key in params) {
+                    switch (key) {
+                        case "_since":
+                            rest.body.parameter.push({
+                                name: "_since",
+                                valueInstant: params[key]
+                            });
+                        break;
+                        case "_outputFormat":
+                            rest.body.parameter.push({
+                                name: "_outputFormat",
+                                valueString: params[key]
+                            });
+                        break;
+                        case "patient":
+                            rest.body.parameter = rest.body.parameter.concat(
+                                params[key].map(id => ({
+                                    name : "patient",
+                                    valueReference : { reference: `Patient/${id}` }
+                                }))
+                            );
+                        break;
+                        case "_type":
+                            rest.body.parameter = rest.body.parameter.concat(
+                                params[key].map(type => ({
+                                    name : "_type",
+                                    valueString : type
+                                }))
+                            );
+                        break;
+                    }
+                }
+            } else {
+                for (const key in params) {
+                    url.searchParams.append(key, params[key]);
+                }
+            }
+        }
         this.kickOffRequest = await this.request({
-            uri : this.url.href,
+            url,
             json: true,
-            ...options,
+            ...rest,
             headers: {
                 accept: "application/fhir+json",
                 prefer: "respond-async",
-                ...options.headers
+                ...rest.headers
             }
         });
         this.testApi.logRequest(this.kickOffRequest, "Kick-off Request");
@@ -571,8 +648,12 @@ class BulkDataClient
      * true. 
      */
     async downloadFileAt(index, skipAuth = null) {
-        await this.kickOff();
-        await this.waitForExport();
+        if (!this.kickOffRequest) {
+            await this.kickOff();
+        }
+        if (!this.statusRequest) {
+            await this.waitForExport();
+        }
         let fileUrl;
         try {
             fileUrl = this.statusResponse.body.output[index].url;
@@ -583,10 +664,8 @@ class BulkDataClient
     }
 
     /**
-     * Starts an export and waits for it. Then downloads the file at the given
-     * index. NOTE: this method assumes that the index exists and will throw
-     * otherwise.
-     * @param {string} fileUrl The index of the file in the status list
+     * Downloads the file at the given fileUrl
+     * @param {string} fileUrl The file URL
      * @param {boolean} skipAuth If true, the authorization header will NOT be
      * included, even if the `requiresAuth` property of the server settings is
      * true. 
@@ -594,7 +673,7 @@ class BulkDataClient
     async downloadFile(fileUrl, skipAuth = null) {
         const req = await this.request({
             uri: fileUrl,
-            json: true,
+            // json: true,
             gzip: true,
             headers: {
                 accept: "application/fhir+ndjson"

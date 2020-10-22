@@ -19,7 +19,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
         return new BulkDataClient(cfg, api, `${cfg.baseURL}${pathName}?_type=${resourceType}`);
     }
 
-    describe("Download Endpoint", () => {
+    describe({ version: "1.2", name: "Download Endpoint" }, () => {
 
         // let CLIENT;
 
@@ -62,17 +62,23 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
             // Create a client to download the fastest resource.
             const client = createClient(cfg, api);
             if (client) {
-                const { body } = await client.getExportResponse();
-                if (body.requiresAccessToken) {
-                    const response = await client.downloadFileAt(0, true);
-                    expect(response.statusCode, getResponseError(response)).to.be.above(399);
-                } else {
-                    api.decorateHTML(
-                        "NOTE",
-                        "<div><b>NOTE: </b> This test was not executed because the " +
-                        "<code>requiresAccessToken</code> field in the complete status " +
-                        "body was <b>not</b> set to <code>true</code>.</div>"
-                    );
+                try {
+                    const { body } = await client.getExportResponse();
+                    if (body.requiresAccessToken) {
+                        const response = await client.downloadFileAt(0, true);
+                        expect(response.statusCode, getResponseError(response)).to.be.above(399);
+                    } else {
+                        api.decorateHTML(
+                            "NOTE",
+                            "<div><b>NOTE: </b> This test was not executed because the " +
+                            "<code>requiresAccessToken</code> field in the complete status " +
+                            "body was <b>not</b> set to <code>true</code>.</div>"
+                        );
+                    }
+                } catch (ex) {
+                    throw ex;
+                } finally {
+                    await client.cancel();
                 }
             }
         });
@@ -85,16 +91,22 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
             // Create a client to download the fastest resource.
             const client = createClient(cfg, api);
             if (client) {
-                await client.kickOff();
-                await client.waitForExport();
-                if (!client.statusResponse.body.requiresAccessToken) {
-                    const response = await client.downloadFileAt(0, true);
-                    expect(response.statusCode, getResponseError(response)).to.be.below(400);
-                } else {
-                    api.decorateHTML(
-                        "NOTE",
-                        "<div>This test was not executed because the <code>requiresAccessToken</code> field in the complete status body was set to <code>true</code>.</div>"
-                    );
+                try {
+                    await client.kickOff();
+                    await client.waitForExport();
+                    if (!client.statusResponse.body.requiresAccessToken) {
+                        const response = await client.downloadFileAt(0, true);
+                        expect(response.statusCode, getResponseError(response)).to.be.below(400);
+                    } else {
+                        api.decorateHTML(
+                            "NOTE",
+                            "<div>This test was not executed because the <code>requiresAccessToken</code> field in the complete status body was set to <code>true</code>.</div>"
+                        );
+                    }
+                } catch (ex) {
+                    throw ex;
+                } finally {
+                    await client.cancel();
                 }
             }
         });
@@ -119,28 +131,34 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
         }, async (cfg, api) => {
             const client = createClient(cfg, api);
             if (client) {
-                const resp = await client.downloadFileAt(0);
+                try {
+                    const resp = await client.downloadFileAt(0);
 
-                expect(resp.statusCode, getResponseError(resp)).to.equal(200);
-                expect(resp.headers["content-type"], getResponseError(resp)).to.equal("application/fhir+ndjson");
-                expect(resp.body, getResponseError(resp)).to.not.be.empty();
+                    expect(resp.statusCode, getResponseError(resp)).to.equal(200);
+                    expect(resp.headers["content-type"], getResponseError(resp)).to.equal("application/fhir+ndjson");
+                    expect(resp.body, getResponseError(resp)).to.not.be.empty();
 
-                const lines = resp.body.split(/\r?\n/);
-                
-                lines.forEach((line, i) => {
-                    if (!line) {
-                        api.decorateHTML("eol-warning", i === lines.length - 1 ?
-                            '<div class="warning">The NDJSON file ends with new line. This could confuse some parsers.</div>' :
-                            '<div class="warning">The NDJSON file contains empty lines. This could confuse some parsers.</div>'
-                        , "warning");
-                    } else {
-                        try {
-                            JSON.parse(line);
-                        } catch (ex) {
-                            throw new Error(`Failed to parse line ${i + 1}: ${ex.message}`);
+                    const lines = resp.body.split(/\r?\n/);
+                    
+                    lines.forEach((line, i) => {
+                        if (!line) {
+                            api.decorateHTML("eol-warning", i === lines.length - 1 ?
+                                '<div class="warning">The NDJSON file ends with new line. This could confuse some parsers.</div>' :
+                                '<div class="warning">The NDJSON file contains empty lines. This could confuse some parsers.</div>'
+                            , "warning");
+                        } else {
+                            try {
+                                JSON.parse(line);
+                            } catch (ex) {
+                                throw new Error(`Failed to parse line ${i + 1}: ${ex.message}`);
+                            }
                         }
-                    }
-                });
+                    });
+                } catch (ex) {
+                    throw ex;
+                } finally {
+                    await client.cancel();
+                }
             }
         });
 
@@ -173,6 +191,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
             const resp = await client.getExportResponse();
 
             if (!client.statusResponse.body.requiresAccessToken) {
+                await client.cancel();
                 return api.decorateHTML(
                     "NOTE",
                     "<div>This test was not executed because the <code>requiresAccessToken</code> field in the complete status body was NOT set to <code>true</code>.</div>"
@@ -196,6 +215,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
             }
 
             const resp2 = await client.downloadFile(resp.body.output[0].url);
+            await client.cancel();
             expect(resp2.statusCode, `Download should fail if the client does not have proper scopes. ${getResponseError(resp2)}`).to.be.above(399);
         });
 
@@ -226,127 +246,135 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
             // we just give it a try
             await client.kickOff();
             if (client.kickOffResponse.statusCode !== 202 || !client.kickOffResponse.headers["content-location"]) {
+                await client.cancel();
                 return api.setNotSupported(`Unable to export DocumentReference resources. Perhaps the server does not support that.`);
             }
 
-            // If we got here, it mans the kick-off was successful. We now have
-            // to wait for the export to complete
-            await client.waitForExport();
+            try {
 
-            // Inspect and validate the export response
-            expect(client.statusResponse.body.output, "The output property of the status response must be an array").to.be.an.array();
+                // If we got here, it mans the kick-off was successful. We now have
+                // to wait for the export to complete
+                await client.waitForExport();
 
-            // If DocumentReference is supported but there is nothing to export
-            // then we have no choice but to skip the test
-            if (!client.statusResponse.body.output.length) {
-                return api.setNotSupported(`No DocumentReference resources found on this server`);
-            }
+                // Inspect and validate the export response
+                expect(client.statusResponse.body.output, "The output property of the status response must be an array").to.be.an.array();
 
-            const skipAuth = !client.statusResponse.body.requiresAccessToken;
+                // If DocumentReference is supported but there is nothing to export
+                // then we have no choice but to skip the test
+                if (!client.statusResponse.body.output.length) {
+                    return api.setNotSupported(`No DocumentReference resources found on this server`);
+                }
 
-            // We do not test every single attachment! We only check one specified
-            // by url and one that is inline (if any of these are found);
-            
-            // toggled to true after the first url is found
-            let urlChecked = false;
+                const skipAuth = !client.statusResponse.body.requiresAccessToken;
 
-            // toggled to true after the first inline attachment is found
-            let inlineChecked = false;
+                // We do not test every single attachment! We only check one specified
+                // by url and one that is inline (if any of these are found);
 
-            for (let entry of client.statusResponse.body.output) {
+                // toggled to true after the first url is found
+                let urlChecked = false;
 
-                // Download each DocumentReference file
-                const resp = await client.downloadFile(entry.url, skipAuth);
+                // toggled to true after the first inline attachment is found
+                let inlineChecked = false;
 
-                expect(resp.statusCode, getResponseError(resp)).to.equal(200);
-                expect(resp.headers["content-type"], getResponseError(resp)).to.equal("application/fhir+ndjson");
-                expect(resp.body, getResponseError(resp)).to.not.be.empty();
+                for (let entry of client.statusResponse.body.output) {
 
-                const lines = resp.body.split(/\r?\n/);
+                    // Download each DocumentReference file
+                    const resp = await client.downloadFile(entry.url, skipAuth);
 
-                for (let line of lines) {
-                    // skip empty lines
-                    if (!line.trim()) {
-                        continue;
-                    }
+                    expect(resp.statusCode, getResponseError(resp)).to.equal(200);
+                    expect(resp.headers["content-type"], getResponseError(resp)).to.equal("application/fhir+ndjson");
+                    expect(resp.body, getResponseError(resp)).to.not.be.empty();
 
-                    let documentReference;
-                    try {
-                        documentReference = JSON.parse(line);
-                    } catch (ex) {
-                        throw new Error(`Failed to parse DocumentReference line from NDJSON: ${ex.message}`);
-                    }
+                    const lines = resp.body.split(/\r?\n/);
 
-                    // If resources in an output file contain elements of the type Attachment,
-                    // servers SHALL populate the Attachment.contentType code as well as either
-                    // the data element or the url element. The url element SHALL be an absolute
-                    // url that can be de-referenced to the attachment's content.
-                    let i = -1;
-                    for (let item of documentReference.content) {
-                        i++;
-                        expect(item.attachment.contentType, "The contentType property of attachments must be specified").to.not.be.empty();
-                        
-                        if (item.attachment.data && item.attachment.url) {
-                            throw new Error("Either attachment.data or attachment.url should be specified, but not both.");
+                    for (let line of lines) {
+                        // skip empty lines
+                        if (!line.trim()) {
+                            continue;
                         }
 
-                        if (!item.attachment.data && !item.attachment.url) {
-                            throw new Error("Either attachment.data or attachment.url should be specified.");
+                        let documentReference;
+                        try {
+                            documentReference = JSON.parse(line);
+                        } catch (ex) {
+                            throw new Error(`Failed to parse DocumentReference line from NDJSON: ${ex.message}`);
                         }
 
-                        if (!inlineChecked && item.attachment.data) {
-                            inlineChecked = true;
-                            // verify base64Binary
-                            const valid = isBase64(item.attachment.data, {
-                                allowMime      : true,
-                                mimeRequired   : false,
-                                allowEmpty     : false,
-                                paddingRequired: true
-                            });
-                            if (!valid) {
-                                throw new Error(
-                                    `Found invalid base64Binary data at documentReference.content[${i}].attachment.data`
-                                );
-                            }
-                        }
-                        
-                        if (!urlChecked && item.attachment.url) {
-                            
-                            // verify url
-                            const isAbsolute = String(item.attachment.url).search(/https?\:\/\/.+/) === 0;
-                            if (!isAbsolute) {
-                                throw new Error(`The attachment url property must be an absolute URL. Found "${item.attachment.url}".`);
+                        // If resources in an output file contain elements of the type Attachment,
+                        // servers SHALL populate the Attachment.contentType code as well as either
+                        // the data element or the url element. The url element SHALL be an absolute
+                        // url that can be de-referenced to the attachment's content.
+                        let i = -1;
+                        for (let item of documentReference.content) {
+                            i++;
+                            expect(item.attachment.contentType, "The contentType property of attachments must be specified").to.not.be.empty();
+
+                            if (item.attachment.data && item.attachment.url) {
+                                throw new Error("Either attachment.data or attachment.url should be specified, but not both.");
                             }
 
-                            urlChecked = true;
+                            if (!item.attachment.data && !item.attachment.url) {
+                                throw new Error("Either attachment.data or attachment.url should be specified.");
+                            }
 
-                            // try to download the attachment
-                            let file;
-
-                            // omit authentication if the server requires it to
-                            // verify that the file cannot be downloaded
-                            if (!skipAuth) {
-                                let failed;
-                                try {
-                                    await client.request({ url: item.attachment.url }, true);
-                                    failed = false;
-                                } catch {
-                                    failed = true;
-                                }
-                                if (!failed) {
+                            if (!inlineChecked && item.attachment.data) {
+                                inlineChecked = true;
+                                // verify base64Binary
+                                const valid = isBase64(item.attachment.data, {
+                                    allowMime      : true,
+                                    mimeRequired   : false,
+                                    allowEmpty     : false,
+                                    paddingRequired: true
+                                });
+                                if (!valid) {
                                     throw new Error(
-                                        `The attachment at ${item.attachment.url} should not be downloadable without authentication.`
+                                        `Found invalid base64Binary data at documentReference.content[${i}].attachment.data`
                                     );
                                 }
                             }
-                            
-                            // now actually download it. Don't parse it though,
-                            // just verify that it is downloadable
-                            await request({ url: item.attachment.url }).promise();
-                            // console.log(`Successfully downloaded ${item.attachment.url}`);
+
+                            if (!urlChecked && item.attachment.url) {
+
+                                // verify url
+                                const isAbsolute = String(item.attachment.url).search(/https?\:\/\/.+/) === 0;
+                                if (!isAbsolute) {
+                                    throw new Error(`The attachment url property must be an absolute URL. Found "${item.attachment.url}".`);
+                                }
+
+                                urlChecked = true;
+
+                                // try to download the attachment
+                                let file;
+
+                                // omit authentication if the server requires it to
+                                // verify that the file cannot be downloaded
+                                if (!skipAuth) {
+                                    let failed;
+                                    try {
+                                        await client.request({ url: item.attachment.url }, true);
+                                        failed = false;
+                                    } catch {
+                                        failed = true;
+                                    }
+                                    if (!failed) {
+                                        throw new Error(
+                                            `The attachment at ${item.attachment.url} should not be downloadable without authentication.`
+                                        );
+                                    }
+                                }
+
+                                // now actually download it. Don't parse it though,
+                                // just verify that it is downloadable
+                                await request({ url: item.attachment.url }).promise();
+                                // console.log(`Successfully downloaded ${item.attachment.url}`);
+                            }
                         }
                     }
                 }
+            } catch (ex) {
+                throw ex;
+            } finally {
+                await client.cancel();
             }
         });
 
@@ -369,17 +397,23 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
 
             const client = createClient(cfg, api);
             if (client) {
-                const resp = await client.downloadFileAt(0);
+                try {
+                    const resp = await client.downloadFileAt(0);
 
-                expect(resp.statusCode, getResponseError(resp)).to.equal(200);
+                    expect(resp.statusCode, getResponseError(resp)).to.equal(200);
 
-                await client.cancel();
+                    await client.cancel();
 
-                let fileUrl = client.statusResponse.body.output[0].url;
+                    let fileUrl = client.statusResponse.body.output[0].url;
 
-                const resp2 = await client.downloadFile(fileUrl);
+                    const resp2 = await client.downloadFile(fileUrl);
 
-                expect(resp2.statusCode, getResponseError(resp2)).to.equal(404);
+                    expect(resp2.statusCode, getResponseError(resp2)).to.equal(404);
+                } catch (ex) {
+                    throw ex;
+                } finally {
+                    await client.cancel();
+                }
             }
         });
     });

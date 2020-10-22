@@ -10,16 +10,17 @@ const reporters = {
 
 APP
     .version("0.0.1")
-    .option("-p, --pattern [glob]" , "A glob pattern to load test files from", "testSuite/**/*.test.js")
-    .option("-r, --reporter [name]", "Specify a reporter to use (console | json)", "console")
-    .option("-l, --list"           , "List loaded structure instead of executing tests")
-    .option("-P, --path [path]"    , "Path to the test node to execute (e.g. '0.2' for the third child of the first child of the root node)", "")
-    .option("-c, --config [path]"  , "Path to the config file to load. Defaults to './config.js'", "./config.js")
+    .option("-p, --pattern [glob]"       , "A glob pattern to load test files from", "testSuite/**/*.test.js")
+    .option("-r, --reporter [name]"      , "Specify a reporter to use (console | json)", "console")
+    .option("-l, --list"                 , "List loaded structure instead of executing tests")
+    .option("-P, --path [path]"          , "Path to the test node to execute (e.g. '0.2' for the third child of the first child of the root node)", "")
+    .option("-c, --config [path]"        , "Path to the config file to load. Defaults to './config.js'", "./config.js")
+    .option("-v, --api-version [version]", "Bulk Data API version to test for. Example \"1.0\" or \"1.2\"", "1.0")
     .parse(process.argv);
 
 
 try {
-    Object.assign(settings, require(APP.config), { cli: true });
+    Object.assign(settings, require(APP.config), { cli: true, version: APP.apiVersion });
 } catch (ex) {
     console.error(`Failed to load settings from "${APP.config}". ${ex.message}`);
     process.exit(1);
