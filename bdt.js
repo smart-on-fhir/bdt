@@ -22,7 +22,7 @@ let currentGroup = groups;
 /**
  * This function is called by tests. It creates new group and appends it to the
  * current group.
- * @param {String} name The group name
+ * @param {String|object} name The group name or settings object
  * @param {Function} fn The function that will be called to build the group
  */
 function describe(name, fn)
@@ -36,6 +36,16 @@ function describe(name, fn)
             currentGroup.children.length + ""
         ].filter(Boolean).join(".")
     };
+
+    if (name && typeof name == "object") {
+        group = {
+            ...group,
+            ...name,
+            name: name.name || name.toString()
+        };
+    } else {
+        group.name = String(name);
+    }
 
     currentGroup.children.push(group);
 
@@ -96,11 +106,12 @@ function it(name, fn)
 
     if (name && typeof name == "object") {
         node = {
+            ...node,
             ...name,
-            type: "test",
-            fn,
             name: name.name || name.toString()
         };
+    } else {
+        node.name = name;
     }
 
     const index = currentGroup.children.push(node) - 1;
