@@ -627,6 +627,91 @@ module.exports = function(describe, it) {
                 // Verify that we didn't get an error
                 client.expectSuccessfulKickOff();
             });
+
+            if (meta.idPrefix == "System-level") {
+
+                it ({
+                    id  : `${meta.idPrefix}-${count++}`,
+                    version: "1.2",
+                    name: "Rejects system-level export with patient parameter",
+                    description: "The patient parameter is not applicable to system level export requests. " +
+                        "This test verifies that such invalid export attempts are being rejected."
+                }, async (cfg, api) => {
+                    
+                    if (!cfg.systemExportEndpoint) {
+                        api.setNotSupported(`The system-level export is not supported by this server`);
+                        return null;
+                    }
+        
+                    const client = new BulkDataClient(cfg, api);
+        
+                    await client.kickOff({
+                        method: "POST",
+                        body: {
+                            resourceType: "Parameters",
+                            parameter: [
+                                {
+                                    "name" : "patient",
+                                    "valueReference" : { reference: "Patient/123" }
+                                },
+                                {
+                                    "name" : "patient",
+                                    "valueReference" : { reference: "Patient/456" }
+                                }
+                            ]
+                        }
+                    });
+        
+                    await client.cancelIfStarted();
+        
+                    if (client.kickOffResponse.statusCode === 405) { // Method Not Allowed
+                        return api.setNotSupported(`${meta.name} via POST is not supported by this server`);
+                    }
+        
+                    if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
+                        return api.setNotSupported(`It seems that ${meta.name} via POST is not supported by this server`);
+                    }
+        
+                    // Finally check that we have got an error response
+                    client.expectFailedKickOff();
+                });
+            }
+            else {
+                it ({
+                    id  : `${meta.idPrefix}-${count++}`,
+                    name: "Can start an export with patient parameter",
+                    version: "1.2",
+                    description: "This test verifies that export attempts including patient are not being rejected."
+                }, async (cfg, api) => {
+                    
+                    if (!cfg[meta.mountPoint]) {
+                        return api.setNotSupported(`${meta.name} is not supported by this server`);
+                    }
+        
+                    const client = new BulkDataClient(cfg, api);
+        
+                    await client.kickOff({
+                        method: "POST",
+                        type: meta.type,
+                        params: {
+                            patient: ["123", "456"]
+                        }
+                    });
+        
+                    await client.cancelIfStarted();
+        
+                    if (client.kickOffResponse.statusCode === 405) { // Method Not Allowed
+                        return api.setNotSupported(`${meta.name} via POST is not supported by this server`);
+                    }
+        
+                    if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
+                        return api.setNotSupported(`It seems that ${meta.name} via POST is not supported by this server`);
+                    }
+        
+                    // Finally check that we have got an error response
+                    client.expectSuccessfulKickOff();
+                });
+            }
         });
     });
 };
