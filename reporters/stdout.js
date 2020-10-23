@@ -27,17 +27,20 @@ function icon(node) {
     if (node.status === "failed")
         return "✘".red;
 
-    if (node.status === "waiting")
-        return "◔".blue;
-
     if (node.status === "not-implemented")
         return "⛔".grey;
 
     if (node.status === "not-supported")
         return "✘".grey;
     
+    if (node.status === "skipped")
+        return "-".grey;
+    
     if (node.status === "warned")
         return "!".yellow.bold;
+
+    if (node.status === "loading")
+        return "◔".yellow;
 
     return " ";
 }
@@ -48,6 +51,9 @@ function text(node) {
     }
     if (node.status === "not-supported") {
         return node.name.grey.bold;
+    }
+    if (node.status === "skipped") {
+        return node.name.grey.bold + " (skipped)";
     }
     return node.name.bold;
 }
@@ -232,7 +238,7 @@ function parseHTML(html, linePrefix = "\t") {
         return out;
     }
 
-    return render(md.parse(html));
+    return render(md.parse(html, {}));
 }
 
 module.exports = function StdoutReporter()
@@ -248,6 +254,7 @@ module.exports = function StdoutReporter()
     let notImplemented = 0;
     let notSupported   = 0;
     let warnings       = 0;
+    let skipped        = 0;
 
     function onStart() {
         startTime = Date.now();
@@ -258,6 +265,7 @@ module.exports = function StdoutReporter()
         endTime = Date.now();
         log(`\n${count} tests executed in ${formatDuration(endTime - startTime)}`.bold);
         log(`     succeeded tests: ${successful}`);
+        log(`       skipped tests: ${skipped}`);
         log(`        failed tests: ${failed}`);
         log(`     not implemented: ${notImplemented}`);
         log(` not supported tests: ${notSupported}`);
@@ -274,9 +282,20 @@ module.exports = function StdoutReporter()
         --depth;
     }
 
+    function onTestStart(node) {
+        process.stdout.write(`${indent(depth)} ${icon(node)} ${text(node)} ${duration(node)}`);
+    }
+
     function onTestEnd(node) {
+        if (node.status === "skipped") {
+            skipped += 1;
+            process.stdout.write("\u001b[2K\r");
+            return;
+        }
+
         count += 1;
-        log(`${indent(depth)} ${icon(node)} ${text(node)} ${duration(node)}`);
+        log("\u001b[2K\r" + `${indent(depth)} ${icon(node)} ${text(node)} ${duration(node)}`);
+
         if (node.status === "failed") {
             failed += 1;
             if (node.description) {
@@ -323,6 +342,7 @@ module.exports = function StdoutReporter()
             runner.on("groupStart", onGroupStart);
             runner.on("end"       , onEnd       );
             runner.on("groupEnd"  , onGroupEnd  );
+            runner.on("testStart" , onTestStart );
             runner.on("testEnd"   , onTestEnd   );
         },
 
@@ -332,6 +352,7 @@ module.exports = function StdoutReporter()
             runner.off("groupStart", onGroupStart);
             runner.off("end"       , onEnd       );
             runner.off("groupEnd"  , onGroupEnd  );
+            runner.off("testStart" , onTestStart );
             runner.off("testEnd"   , onTestEnd   );
         }
     };

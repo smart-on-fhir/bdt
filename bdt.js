@@ -339,7 +339,7 @@ class Runner extends EventEmitter
         const _node = { ...node };
         const isRoot = _node.name === "__ROOT__";
 
-        if (!versionCheck(_node.minVersion, this.settings.version || "1.0")) {
+        if (!versionCheck(_node.version, this.settings.version || "1.0")) {
             return;
         }
 
@@ -384,12 +384,13 @@ class Runner extends EventEmitter
 
         }
         else {
+
             _node.status      = "loading";
             _node.decorations = {};
             _node.warnings    = [];
             _node.error       = null;
 
-            this.emit("testStart", _node);
+            
 
             const api = createTestAPI(_node);
             const next = (error) => {
@@ -400,6 +401,9 @@ class Runner extends EventEmitter
                         ...error,
                         message: String(error)
                     };
+                    if (this.settings.bail) {
+                        this.cancel();
+                    }
                 } else {
                     if (_node.warnings.length) {
                         if (_node.status === "loading") {
@@ -411,6 +415,19 @@ class Runner extends EventEmitter
                 }
                 this.emit("testEnd", _node);
             };
+
+            this.emit("testStart", _node);
+
+            if (this.settings.match) {
+                const re = new RegExp(this.settings.match, "i");
+                if (!re.test(_node.name)) {
+                    _node.status      = "skipped";
+                    this.emit("testEnd", _node);
+                    return;// next();
+                }
+            }
+
+            
 
 
             if (typeof _node.notSupported == "function") {
