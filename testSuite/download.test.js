@@ -111,14 +111,6 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
             }
         });
 
-        // it ({
-        //     id  : "Download-03",
-        //     name: "Replies properly in case of error",
-        //     description: "The server should return HTTP Status Code of 4XX or 5XX"
-        // }/*
-        //     TODO: Figure out how to produce errors!
-        // */);
-
         it ({
             id  : "Download-04",
             name: "Generates valid file response",
@@ -233,18 +225,15 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                 "(https://github.com/HL7/bulk-data/blob/master/spec/export/index.md#attachments)"
         }, async (cfg, api) => {
             
-            let pathName = cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint;
-
-            if (!pathName) {
-                api.setNotSupported(`No export endpoints configured`);
-                return null;
-            }
-
-            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${pathName}?_type=DocumentReference`);
+            const client = new BulkDataClient(cfg, api);
 
             // We don't know if the server supports DocumentReference export so
             // we just give it a try
-            await client.kickOff();
+            await client.kickOff({
+                params: {
+                    _type: "DocumentReference"
+                }
+            });
             if (client.kickOffResponse.statusCode !== 202 || !client.kickOffResponse.headers["content-location"]) {
                 await client.cancel();
                 return api.setNotSupported(`Unable to export DocumentReference resources. Perhaps the server does not support that.`);
