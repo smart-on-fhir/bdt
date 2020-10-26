@@ -4,19 +4,16 @@ const exportTypes = [
     {
         idPrefix   : "Patient-level",
         name       : "Patient-level export",
-        mountPoint : "patientExportEndpoint",
         type       : "patient"
     },
     {
         idPrefix   : "System-level",
         name       : "System-level export",
-        mountPoint : "systemExportEndpoint",
         type       : "system"
     },
     {
         idPrefix   : "Group-level",
         name       : "Group-level export",
-        mountPoint : "groupExportEndpoint",
         type       : "group"
     }
 ];
@@ -31,8 +28,7 @@ module.exports = function(describe, it) {
                 id  : `${meta.idPrefix}-${count++}`,
                 name: "Requires Accept header",
                 description: 'The Accept header specifies the format of the optional OperationOutcome response ' +
-                    'to the kick-off request. Currently, only `application/fhir+json` is supported.',
-                notSupported: cfg => cfg[meta.mountPoint] ? false : `${meta.name} is not supported by this server`
+                    'to the kick-off request. Currently, only `application/fhir+json` is supported.'
             }, async (cfg, api) => {
                 
                 const client = new BulkDataClient(cfg, api);
@@ -61,8 +57,7 @@ module.exports = function(describe, it) {
                 name: "Requires Accept header in POST requests",
                 version: "1.2",
                 description: 'The Accept header specifies the format of the optional OperationOutcome response ' +
-                    'to the kick-off request. Currently, only `application/fhir+json` is supported.',
-                notSupported: cfg => cfg[meta.mountPoint] ? false : `${meta.name} is not supported by this server`
+                    'to the kick-off request. Currently, only `application/fhir+json` is supported.'
             }, async (cfg, api) => {
                 
                 const client = new BulkDataClient(cfg, api);
@@ -100,8 +95,7 @@ module.exports = function(describe, it) {
                 description: 'The **Prefer** request header is required and specifies ' +
                             'whether the response is immediate or asynchronous. ' +
                             'The header MUST be set to **respond-async**. ' +
-                            '[Red More](https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#headers).',
-                notSupported: cfg => cfg[meta.mountPoint] ? false : `${meta.name} is not supported by this server`
+                            '[Red More](https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#headers).'
             }, async (cfg, api) => {
 
                 const client = new BulkDataClient(cfg, api);
@@ -131,22 +125,18 @@ module.exports = function(describe, it) {
                 description: 'The **Prefer** request header is required and specifies ' +
                             'whether the response is immediate or asynchronous. ' +
                             'The header MUST be set to **respond-async**. ' +
-                            '[Red More](https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#headers).',
-                notSupported: cfg => cfg[meta.mountPoint] ? false : `${meta.name} is not supported by this server`
+                            '[Red More](https://github.com/smart-on-fhir/fhir-bulk-data-docs/blob/master/export.md#headers).'
             }, async (cfg, api) => {
 
-                // Skip if not supported
-                if (!cfg[meta.mountPoint]) {
-                    return api.setNotSupported(`${meta.name} is not supported by this server`);
-                }
-
-                const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+                
+                const client = new BulkDataClient(cfg, api);
                 
                 // By default the kickOff method will do a proper request to the
                 // kick-off endpoint, including accept and prefer headers.
                 // We need to remove the accept header for this test.
                 await client.kickOff({
                     method: "POST",
+                    type: meta.type,
                     headers: {
                         prefer: undefined // Remove the "prefer: respond-async" header
                     }
@@ -178,9 +168,6 @@ module.exports = function(describe, it) {
                     name: `Accepts _outputFormat=${type}`,
                     description: `Verifies that the server accepts \`${type}\` as **_outputFormat** parameter`
                 }, async (cfg, api) => {
-                    if (!cfg[meta.mountPoint]) {
-                        return api.setNotSupported(`${meta.name} is not supported by this server`);
-                    }
                     const client = new BulkDataClient(cfg, api);
 
                     // Start an export
@@ -204,9 +191,6 @@ module.exports = function(describe, it) {
                     version: "1.2",
                     description: `Verifies that the server accepts \`${type}\` as **_outputFormat** parameter`
                 }, async (cfg, api) => {
-                    if (!cfg[meta.mountPoint]) {
-                        return api.setNotSupported(`${meta.name} is not supported by this server`);
-                    }
                     const client = new BulkDataClient(cfg, api);
 
                     // Start an export
@@ -245,9 +229,6 @@ module.exports = function(describe, it) {
                     description: `This tests if the server rejects \`_outputFormat=${type}\` ` +
                         `parameter, even though \`${type}\` is valid mime type.`
                 }, async (cfg, api) => {
-                    if (!cfg[meta.mountPoint]) {
-                        return api.setNotSupported(`${meta.name} is not supported by this server`);
-                    }
 
                     const client = new BulkDataClient(cfg, api);
                     
@@ -274,9 +255,6 @@ module.exports = function(describe, it) {
                     description: `This tests if the server rejects \`_outputFormat=${type}\` ` +
                         `parameter, even though \`${type}\` is valid mime type.`
                 }, async (cfg, api) => {
-                    if (!cfg[meta.mountPoint]) {
-                        return api.setNotSupported(`${meta.name} is not supported by this server`);
-                    }
 
                     const client = new BulkDataClient(cfg, api);
 
@@ -311,10 +289,6 @@ module.exports = function(describe, it) {
                 name: "Rejects _since={invalid date} parameter",
                 description: "The server should reject exports if the `_since` parameter is not a valid date"
             }, async (cfg, api) => {
-                if (!cfg[meta.mountPoint]) {
-                    return api.setNotSupported(`${meta.name} is not supported by this server`);
-                }
-
                 const client = new BulkDataClient(cfg, api);
                 
                 // Start an export
@@ -339,11 +313,8 @@ module.exports = function(describe, it) {
                 name: "Rejects _since={invalid date} parameter in POST requests",
                 description: "The server should reject exports if the `_since` parameter is not a valid date"
             }, async (cfg, api) => {
-                if (!cfg[meta.mountPoint]) {
-                    return api.setNotSupported(`${meta.name} is not supported by this server`);
-                }
 
-                const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+                const client = new BulkDataClient(cfg, api);
                 
                 // Start an export
                 await client.kickOff({
@@ -375,10 +346,7 @@ module.exports = function(describe, it) {
                 name: "Rejects _since={future date} parameter",
                 description: "The server should reject exports if the `_since` parameter is a date in the future"
             }, async (cfg, api) => {
-                if (!cfg[meta.mountPoint]) {
-                    return api.setNotSupported(`${meta.name} is not supported by this server`);
-                }
-                
+
                 const client = new BulkDataClient(cfg, api);
 
                 // Start an export
@@ -403,11 +371,8 @@ module.exports = function(describe, it) {
                 name: "Rejects _since={future date} parameter in POST requests",
                 description: "The server should reject exports if the `_since` parameter is a date in the future"
             }, async (cfg, api) => {
-                if (!cfg[meta.mountPoint]) {
-                    return api.setNotSupported(`${meta.name} is not supported by this server`);
-                }
-                
-                const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+
+                const client = new BulkDataClient(cfg, api);
 
                 // Start an export
                 await client.kickOff({
@@ -440,10 +405,7 @@ module.exports = function(describe, it) {
                 description: "Verifies that the request is rejected if the `_type` " +
                     "contains invalid resource type"
             }, async (cfg, api) => {
-                if (!cfg[meta.mountPoint]) {
-                    return api.setNotSupported(`${meta.name} is not supported by this server`);
-                }
-                
+
                 const client = new BulkDataClient(cfg, api);
 
                 // Start an export
@@ -468,10 +430,7 @@ module.exports = function(describe, it) {
                 description: "Verifies that the request is rejected if the `_type` " +
                     "contains invalid resource type"
             }, async (cfg, api) => {
-                if (!cfg[meta.mountPoint]) {
-                    return api.setNotSupported(`${meta.name} is not supported by this server`);
-                }
-                
+
                 const client = new BulkDataClient(cfg, api);
                 
                 // Start an export
@@ -505,14 +464,12 @@ module.exports = function(describe, it) {
                 description: "The `_typeFilter` parameter is optional so the servers " +
                     "should not reject it, even if they don't support it"
             }, async (cfg, api) => {
-                if (!cfg[meta.mountPoint]) {
-                    return api.setNotSupported(`${meta.name} is not supported by this server`);
-                }
 
                 const client = new BulkDataClient(cfg, api);
 
                 // Start an export
                 await client.kickOff({
+                    type: meta.type,
                     params: {
                         _typeFilter: "Patient?status=active"
                     }
@@ -532,15 +489,13 @@ module.exports = function(describe, it) {
                 description: "The `_typeFilter` parameter is optional so the servers " +
                     "should not reject it, even if they don't support it"
             }, async (cfg, api) => {
-                if (!cfg[meta.mountPoint]) {
-                    return api.setNotSupported(`${meta.name} is not supported by this server`);
-                }
 
-                const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+                const client = new BulkDataClient(cfg, api);
                 
                 // Start an export
                 await client.kickOff({
                     method: "POST",
+                    type: meta.type,
                     body: {
                         resourceType: "Parameters",
                         parameter: [
@@ -574,14 +529,11 @@ module.exports = function(describe, it) {
                     "The status code must be `202 Accepted` and a `Content-Location` header must be " +
                     "returned. The response body should be either empty, or a JSON OperationOutcome."
             }, async (cfg, api) => {
-                if (!cfg[meta.mountPoint]) {
-                    return api.setNotSupported(`${meta.name} is not supported by this server`);
-                }
 
-                const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+                const client = new BulkDataClient(cfg, api);
                 
                 // Start an export
-                await client.kickOff();
+                await client.kickOff({ type: meta.type });
 
                 // Cancel the export immediately
                 await client.cancelIfStarted();
@@ -598,15 +550,13 @@ module.exports = function(describe, it) {
                     "The status code must be `202 Accepted` and a `Content-Location` header must be " +
                     "returned. The response body should be either empty, or a JSON OperationOutcome."
             }, async (cfg, api) => {
-                if (!cfg[meta.mountPoint]) {
-                    return api.setNotSupported(`${meta.name} is not supported by this server`);
-                }
 
-                const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg[meta.mountPoint]}`);
+                const client = new BulkDataClient(cfg, api);
                 
                 // Start an export
                 await client.kickOff({
                     method: "POST",
+                    type: meta.type,
                     body: {
                         resourceType: "Parameters",
                         parameter: []
@@ -637,16 +587,12 @@ module.exports = function(describe, it) {
                     description: "The patient parameter is not applicable to system level export requests. " +
                         "This test verifies that such invalid export attempts are being rejected."
                 }, async (cfg, api) => {
-                    
-                    if (!cfg.systemExportEndpoint) {
-                        api.setNotSupported(`The system-level export is not supported by this server`);
-                        return null;
-                    }
-        
-                    const client = new BulkDataClient(cfg, api);
-        
+                   
+                    const client = new BulkDataClient(cfg, api);                    
+
                     await client.kickOff({
                         method: "POST",
+                        type: meta.type,
                         body: {
                             resourceType: "Parameters",
                             parameter: [
@@ -684,10 +630,6 @@ module.exports = function(describe, it) {
                     description: "This test verifies that export attempts including patient are not being rejected."
                 }, async (cfg, api) => {
                     
-                    if (!cfg[meta.mountPoint]) {
-                        return api.setNotSupported(`${meta.name} is not supported by this server`);
-                    }
-        
                     const client = new BulkDataClient(cfg, api);
         
                     await client.kickOff({

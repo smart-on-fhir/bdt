@@ -309,11 +309,45 @@ function truncate(str, maxLength = 5) {
 }
 
 /**
+ * Walks thru an object (ar array) and returns the value found at the
+ * provided path. This function is very simple so it intentionally does not
+ * support any argument polymorphism, meaning that the path can only be a
+ * dot-separated string. If the path is invalid returns undefined.
+ * @param {Object} obj The object (or Array) to walk through
+ * @param {String} path The path (eg. "a.b.4.c")
+ * @returns {*} Whatever is found in the path or undefined
+ */
+function getPath(obj, path = "")
+{
+    return path.split(".").reduce((out, key) => out ? out[key] : undefined, obj)
+}
+
+/**
  * Implements all the interactions with a bulk-data server that tests may need
  * to use. Helps keeping the tests clean and readable.
  */
 class BulkDataClient
 {
+    /**
+     * The systemExportEndpoint if supported by the server
+     */
+    #systemExportEndpoint;
+
+    /**
+     * The patientExportEndpoint if supported by the server
+     */
+    #patientExportEndpoint;
+
+    /**
+     * The groupExportEndpoint if supported by the server
+     */
+    #groupExportEndpoint;
+
+    /**
+     * The capability statement
+     */
+    #capabilityStatement;
+
     constructor(options, testApi, uri)
     {
         if (!options.baseURL) {
@@ -330,6 +364,78 @@ class BulkDataClient
         this.cancelResponse  = null;
         this.accessToken     = null;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    async getCapabilityStatement(cfg, api)
+    {
+        if (!this.#capabilityStatement) {
+            this.#capabilityStatement = (await customRequest({
+                uri      : `${this.options.baseURL}/metadata`,
+                json     : true,
+                strictSSL: false,
+                headers: {
+                    accept: "application/fhir+json"
+                }
+            }).promise()).body;
+        }
+
+        return this.#capabilityStatement;
+    }
+
+    async getSystemExportEndpoint()
+    {
+        if (this.#systemExportEndpoint === undefined) {
+            const capabilityStatement = await this.getCapabilityStatement();
+            const operations = getPath(capabilityStatement, "rest.0.operation") || [];
+            const definition = operations.find(e => e.name === "export");
+            this.#systemExportEndpoint = definition ? "$export" : null;
+        }
+
+        return this.#systemExportEndpoint;
+    }
+
+    async getGroupExportEndpoint()
+    {
+        if (this.#groupExportEndpoint === undefined) {
+            if (!this.options.groupId) {
+                this.#groupExportEndpoint = null;
+            } else {
+                const capabilityStatement = await this.getCapabilityStatement();
+                let supported;
+                try {
+                    supported = !!capabilityStatement.rest[0].resource.find(
+                        x => x.type === "Group"
+                    ).operation.find(x => x.name = "group-export");
+                } catch {
+                    supported = false;
+                }
+                this.#groupExportEndpoint = supported ? `Group/${this.options.groupId}/$export` : null;
+            }
+        }
+
+        return this.#groupExportEndpoint;
+    }
+
+    async getPatientExportEndpoint()
+    {
+        if (this.#patientExportEndpoint === undefined) {
+            const capabilityStatement = await this.getCapabilityStatement();
+            let supported;
+            try {
+                supported = !!capabilityStatement.rest[0].resource.find(
+                    x => x.type === "Patient"
+                ).operation.find(x => x.name = "patient-export");
+            } catch {
+                supported = false;
+            }
+            this.#patientExportEndpoint = supported ? "Patient/$export" : null;
+        }
+
+        return this.#patientExportEndpoint;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
 
     /**
      * The purpose of this method is to attach some common properties (like
@@ -472,24 +578,24 @@ class BulkDataClient
 
         let path;
         if (type == "system") {
-            path = this.options.systemExportEndpoint;
+            path = await this.getSystemExportEndpoint();
             if (!path) {
-                throw new Error("No systemExportEndpoint defined in configuration");
+                throw new Error("System-level export is not supported by this server");
             }
         } else if (type == "patient") {
-            path = this.options.patientExportEndpoint;
+            path = await this.getPatientExportEndpoint();
             if (!path) {
-                throw new Error("No patientExportEndpoint defined in configuration");
+                throw new Error("Patient-level export is not supported by this server");
             }
         } else if (type == "group") {
-            path = this.options.groupExportEndpoint;
+            path = await this.getGroupExportEndpoint();
             if (!path) {
-                throw new Error("No groupExportEndpoint defined in configuration");
+                throw new Error("Group-level export is not supported by this server");
             }
         } else {
-            path = this.options.systemExportEndpoint ||
-                   this.options.patientExportEndpoint ||
-                   this.options.groupExportEndpoint;
+            path = await this.getSystemExportEndpoint() ||
+                   await this.getPatientExportEndpoint() ||
+                   await this.getGroupExportEndpoint();
             if (!path) {
                 throw new Error("No export endpoints defined in configuration")
             }

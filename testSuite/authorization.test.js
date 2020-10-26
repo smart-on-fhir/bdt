@@ -8,7 +8,8 @@ const {
     createJWKS,
     expectStatusCode,
     authenticate,
-    getResponseError
+    getResponseError,
+    BulkDataClient
 } = require("./lib");
 
 
@@ -49,10 +50,10 @@ module.exports = function(describe, it) {
         
         // A few tests that are the same for each of the kick-off endpoints
         [
-            { prop: "systemExportEndpoint" , name: "system-level export" },
-            { prop: "patientExportEndpoint", name: "patient-level export" },
-            { prop: "groupExportEndpoint"  , name: "group-level export" }
-        ].forEach(({ prop, name }, i) => {
+            { name: "system-level export" , endpointGetter: "getSystemExportEndpoint"  },
+            { name: "patient-level export", endpointGetter: "getPatientExportEndpoint" },
+            { name: "group-level export"  , endpointGetter: "getGroupExportEndpoint"   }
+        ].forEach(({ name, endpointGetter }, i) => {
             let y = 0;
             describe(`Kick-off request at the ${name} endpoint`, () => {
                 it ({
@@ -65,7 +66,10 @@ module.exports = function(describe, it) {
                         return api.setNotSupported(`This server does not support authorization`);
                     }
 
-                    if (!cfg[prop]) {
+                    const client = new BulkDataClient(cfg, api);
+                    const endpoint = await client[endpointGetter]();
+
+                    if (!endpoint) {
                         return api.setNotSupported(`The ${name} is not supported by this server`);
                     }
 
@@ -74,7 +78,7 @@ module.exports = function(describe, it) {
                     }
 
                     const req = await request({
-                        uri: `${cfg.baseURL}${cfg[prop]}`,
+                        uri: `${cfg.baseURL}/${endpoint}`,
                         json: true,
                         strictSSL: cfg.strictSSL,
                         headers: {
@@ -162,7 +166,10 @@ module.exports = function(describe, it) {
                         return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
                     }
 
-                    if (!cfg[prop]) {
+                    const client = new BulkDataClient(cfg, api);
+                    const endpoint = await client[endpointGetter]();
+
+                    if (!endpoint) {
                         return api.setNotSupported(`The ${name} is not supported by this server`);
                     }
 
@@ -189,7 +196,7 @@ module.exports = function(describe, it) {
                     });
                     
                     const req = request({
-                        uri: `${cfg.baseURL}${cfg[prop]}`,
+                        uri: `${cfg.baseURL}/${endpoint}`,
                         json: true,
                         strictSSL: cfg.strictSSL,
                         headers: {

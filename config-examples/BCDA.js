@@ -24,17 +24,9 @@ module.exports = {
     // Set this to false to allow tests to accept self-signed certificates.
     strictSSL: false,
 
-    // The BCDA API does not currently support system-level export
-    systemExportEndpoint: "",
-
-    // Enter the path to the patient-level export endpoint relative to the
-    // server root (e.g.: "/Patient/$export"). Keep this empty if the server
-    // does not support patient-level export.
-    patientExportEndpoint: "/Patient/$export",
-
     // The BCDA API does support group-level export but we don't know what
     // group IDs are available
-    groupExportEndpoint: "/Group/all/$export",
+    groupId: "all",
 
     // While testing we need to attempt downloading at least one resource type.
     // Please enter the resource type that would be fast to export (because

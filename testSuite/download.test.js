@@ -5,81 +5,34 @@ const { BulkDataClient, getResponseError, request } = require("./lib");
 
 module.exports = function(describe, it, before, after, beforeEach, afterEach) {
 
-    function createClient(cfg, api)
-    {
-        // Create a client to download the fastest resource.
-        let pathName = cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint;
+    describe("Download Endpoint", () => {
 
-        if (!pathName) {
-            api.setNotSupported(`No export endpoints configured`);
-            return null;
-        }
-
-        const resourceType = cfg.fastestResource || "Patient";
-        return new BulkDataClient(cfg, api, `${cfg.baseURL}${pathName}?_type=${resourceType}`);
-    }
-
-    describe({ version: "1.2", name: "Download Endpoint" }, () => {
-
-        // let CLIENT;
-
-        // function getClient(cfg, api)
-        // {
-        //     if (!CLIENT) {
-        //         // Create a client to download the fastest resource.
-        //         let pathName = cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint;
-
-        //         if (!pathName) {
-        //             api.setNotSupported(`No export endpoints configured`);
-        //             return null;
-        //         }
-
-        //         const resourceType = cfg.fastestResource || "Patient";
-        //         CLIENT = new BulkDataClient(cfg, api, `${cfg.baseURL}${pathName}?_type=${resourceType}`);
-        //     }
-        //     return CLIENT;
-        // }   
-
-        // before(() => console.log(">"));
-        // after(() => console.log("<"));
-        // beforeEach(() => console.log(" ->"));
-        // afterEach(() => console.log(" <-"));
-
-        // Using the URIs supplied by the FHIR server in the Complete Status response body,
-        // a client MAY download the generated bulk data files (one or more per resource type)
-        // within the specified Expires time period. If the requiresAccessToken field in the
-        // Complete Status body is set to true, the request MUST include a valid access token.
-        // See the Security Considerations section above.
-        // const client = new BulkDataClient()
-
+        
         it ({
             id  : "Download-01",
             name: "Requires valid access token if the requiresAccessToken field in the status body is true",
             description: "If the `requiresAccessToken` field in the Complete Status body is " +
                 "set to true, the request MUST include a valid access token."
         }, async (cfg, api) => {
-
-            // Create a client to download the fastest resource.
-            const client = createClient(cfg, api);
-            if (client) {
-                try {
-                    const { body } = await client.getExportResponse();
-                    if (body.requiresAccessToken) {
-                        const response = await client.downloadFileAt(0, true);
-                        expect(response.statusCode, getResponseError(response)).to.be.above(399);
-                    } else {
-                        api.decorateHTML(
-                            "NOTE",
-                            "<div><b>NOTE: </b> This test was not executed because the " +
-                            "<code>requiresAccessToken</code> field in the complete status " +
-                            "body was <b>not</b> set to <code>true</code>.</div>"
-                        );
-                    }
-                } catch (ex) {
-                    throw ex;
-                } finally {
-                    await client.cancel();
+            const client = new BulkDataClient(cfg, api);
+            try {
+                await client.kickOff({ params: { _type: cfg.fastestResource || "Patient" }});
+                const { body } = await client.getExportResponse();
+                if (body.requiresAccessToken) {
+                    const response = await client.downloadFileAt(0, true);
+                    expect(response.statusCode, getResponseError(response)).to.be.above(399);
+                } else {
+                    api.decorateHTML(
+                        "NOTE",
+                        "<div><b>NOTE: </b> This test was not executed because the " +
+                        "<code>requiresAccessToken</code> field in the complete status " +
+                        "body was <b>not</b> set to <code>true</code>.</div>"
+                    );
                 }
+            } catch (ex) {
+                throw ex;
+            } finally {
+                await client.cancel();
             }
         });
 
@@ -88,26 +41,23 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
             name: "Does not require access token if the requiresAccessToken field in the status body is not true",
             description: "Verifies that files can be downloaded without authorization if the `requiresAccessToken` field in the complete status body is not set to true"
         }, async (cfg, api) => {
-            // Create a client to download the fastest resource.
-            const client = createClient(cfg, api);
-            if (client) {
-                try {
-                    await client.kickOff();
-                    await client.waitForExport();
-                    if (!client.statusResponse.body.requiresAccessToken) {
-                        const response = await client.downloadFileAt(0, true);
-                        expect(response.statusCode, getResponseError(response)).to.be.below(400);
-                    } else {
-                        api.decorateHTML(
-                            "NOTE",
-                            "<div>This test was not executed because the <code>requiresAccessToken</code> field in the complete status body was set to <code>true</code>.</div>"
-                        );
-                    }
-                } catch (ex) {
-                    throw ex;
-                } finally {
-                    await client.cancel();
+            const client = new BulkDataClient(cfg, api);
+            try {
+                await client.kickOff({ params: { _type: cfg.fastestResource || "Patient" }});
+                await client.waitForExport();
+                if (!client.statusResponse.body.requiresAccessToken) {
+                    const response = await client.downloadFileAt(0, true);
+                    expect(response.statusCode, getResponseError(response)).to.be.below(400);
+                } else {
+                    api.decorateHTML(
+                        "NOTE",
+                        "<div>This test was not executed because the <code>requiresAccessToken</code> field in the complete status body was set to <code>true</code>.</div>"
+                    );
                 }
+            } catch (ex) {
+                throw ex;
+            } finally {
+                await client.cancel();
             }
         });
 
@@ -117,40 +67,39 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
             description: "Runs a set of assertions to verify that:\n" +
                 "- The server returns HTTP status of **200 OK**.\n" +
                 "- The server returns a `Content-Type` header that matches the file format being delivered. " +
-                    "For files in ndjson format, MUST be `application/fhir+ndjson`.\n" +
+                "For files in ndjson format, MUST be `application/fhir+ndjson`.\n" +
                 "- The response body is valid FHIR **ndjson** (unless other format is requested).\n" +
                 "- An `Accept` header might be sent (optional, defaults to `application/fhir+ndjson`)."
         }, async (cfg, api) => {
-            const client = createClient(cfg, api);
-            if (client) {
-                try {
-                    const resp = await client.downloadFileAt(0);
+            const client = new BulkDataClient(cfg, api);
+            try {
+                await client.kickOff({ params: { _type: cfg.fastestResource || "Patient" }});    
+                const resp = await client.downloadFileAt(0);
 
-                    expect(resp.statusCode, getResponseError(resp)).to.equal(200);
-                    expect(resp.headers["content-type"], getResponseError(resp)).to.equal("application/fhir+ndjson");
-                    expect(resp.body, getResponseError(resp)).to.not.be.empty();
+                expect(resp.statusCode, getResponseError(resp)).to.equal(200);
+                expect(resp.headers["content-type"], getResponseError(resp)).to.equal("application/fhir+ndjson");
+                expect(resp.body, getResponseError(resp)).to.not.be.empty();
 
-                    const lines = resp.body.split(/\r?\n/);
-                    
-                    lines.forEach((line, i) => {
-                        if (!line) {
-                            api.decorateHTML("eol-warning", i === lines.length - 1 ?
-                                '<div class="warning">The NDJSON file ends with new line. This could confuse some parsers.</div>' :
-                                '<div class="warning">The NDJSON file contains empty lines. This could confuse some parsers.</div>'
-                            , "warning");
-                        } else {
-                            try {
-                                JSON.parse(line);
-                            } catch (ex) {
-                                throw new Error(`Failed to parse line ${i + 1}: ${ex.message}`);
-                            }
+                const lines = resp.body.split(/\r?\n/);
+                
+                lines.forEach((line, i) => {
+                    if (!line) {
+                        api.decorateHTML("eol-warning", i === lines.length - 1 ?
+                            '<div class="warning">The NDJSON file ends with new line. This could confuse some parsers.</div>' :
+                            '<div class="warning">The NDJSON file contains empty lines. This could confuse some parsers.</div>'
+                        , "warning");
+                    } else {
+                        try {
+                            JSON.parse(line);
+                        } catch (ex) {
+                            throw new Error(`Failed to parse line ${i + 1}: ${ex.message}`);
                         }
-                    });
-                } catch (ex) {
-                    throw ex;
-                } finally {
-                    await client.cancel();
-                }
+                    }
+                });
+            } catch (ex) {
+                throw ex;
+            } finally {
+                await client.cancel();
             }
         });
 
@@ -170,16 +119,10 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                 );
             }
 
-            // Create a client to download the fastest resource.
-            let pathName = cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint;
-
-            if (!pathName) {
-                return api.setNotSupported(`No export endpoints configured`);
-            }
-
-            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${pathName}?_type=Patient`);
+            const client = new BulkDataClient(cfg, api);
 
             // Do an export using the full access scopes
+            await client.kickOff({ params: { _type: cfg.fastestResource || "Patient" }});    
             const resp = await client.getExportResponse();
 
             if (!client.statusResponse.body.requiresAccessToken) {
@@ -234,6 +177,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     _type: "DocumentReference"
                 }
             });
+
             if (client.kickOffResponse.statusCode !== 202 || !client.kickOffResponse.headers["content-location"]) {
                 await client.cancel();
                 return api.setNotSupported(`Unable to export DocumentReference resources. Perhaps the server does not support that.`);
@@ -377,16 +321,12 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                 "the server SHALL return a 404 error and an associated FHIR OperationOutcome in JSON format."
         }, async (cfg, api) => {
             
-            let pathName = cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint;
+            const client = new BulkDataClient(cfg, api);
 
-            if (!pathName) {
-                api.setNotSupported(`No export endpoints configured`);
-                return null;
-            }
-
-            const client = createClient(cfg, api);
             if (client) {
                 try {
+                    await client.kickOff({ params: { _type: cfg.fastestResource || "Patient" }});
+
                     const resp = await client.downloadFileAt(0);
 
                     expect(resp.statusCode, getResponseError(resp)).to.equal(200);
@@ -499,16 +439,17 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
             description: "The patient parameter is not applicable to system level export requests. " +
                 "This test verifies that such invalid export attempts are being rejected."
         }, async (cfg, api) => {
-            
-            if (!cfg.systemExportEndpoint) {
+
+            const client = new BulkDataClient(cfg, api);
+
+            if (!(await client.getSystemExportEndpoint())) {
                 api.setNotSupported(`The system-level export is not supported by this server`);
                 return null;
             }
 
-            const client = new BulkDataClient(cfg, api, `${cfg.baseURL}${cfg.systemExportEndpoint}`);
-
             await client.kickOff({
                 method: "POST",
+                type: "system",
                 body: {
                     resourceType: "Parameters",
                     parameter: [

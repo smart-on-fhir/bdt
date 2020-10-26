@@ -41,21 +41,9 @@ module.exports = {
     // Change to "start" to supports the old-style parameter.
     sinceParam: "_since",
 
-    // Enter the path to the system-level export endpoint relative to the server
-    // root (e.g.: "/$export"). Keep this empty if the server does not support
-    // system-level export.
-    systemExportEndpoint: "/$export",
-
-    // Enter the path to the patient-level export endpoint relative to the
-    // server root (e.g.: "/Patient/$export"). Keep this empty if the server
-    // does not support patient-level export.
-    patientExportEndpoint: "/Patient/$export",
-
-    // Enter the path to the system-level export endpoint relative to the server
-    // root (e.g.: "/Group/5/$export"). Please use the id of the group having
-    // the least amount of resources. Keep this empty if the server does not
-    // support group-level export.
-    groupExportEndpoint: "",
+    // Enter the ID of the Group used for testing. Keep this empty if the server
+    // does not support group-level export.
+    groupId: "",
 
     // Set this to true if the server supports JWKS URL authorization.
     // NOTE: These tests ate not available in CLI environment.
