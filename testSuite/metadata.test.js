@@ -160,12 +160,6 @@ module.exports = function(describe, it) {
                     return api.warn(`No capability statement found at "${cfg.baseURL}/metadata"`);
                 }
 
-                // If the server has not declared that it supports this type of
-                // export, then skip the test
-                if (!String(cfg.systemExportEndpoint || "").trim()) {
-                    return api.setNotSupported(`The "export" operation is not supported by this server`);
-                }
-
                 // If a CapabilityStatement was found, then the export
                 // operations MUST be defined.
                 try {
