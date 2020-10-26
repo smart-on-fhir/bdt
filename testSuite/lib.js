@@ -331,28 +331,29 @@ class BulkDataClient
     /**
      * The systemExportEndpoint if supported by the server
      */
-    #systemExportEndpoint;
+    // _systemExportEndpoint;
 
     /**
      * The patientExportEndpoint if supported by the server
      */
-    #patientExportEndpoint;
+    // _patientExportEndpoint;
 
     /**
      * The groupExportEndpoint if supported by the server
      */
-    #groupExportEndpoint;
+    // _groupExportEndpoint;
 
     /**
      * The capability statement
      */
-    #capabilityStatement;
+    // _capabilityStatement;
 
     constructor(options, testApi, uri)
     {
         if (!options.baseURL) {
             throw new Error("A baseURL option is required");
         }
+
         this.options         = options;
         this.testApi         = testApi;
         this.url             = options.baseURL.replace(/\/*$/, "/");
@@ -369,8 +370,8 @@ class BulkDataClient
 
     async getCapabilityStatement(cfg, api)
     {
-        if (!this.#capabilityStatement) {
-            this.#capabilityStatement = (await customRequest({
+        if (!this._capabilityStatement) {
+            this._capabilityStatement = (await customRequest({
                 uri      : `${this.options.baseURL}/metadata`,
                 json     : true,
                 strictSSL: false,
@@ -380,26 +381,26 @@ class BulkDataClient
             }).promise()).body;
         }
 
-        return this.#capabilityStatement;
+        return this._capabilityStatement;
     }
 
     async getSystemExportEndpoint()
     {
-        if (this.#systemExportEndpoint === undefined) {
+        if (this._systemExportEndpoint === undefined) {
             const capabilityStatement = await this.getCapabilityStatement();
             const operations = getPath(capabilityStatement, "rest.0.operation") || [];
             const definition = operations.find(e => e.name === "export");
-            this.#systemExportEndpoint = definition ? "$export" : null;
+            this._systemExportEndpoint = definition ? "$export" : null;
         }
 
-        return this.#systemExportEndpoint;
+        return this._systemExportEndpoint;
     }
 
     async getGroupExportEndpoint()
     {
-        if (this.#groupExportEndpoint === undefined) {
+        if (this._groupExportEndpoint === undefined) {
             if (!this.options.groupId) {
-                this.#groupExportEndpoint = null;
+                this._groupExportEndpoint = null;
             } else {
                 const capabilityStatement = await this.getCapabilityStatement();
                 let supported;
@@ -410,16 +411,16 @@ class BulkDataClient
                 } catch {
                     supported = false;
                 }
-                this.#groupExportEndpoint = supported ? `Group/${this.options.groupId}/$export` : null;
+                this._groupExportEndpoint = supported ? `Group/${this.options.groupId}/$export` : null;
             }
         }
 
-        return this.#groupExportEndpoint;
+        return this._groupExportEndpoint;
     }
 
     async getPatientExportEndpoint()
     {
-        if (this.#patientExportEndpoint === undefined) {
+        if (this._patientExportEndpoint === undefined) {
             const capabilityStatement = await this.getCapabilityStatement();
             let supported;
             try {
@@ -429,10 +430,10 @@ class BulkDataClient
             } catch {
                 supported = false;
             }
-            this.#patientExportEndpoint = supported ? "Patient/$export" : null;
+            this._patientExportEndpoint = supported ? "Patient/$export" : null;
         }
 
-        return this.#patientExportEndpoint;
+        return this._patientExportEndpoint;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -509,12 +510,9 @@ class BulkDataClient
 
         if (this.options.authType == "client-credentials") {
             if (!this.options.clientSecret) {
-                throw new Error('Unable to authorize! A "clientSecret" option is needed for client-credentials authentication.')
+                throw new Error('Unable to authorize! A "clientSecret" option is needed for client-credentials authentication.');
             }
-            return await this.authorizeWithCredentials({
-                requestLabel,
-                responseLabel
-            });
+            return await this.authorizeWithCredentials({ requestLabel, responseLabel });
         }
 
         const request = customRequest({
@@ -597,7 +595,7 @@ class BulkDataClient
                    await this.getPatientExportEndpoint() ||
                    await this.getGroupExportEndpoint();
             if (!path) {
-                throw new Error("No export endpoints defined in configuration")
+                throw new Error("No export endpoints defined in configuration");
             }
         }
 
