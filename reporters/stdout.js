@@ -255,6 +255,7 @@ module.exports = function StdoutReporter()
     let notSupported   = 0;
     let warnings       = 0;
     let skipped        = 0;
+    let settings       = {};
 
     function onStart() {
         startTime = Date.now();
@@ -273,7 +274,7 @@ module.exports = function StdoutReporter()
     }
 
     function onGroupStart(node) {
-        if (node.name !== "__ROOT__") {
+        if (!settings.match && node.name !== "__ROOT__") {
             log(`${indent(depth++)} ${icon(node)} ${node.name.bold}`);
         }
     }
@@ -338,6 +339,7 @@ module.exports = function StdoutReporter()
     return {
         attach(runner)
         {
+            settings = runner.settings;
             runner.on("start"     , onStart     );
             runner.on("groupStart", onGroupStart);
             runner.on("end"       , onEnd       );
