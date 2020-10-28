@@ -201,12 +201,6 @@ module.exports = function(describe, it) {
                     return api.warn(`No capability statement found at "${cfg.baseURL}/metadata"`);
                 }
 
-                // If the server has not declared that it supports this type of
-                // export, then skip the test
-                if (!String(cfg.patientExportEndpoint || "").trim()) {
-                    return api.setNotSupported(`The "patient-export" operation is not supported by this server`);
-                }
-
                 // If a CapabilityStatement was found, then the export
                 // operations MUST be defined.
                 try {
@@ -247,12 +241,6 @@ module.exports = function(describe, it) {
                 // However, missing a CapabilityStatement will generate a warning.
                 if (response.statusCode === 404) {
                     return api.warn(`No capability statement found at "${cfg.baseURL}/metadata"`);
-                }
-
-                // If the server has not declared that it supports this type of
-                // export, then skip the test
-                if (!String(cfg.groupExportEndpoint || "").trim()) {
-                    return api.setNotSupported(`The "group-export" operation is not supported by this server`);
                 }
 
                 // If a CapabilityStatement was found, then the export
