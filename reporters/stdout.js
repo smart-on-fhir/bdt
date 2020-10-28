@@ -1,7 +1,6 @@
 require("colors");
 
-const sax = require("sax");
-const md  = require("markdown-it")();
+const md = require("markdown-it")();
 
 
 // Every test that takes more than DURATION_MEDIUM (but less then DURATION_SLOW)
@@ -142,7 +141,7 @@ function wrap(str, linePrefix = "", maxLen = 80) {
     return lines.join("\n" + linePrefix);
 }
 
-function parseHTML(html, linePrefix = "\t") {
+function parseMD(html, linePrefix = "\t") {
 
     function render(tokens, context = {}) {
         let out = "";
@@ -301,7 +300,7 @@ module.exports = function StdoutReporter()
             failed += 1;
             if (node.description) {
                 log(`${indent(depth + 1)} ${"├─".grey} ${
-                    parseHTML(node.description, `${indent(depth + 1)} ${"│ ".grey} `)
+                    parseMD(node.description, `${indent(depth + 1)} ${"│ ".grey} `)
                 }`);    
             }
             log(`${indent(depth + 1)} ${"└⯈".grey} ${node.error.message.red}`);
@@ -312,7 +311,7 @@ module.exports = function StdoutReporter()
                 warnings += len;
                 if (node.description) {
                     log(`${indent(depth + 1)} ${"├─".grey} ${
-                        parseHTML(node.description, `${indent(depth + 1)} ${"│ ".grey} `)
+                        parseMD(node.description, `${indent(depth + 1)} ${"│ ".grey} `)
                     }`);    
                 }
                 node.warnings.forEach((w, i) => {
