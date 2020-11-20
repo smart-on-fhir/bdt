@@ -41,6 +41,5 @@ module.exports = {
             }
         ]
     },
-    "scope": "system/*.read",
-    "jwksUrl": "http://localhost:3002/jwks"
+    "scope": "system/*.read"
 };

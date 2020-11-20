@@ -9,7 +9,7 @@ module.exports = {
     //   tests will be skipped.
     // - If "client-credentials" most of the authorization tests will be skipped.
     // - If "backend-services" (default) all tests will be executed. `jwks` or
-    //   `jwksUrl` auth must be supported in this case.
+    //   `jwks url` auth must be supported in this case.
     authType: "backend-services",
 
     // Set this to false if your server does not require authentication. This
@@ -45,10 +45,6 @@ module.exports = {
     // Set this to true if the server supports JWKS URL authorization.
     // NOTE: These tests ate not available in CLI environment.
     jwksUrlAuth: false,
-
-    // The fill URL on which the JWK keys are hosted. This will not be used
-    // unless `jwksUrlAuth` is set to `true`. Not available in CLI environment.
-    jwksUrl: "https://...",
 
     // The Private Key as JWK. Required if authType is set to "backend-services"
     // and ignored otherwise

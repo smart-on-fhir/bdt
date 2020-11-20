@@ -8,7 +8,7 @@ module.exports = {
     //   tests will be skipped.
     // - If "client-credentials" most of the authorization tests will be skipped.
     // - If "backend-services" (default) all tests will be executed. `jwks` or
-    //   `jwksUrl` auth must be supported in this case.
+    //   `jwks url` auth must be supported in this case.
     authType: "backend-services",
 
     // REQUIRED: The full URL of the token endpoint
