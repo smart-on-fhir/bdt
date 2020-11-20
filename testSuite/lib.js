@@ -329,21 +329,6 @@ function getPath(obj, path = "")
 class BulkDataClient
 {
     /**
-     * The systemExportEndpoint if supported by the server
-     */
-    // _systemExportEndpoint;
-
-    /**
-     * The patientExportEndpoint if supported by the server
-     */
-    // _patientExportEndpoint;
-
-    /**
-     * The groupExportEndpoint if supported by the server
-     */
-    // _groupExportEndpoint;
-
-    /**
      * The capability statement
      */
     // _capabilityStatement;

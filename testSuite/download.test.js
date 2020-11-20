@@ -354,13 +354,11 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
             {
                 idPrefix   : "Patient-level",
                 name       : "Patient-level export",
-                mountPoint : "patientExportEndpoint",
                 type       : "patient"
             },
             {
                 idPrefix   : "Group-level",
                 name       : "Group-level export",
-                mountPoint : "groupExportEndpoint",
                 type       : "group"
             }
         ].forEach((meta, index) => {
