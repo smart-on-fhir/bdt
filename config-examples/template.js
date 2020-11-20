@@ -38,9 +38,6 @@ module.exports = {
     // server.
     fastestResource: "Patient",
 
-    // Change to "start" to supports the old-style parameter.
-    sinceParam: "_since",
-
     // Enter the ID of the Group used for testing. Keep this empty if the server
     // does not support group-level export.
     groupId: "",

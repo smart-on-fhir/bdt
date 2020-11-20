@@ -5,7 +5,6 @@ module.exports = {
     "description": "",
     "baseURL": "https://34.73.85.246",
     "fastestResource": "Practitioner",
-    "sinceParam": "_since",
     "authType": "backend-services",
     "jwksAuth": true,
     "jwksUrlAuth": false,

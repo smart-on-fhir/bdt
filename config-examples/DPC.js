@@ -12,7 +12,6 @@ module.exports = {
     requiresAuth: true,
     fastestResource: "Group",
     groupId: "e42a540e-f811-411a-b3b5-6c73aadbf9e6",
-    sinceParam: "_since",
     scope: "system/*.*",
     privateKey: {
         "kty":"RSA",
