@@ -266,18 +266,18 @@ module.exports = function(describe, it) {
                     'a `token_endpoint` property is declared ' +
                     'within that file.'
             }, async(cfg, api) => {
-                const json = await fetchWellKnownSmartConfiguration(cfg, api);
+                const response = await fetchWellKnownSmartConfiguration(cfg, api);
 
                 // Having a WellKnown JSON is optional but we show a warning if
                 // it is missing.
-                if (json.statusCode === 404) {
+                if (response.statusCode === 404) {
                     return api.warn(`No WellKnown JSON found at "${cfg.baseURL}/.well-known/smart-configuration"`);
                 }
 
                 // If WellKnown JSON is found, then it must include the 
                 // "token_endpoint" property
                 try {
-                    expect(json).to.include("token_endpoint");
+                    expect(response.body).to.include("token_endpoint");
                 } catch(ex) {
                     throw new Error('The WellKnown JSON did not include a "token_endpoint" declaration');
                 }
