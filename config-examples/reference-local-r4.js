@@ -1,3 +1,5 @@
+// This file will configure BDT to test a locally running instance of the
+// reference bulk data server (https://github.com/smart-on-fhir/bulk-data-server)
 module.exports = {
 
     // REQUIRED: The full URL of the server to which we can append "/$export".
@@ -25,7 +27,7 @@ module.exports = {
 
     // Enter the ID of the Group used for testing. Keep this empty if the server
     // does not support group-level export.
-    groupId: "6",
+    groupId: "ff7dc35f-79e9-47a0-af22-475cf301a085",
 
     // While testing we need to attempt downloading at least one resource type.
     // Please enter the resource type that would be fast to export (because

@@ -9,51 +9,10 @@ const {
     expectStatusCode,
     authenticate,
     getResponseError,
-    BulkDataClient,
-    wait
+    BulkDataClient
 } = require("./lib");
 
 
-// {
-//     "alg": "HS256",
-//     "typ": "JWT"
-// }
-// {
-//   "scope": "system/*.*",
-//   "token_type": "bearer",
-//   "expires_in": 600,
-//   "access_token": "",
-//   "iat": 1548900000 // Wed Jan 30 2019 21:00:00 GMT-0500 (Eastern Standard Time)
-// }
-// const EXPIRED_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZS" +
-//     "I6InN5c3RlbS8qLioiLCJ0b2tlbl90eXBlIjoiYmVhcmVyIiwiZXhwaXJlc19pbiI6NjAwLC" +
-//     "JhY2Nlc3NfdG9rZW4iOiIiLCJpYXQiOjE1NDg5MDAwMDB9.R4cr28kxx9V4mzu8sJ5fg7zGq" +
-//     "I-A5R77v5BhDuN-7jc";
-
-// {
-//   "alg": "HS256",
-//   "typ": "JWT"
-// }
-// {
-//   "scope": "system/*.*",
-//   "token_type": "bearer",
-//   "expires_in": 600,
-//   "access_token": "",
-//   "iat": 1548900000 // Wed Jan 30 2019 21:00:00 GMT-0500 (Eastern Standard Time)
-// }
-// const WRONG_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6" +
-//     "InN5c3RlbS8qLioiLCJ0b2tlbl90eXBlIjoiYmVhcmVyIiwiZXhwaXJlc19pbiI6NjAwLCJh" +
-//     "Y2Nlc3NfdG9rZW4iOiIiLCJpYXQiOjE1NDg5MDAwMDB9.er7H4904s8yMlaOmGLPxJzq7Z-i" +
-//     "fSrDuHccVuijgWr4";
-
-// function test({ pre = [] })
-// {
-//     return async function(cfg, api) {
-//         for (const fn of pre) {
-//             const result = await fn();
-//         }
-//     };
-// }
 
 async function getAccessToken(cfg, body= {}, signOptions = {})
 {
