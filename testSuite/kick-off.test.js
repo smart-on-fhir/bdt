@@ -1,3 +1,4 @@
+const { expect } = require("code");
 const { BulkDataClient } = require("./lib");
 
 const exportTypes = [
@@ -461,8 +462,9 @@ module.exports = function(describe, it) {
             it ({
                 id  : `${meta.idPrefix}-${count++}`,
                 name: "Accepts the _typeFilter parameter",
+                maxVersion: "1.0",
                 description: "The `_typeFilter` parameter is optional so the servers " +
-                    "should not reject it, even if they don't support it"
+                    "should reply with a server error, even if they don't support it"
             }, async (cfg, api) => {
 
                 const client = new BulkDataClient(cfg, api);
@@ -477,6 +479,62 @@ module.exports = function(describe, it) {
 
                 // Cancel the export immediately
                 await client.cancelIfStarted();
+
+                // In version 1.0 it is not clear how the servers should respond
+                // if they do not support the _typeFilter parameter. The can
+                // reply with error or just ignore it. All we can do here is to
+                // verify that the presence of the _typeFilter did not result in
+                // a server error
+
+                if (client.kickOffResponse.statusCode === 202) {
+                    return client.expectSuccessfulKickOff();
+                } else {
+                    expect(client.kickOffResponse.statusCode).to.be.between(399, 499);
+                }
+            });
+
+            it ({
+                id  : `${meta.idPrefix}-${count++}`,
+                name: "Handles the _typeFilter parameter",
+                version: "1.2",
+                description: "The `_typeFilter` parameter is optional. Servers that do not support it " +
+                    "should reject it, unless `handling=lenient` is included in the `Prefer` header"
+            }, async (cfg, api) => {
+
+                const client = new BulkDataClient(cfg, api);
+
+                // First attempt
+                await client.kickOff({
+                    type: meta.type,
+                    params: {
+                        _typeFilter: "Patient?status=active"
+                    }
+                });
+
+                await client.cancelIfStarted();
+
+                // If the export was successful assume that _typeFilter is
+                // supported. We have nothing else to do here.
+                if (client.kickOffResponse.statusCode === 202) {
+                    return client.expectSuccessfulKickOff();
+                }
+
+                // Second attempt
+                await client.kickOff({
+                    type: meta.type,
+                    headers: {
+                        prefer: "respond-async,handling=lenient"
+                    },
+                    params: {
+                        _typeFilter: "Patient?status=active"
+                    }
+                });
+
+                await client.cancelIfStarted();
+
+                if (client.kickOffResponse.statusCode !== 202) {
+                    throw new Error("The server was expected to ignore the _typeFilter parameter if handling=lenient is included in the Prefer header");
+                }
 
                 // Verify that we didn't get an error
                 client.expectSuccessfulKickOff();
@@ -516,6 +574,36 @@ module.exports = function(describe, it) {
 
                 if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
                     return api.setNotSupported(`It seems that ${meta.name} via POST is not supported by this server`);
+                }
+
+                // If the export was successful assume that _typeFilter is
+                // supported. We have nothing else to do here.
+                if (client.kickOffResponse.statusCode === 202) {
+                    return client.expectSuccessfulKickOff();
+                }
+
+                // Second attempt
+                await client.kickOff({
+                    method: "POST",
+                    type: meta.type,
+                    headers: {
+                        prefer: "respond-async,handling=lenient"
+                    },
+                    body: {
+                        resourceType: "Parameters",
+                        parameter: [
+                            {
+                                name: "_typeFilter",
+                                valueString: "Patient?status=active"
+                            }
+                        ]
+                    }
+                });
+
+                await client.cancelIfStarted();
+
+                if (client.kickOffResponse.statusCode !== 202) {
+                    throw new Error("The server was expected to ignore the _typeFilter parameter if handling=lenient is included in the Prefer header");
                 }
 
                 // Verify that we didn't get an error

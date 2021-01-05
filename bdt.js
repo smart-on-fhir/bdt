@@ -434,9 +434,6 @@ class Runner extends EventEmitter
                 }
             }
 
-            
-
-
             if (typeof _node.notSupported == "function") {
                 const check = _node.notSupported(this.settings);
                 if (check !== false) {
@@ -451,6 +448,10 @@ class Runner extends EventEmitter
 
             if (currentGroup.beforeEach) {
                 await currentGroup.beforeEach();
+            }
+
+            if (_node.before) {
+                await _node.before(this.settings, api);
             }
 
             try {
@@ -468,6 +469,9 @@ class Runner extends EventEmitter
             } catch (ex) {
                 next(ex);
             } finally {
+                if (_node.after) {
+                    await _node.after(this.settings, api);
+                }
                 if (currentGroup.afterEach) {
                     await currentGroup.afterEach();
                 }

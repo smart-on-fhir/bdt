@@ -226,7 +226,7 @@ function expectOperationOutcome(response, message = "")
 function createClientAssertion(claims = {}, signOptions = {}, privateKey)
 {
     let jwtToken = {
-        exp: Math.round(Date.now() / 1000) + 300, // 5 min
+        // exp: Math.round(Date.now() / 1000) + 300, // 5 min
         jti: crypto.randomBytes(32).toString("hex"),
         ...claims
     };
@@ -234,6 +234,7 @@ function createClientAssertion(claims = {}, signOptions = {}, privateKey)
     const _signOptions = {
         algorithm: privateKey.alg,
         keyid: privateKey.kid,
+        expiresIn: 300, // 5 min
         ...signOptions,
         header: {
             // jku: jwks_url || undefined,
@@ -364,6 +365,10 @@ class BulkDataClient
         this.cancelRequest   = null;
         this.cancelResponse  = null;
         this.accessToken     = null;
+
+        this._systemExportEndpoint  = options.systemExportEndpoint;
+        this._patientExportEndpoint = options.patientExportEndpoint;
+        this._groupExportEndpoint   = options.groupExportEndpoint;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -572,7 +577,7 @@ class BulkDataClient
      */
     async kickOff(options = {})
     {
-        const { params, type, ...rest } = options;
+        const { params, type, skipAuth, ...rest } = options;
 
         let path;
         if (type == "system") {
@@ -616,12 +621,6 @@ class BulkDataClient
                                 valueInstant: params[key]
                             });
                         break;
-                        case "_outputFormat":
-                            rest.body.parameter.push({
-                                name: "_outputFormat",
-                                valueString: params[key]
-                            });
-                        break;
                         case "patient":
                             rest.body.parameter = rest.body.parameter.concat(
                                 params[key].map(id => ({
@@ -638,6 +637,15 @@ class BulkDataClient
                                 }))
                             );
                         break;
+                        case "_outputFormat":
+                        case "_elements":
+                        case "_includeAssociatedData":
+                        case "_typeFilter":
+                            rest.body.parameter.push({
+                                name: key,
+                                valueString: params[key]
+                            });
+                        break;
                     }
                 }
             } else {
@@ -646,16 +654,27 @@ class BulkDataClient
                 }
             }
         }
-        this.kickOffRequest = await this.request({
+
+        const requestOptions = {
             url,
             json: true,
+            strictSSL: !!this.options.strictSSL,
             ...rest,
             headers: {
                 accept: "application/fhir+json",
                 prefer: "respond-async",
                 ...rest.headers
             }
-        });
+        };
+
+        // console.log(requestOptions)
+
+        this.kickOffRequest = await this.request(
+            requestOptions,
+            skipAuth === undefined ?
+                Object.keys(requestOptions.headers).some(name => name.toLocaleLowerCase() === "authorization") :
+                !!skipAuth
+        );
         this.testApi.logRequest(this.kickOffRequest, "Kick-off Request");
         const { response } = await this.kickOffRequest.promise();
         this.kickOffResponse = response;
