@@ -1,6 +1,7 @@
-const { EventEmitter } = require("events");
-const glob             = require("glob");
-const path             = require("path");
+const { EventEmitter }      = require("events");
+const glob                  = require("glob");
+const path                  = require("path");
+const { NotSupportedError } = require("./testSuite/lib");
 
 /**
  * The root node of the tests structure. This will be augmented when the tests
@@ -395,14 +396,19 @@ class Runner extends EventEmitter
             const api = createTestAPI(_node);
             const next = (error) => {
                 _node.endedAt = Date.now();
+
                 if (error) {
-                    _node.status = "failed";
-                    _node.error = {
-                        ...error,
-                        message: String(error)
-                    };
-                    if (this.settings.bail) {
-                        this.cancel();
+                    if (error instanceof NotSupportedError) {
+                        api.setNotSupported(error.message);
+                    } else {
+                        _node.status = "failed";
+                        _node.error = {
+                            ...error,
+                            message: String(error)
+                        };
+                        if (this.settings.bail) {
+                            this.cancel();
+                        }
                     }
                 } else {
                     if (_node.warnings.length) {
@@ -413,6 +419,7 @@ class Runner extends EventEmitter
                         _node.status = _node.fn ? "succeeded" : "not-implemented";
                     }
                 }
+
                 this.emit("testEnd", _node);
             };
 

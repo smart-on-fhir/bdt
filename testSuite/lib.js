@@ -578,24 +578,24 @@ class BulkDataClient
         if (type == "system") {
             path = await this.getSystemExportEndpoint();
             if (!path) {
-                throw new Error("System-level export is not supported by this server");
+                throw new NotSupportedError("System-level export is not supported by this server");
             }
         } else if (type == "patient") {
             path = await this.getPatientExportEndpoint();
             if (!path) {
-                throw new Error("Patient-level export is not supported by this server");
+                throw new NotSupportedError("Patient-level export is not supported by this server");
             }
         } else if (type == "group") {
             path = await this.getGroupExportEndpoint();
             if (!path) {
-                throw new Error("Group-level export is not supported by this server");
+                throw new NotSupportedError("Group-level export is not supported by this server");
             }
         } else {
             path = await this.getSystemExportEndpoint() ||
                    await this.getPatientExportEndpoint() ||
                    await this.getGroupExportEndpoint();
             if (!path) {
-                throw new Error("No export endpoints defined in configuration");
+                throw new NotSupportedError("No export endpoints defined in configuration");
             }
         }
 
@@ -879,6 +879,8 @@ class BulkDataClient
     }
 }
 
+class NotSupportedError extends Error {}
+
 module.exports = {
     request: customRequest,
     createClientAssertion,
@@ -890,5 +892,6 @@ module.exports = {
     BulkDataClient,
     createJWKS,
     authenticate,
-    getResponseError
+    getResponseError,
+    NotSupportedError
 };
