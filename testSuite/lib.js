@@ -266,7 +266,7 @@ function authenticate(tokenUrl, postBody) {
  */
 function getResponseError(resp)
 {
-    let msg = `Requesting ${resp.request.uri.href} returned ${resp.statusCode} ${resp.statusMessage}`;
+    let msg = `${resp.request.method} ${resp.request.uri.href} returned ${resp.statusCode} ${resp.statusMessage}`;
 
     try {
         const type = resp.headers["content-type"] || "text/plain";
