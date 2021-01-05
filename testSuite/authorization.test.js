@@ -13,210 +13,124 @@ const {
 } = require("./lib");
 
 
-// {
-//     "alg": "HS256",
-//     "typ": "JWT"
-// }
-// {
-//   "scope": "system/*.*",
-//   "token_type": "bearer",
-//   "expires_in": 600,
-//   "access_token": "",
-//   "iat": 1548900000 // Wed Jan 30 2019 21:00:00 GMT-0500 (Eastern Standard Time)
-// }
-// const EXPIRED_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZS" +
-//     "I6InN5c3RlbS8qLioiLCJ0b2tlbl90eXBlIjoiYmVhcmVyIiwiZXhwaXJlc19pbiI6NjAwLC" +
-//     "JhY2Nlc3NfdG9rZW4iOiIiLCJpYXQiOjE1NDg5MDAwMDB9.R4cr28kxx9V4mzu8sJ5fg7zGq" +
-//     "I-A5R77v5BhDuN-7jc";
 
-// {
-//   "alg": "HS256",
-//   "typ": "JWT"
-// }
-// {
-//   "scope": "system/*.*",
-//   "token_type": "bearer",
-//   "expires_in": 600,
-//   "access_token": "",
-//   "iat": 1548900000 // Wed Jan 30 2019 21:00:00 GMT-0500 (Eastern Standard Time)
-// }
-// const WRONG_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6" +
-//     "InN5c3RlbS8qLioiLCJ0b2tlbl90eXBlIjoiYmVhcmVyIiwiZXhwaXJlc19pbiI6NjAwLCJh" +
-//     "Y2Nlc3NfdG9rZW4iOiIiLCJpYXQiOjE1NDg5MDAwMDB9.er7H4904s8yMlaOmGLPxJzq7Z-i" +
-//     "fSrDuHccVuijgWr4";
+async function getAccessToken(cfg, body= {}, signOptions = {})
+{
+    const response = await request({
+        method   : "POST",
+        uri      : cfg.tokenEndpoint,
+        json     : true,
+        strictSSL: !!cfg.strictSSL,
+        form     : {
+            scope                : cfg.scope || "system/*.read",
+            grant_type           : "client_credentials",
+            client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+            client_assertion     : createClientAssertion({
+                aud: cfg.tokenEndpoint,
+                iss: cfg.clientId,
+                sub: cfg.clientId,
+                ...body
+            }, signOptions, cfg.privateKey)
+        }
+    }).promise();
+
+    // console.log("response.body:", response.body)
+
+    return response.body.access_token;
+}
 
 module.exports = function(describe, it) {
     describe("Authorization", () => {
         
         // A few tests that are the same for each of the kick-off endpoints
-        [
-            { name: "system-level export" , endpointGetter: "getSystemExportEndpoint"  },
-            { name: "patient-level export", endpointGetter: "getPatientExportEndpoint" },
-            { name: "group-level export"  , endpointGetter: "getGroupExportEndpoint"   }
-        ].forEach(({ name, endpointGetter }, i) => {
+        ["system", "patient", "group"].forEach((type, i) => {
             let y = 0;
-            describe(`Kick-off request at the ${name} endpoint`, () => {
+            describe(`Kick-off request at the ${type}-level export endpoint`, () => {
+
                 it ({
                     id  : `Auth-01.${i}.${y++}`,
                     name: `Requires authorization header`,
-                    description: `The server should require authorization header at the ${name} endpoint`
-                }, async function(cfg, api) {
-
-                    if (cfg.authType == "none") {
-                        return api.setNotSupported(`This server does not support authorization`);
-                    }
-
-                    const client = new BulkDataClient(cfg, api);
-                    const endpoint = await client[endpointGetter]();
-
-                    if (!endpoint) {
-                        return api.setNotSupported(`The ${name} is not supported by this server`);
-                    }
-
-                    if (!cfg.requiresAuth) {
-                        return api.setNotSupported(`This server does not require authorization`);
-                    }
-
-                    const req = await request({
-                        uri: `${cfg.baseURL}/${endpoint}`,
-                        json: true,
-                        strictSSL: cfg.strictSSL,
-                        headers: {
-                            prefer: "respond-async",
-                            accept: "application/fhir+json"
-                        }
-                    });
-
-                    api.logRequest(req);
-                    const { response } = await req.promise();
-                    api.logResponse(response);
-
-                    if (cfg.requiresAuth) {
-                        expectUnauthorized(response);
-                        try {
-                            expectJson(response);
-                        } catch (ex) {
-                            api.warn("The server does not respond with JSON regardless of the accept header! " + ex);
-                        }
-                        expectOperationOutcome(response, "In case of error, the response body must be an OperationOutcome");
-                    } else {
-                        api.decorateHTML(
-                            "NOTE",
-                            "<b>NOTE: </b> Authorization is not required by this server. These tests were skipped!"
-                        );
-                    }
+                    description: `The server should require authorization header at the ${type}-level export endpoint`,
+                    notSupported: cfg => (cfg.authType == "none" ?
+                        "This server does not support authorization" :
+                        !cfg.requiresAuth ? "This server does not require authorization" : false),
+                    before(cfg, api) { this.client = new BulkDataClient(cfg, api); },
+                    after() { this.client.cancelIfStarted(); }
+                }, async function() {
+                    await this.client.kickOff({ type, skipAuth: true });
+                    expectUnauthorized(
+                        this.client.kickOffResponse,
+                        "The server must not accept kick-off requests without authorization header"
+                    );
+                    expectJson(
+                        this.client.kickOffResponse,
+                        "The body SHALL be a FHIR OperationOutcome resource in JSON format"
+                    );
+                    expectOperationOutcome(
+                        this.client.kickOffResponse,
+                        "The body SHALL be a FHIR OperationOutcome resource in JSON format"
+                    );
                 });
 
+                // TODO: Find a reliable way to test expired tokens!
                 // it ({
                 //     id  : `Auth-01.${i}.${y++}`,
                 //     name: `Rejects expired token`,
-                //     description: `The server should reject expired tokens at the ${name} endpoint`
-                // }, async function(cfg, api) {
-
-                //     if (cfg.authType != "backend-services") {
-                //         return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
+                //     description: `The server should reject expired tokens at the ${type}-level export endpoint. ` +
+                //         "Note that this test will only work properly if the auth server issues access tokens " +
+                //         "with expiration time based on the provided authentication token lifetime.",
+                //     notSupported: cfg => (cfg.authType != "backend-services" ?
+                //         "This test is only applicable for servers that support SMART Backend Services authorization" :
+                //         false),
+                //     before(cfg, api) { this.client = new BulkDataClient(cfg, api); },
+                //     after() { 
+                //         this.client.cancelIfStarted();
+                //         return void 0;
                 //     }
-                    
-                //     if (!cfg[prop]) {
-                //         return api.setNotSupported(`The ${name} is not supported by this server`);
-                //     }
-
-                //     if (!cfg.requiresAuth) {
-                //         return api.setNotSupported(`This server does not require authorization`);
-                //     }
-
-                //     const expiredToken = createClientAssertion({
-                //         exp: Math.floor(Date.now() / 1000) - 300, // 5 min ago
-                //         aud: cfg.tokenEndpoint,
-                //         iss: cfg.clientId,
-                //         sub: cfg.clientId
-                //     }, {}, cfg.privateKey);
-
-                //     const req = request({
-                //         uri: `${cfg.baseURL}${cfg[prop]}`,
-                //         json: true,
-                //         strictSSL: cfg.strictSSL,
-                //         headers: {
-                //             prefer: "respond-async",
-                //             accept: "application/fhir+json",
-                //             authorization: "Bearer " + expiredToken
-                //         }
-                //     });
-
-                //     api.logRequest(req);
-                //     const { response } = await req.promise();
-                //     console.log(JSON.stringify(response.body, null, 4), expiredToken);
-                //     api.logResponse(response);
-                //     expectUnauthorized(response);
-                //     try {
-                //         expectJson(response);
-                //     } catch (ex) {
-                //         api.warn("The server does not respond with JSON regardless of the accept header!");
-                //     }
-                //     expectOperationOutcome(response, "In case of error, the response body must be an OperationOutcome");
+                // }, async function(cfg) {
+                //     const expiredToken = await getAccessToken(cfg, {}, { expiresIn: 1000 });
+                //     console.log("expiredToken:", expiredToken)
+                //     await wait(1000);
+                //     await this.client.kickOff({ type, headers: { authorization: "Bearer " + expiredToken }});
+                //     console.log(JSON.stringify(this.client.kickOffResponse.body, null, 4))
+                //     expectUnauthorized(
+                //         this.client.kickOffResponse,
+                //         "The server must not accept kick-off requests with expired token in the authorization header"
+                //     );
+                //     expectJson(
+                //         this.client.kickOffResponse,
+                //         "The body SHALL be a FHIR OperationOutcome resource in JSON format"
+                //     );
+                //     expectOperationOutcome(
+                //         this.client.kickOffResponse,
+                //         "The body SHALL be a FHIR OperationOutcome resource in JSON format"
+                //     );
                 // });
 
                 it ({
                     id  : `Auth-01.${i}.${y++}`,
                     name: `Rejects invalid token`,
-                    description: `The server should reject invalid tokens at the ${name} endpoint`
-                }, async function(cfg, api) {
-
-                    if (cfg.authType != "backend-services") {
-                        return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                    }
-
-                    const client = new BulkDataClient(cfg, api);
-                    const endpoint = await client[endpointGetter]();
-
-                    if (!endpoint) {
-                        return api.setNotSupported(`The ${name} is not supported by this server`);
-                    }
-
-                    if (!cfg.requiresAuth) {
-                        return api.setNotSupported(`This server does not require authorization`);
-                    }
-
-                    const invalidToken = createClientAssertion({
-                        aud: cfg.tokenEndpoint,
-                        iss: "intentionally messed up",
-                        sub: "intentionally messed up"
-                    }, {}, {
-                        "kty": "EC",
-                        "crv": "P-384",
-                        "d": "FGmEYZ4VVZYZwf06fJOs7owJlnEP56PZ1a_06EGcIFrorC1wvkCBttBjb4EGxyyT",
-                        "x": "Vh657ochrYmEtHLHxoxvyOCRsmi4vahzWWB7-FOYSnFV0FhfsNwveCaO-8os72Am",
-                        "y": "gSF2QwRqBHXxjOQhZtIc0iLdEnBlidPUkF5BGJfHmF967bPgMZHL9fOWgkIZd6IX",
-                        "key_ops": [
-                            "sign"
-                        ],
-                        "ext": true,
-                        "kid": "6cdff3dc149ed8c4bde5cf6f68fe31e4",
-                        "alg": "ES384"
-                    });
-                    
-                    const req = request({
-                        uri: `${cfg.baseURL}/${endpoint}`,
-                        json: true,
-                        strictSSL: cfg.strictSSL,
-                        headers: {
-                            prefer: "respond-async",
-                            accept: "application/fhir+json",
-                            authorization: "Bearer " + invalidToken
-                        }
-                    });
-
-                    api.logRequest(req);
-                    const { response } = await req.promise();
-                    // console.log(JSON.stringify(response.body, null, 4));
-                    api.logResponse(response);
-                    expectUnauthorized(response);
-                    try {
-                        expectJson(response);
-                    } catch (ex) {
-                        api.warn("The server does not respond with JSON regardless of the accept header!");
-                    }
-                    expectOperationOutcome(response, "In case of error, the response body must be an OperationOutcome");
+                    description: `The server should reject invalid tokens at the ${type}-level export endpoint`,
+                    notSupported: cfg => (cfg.authType != "backend-services" ?
+                        "This test is only applicable for servers that support SMART Backend Services authorization" :
+                        false),
+                    before(cfg, api) { this.client = new BulkDataClient(cfg, api); },
+                    after() { this.client.cancelIfStarted(); }
+                }, async function() {
+                    await this.client.kickOff({ type, headers: { authorization: "Bearer invalidToken" }});
+                    // console.log(JSON.stringify(this.client.kickOffResponse.body, null, 4))
+                    expectUnauthorized(
+                        this.client.kickOffResponse,
+                        "The server must not accept kick-off requests with invalid token in the authorization header"
+                    );
+                    expectJson(
+                        this.client.kickOffResponse,
+                        "The body SHALL be a FHIR OperationOutcome resource in JSON format"
+                    );
+                    expectOperationOutcome(
+                        this.client.kickOffResponse,
+                        "The body SHALL be a FHIR OperationOutcome resource in JSON format"
+                    );
                 });
             });
         });

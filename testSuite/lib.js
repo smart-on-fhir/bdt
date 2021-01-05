@@ -226,7 +226,7 @@ function expectOperationOutcome(response, message = "")
 function createClientAssertion(claims = {}, signOptions = {}, privateKey)
 {
     let jwtToken = {
-        exp: Math.round(Date.now() / 1000) + 300, // 5 min
+        // exp: Math.round(Date.now() / 1000) + 300, // 5 min
         jti: crypto.randomBytes(32).toString("hex"),
         ...claims
     };
@@ -234,6 +234,7 @@ function createClientAssertion(claims = {}, signOptions = {}, privateKey)
     const _signOptions = {
         algorithm: privateKey.alg,
         keyid: privateKey.kid,
+        expiresIn: 300, // 5 min
         ...signOptions,
         header: {
             // jku: jwks_url || undefined,
@@ -266,7 +267,7 @@ function authenticate(tokenUrl, postBody) {
  */
 function getResponseError(resp)
 {
-    let msg = `Requesting ${resp.request.uri.href} returned ${resp.statusCode} ${resp.statusMessage}`;
+    let msg = `${resp.request.method} ${resp.request.uri.href} returned ${resp.statusCode} ${resp.statusMessage}`;
 
     try {
         const type = resp.headers["content-type"] || "text/plain";
@@ -349,6 +350,10 @@ class BulkDataClient
         this.cancelRequest   = null;
         this.cancelResponse  = null;
         this.accessToken     = null;
+
+        this._systemExportEndpoint  = options.systemExportEndpoint;
+        this._patientExportEndpoint = options.patientExportEndpoint;
+        this._groupExportEndpoint   = options.groupExportEndpoint;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -557,30 +562,30 @@ class BulkDataClient
      */
     async kickOff(options = {})
     {
-        const { params, type, ...rest } = options;
+        const { params, type, skipAuth, ...rest } = options;
 
         let path;
         if (type == "system") {
             path = await this.getSystemExportEndpoint();
             if (!path) {
-                throw new Error("System-level export is not supported by this server");
+                throw new NotSupportedError("System-level export is not supported by this server");
             }
         } else if (type == "patient") {
             path = await this.getPatientExportEndpoint();
             if (!path) {
-                throw new Error("Patient-level export is not supported by this server");
+                throw new NotSupportedError("Patient-level export is not supported by this server");
             }
         } else if (type == "group") {
             path = await this.getGroupExportEndpoint();
             if (!path) {
-                throw new Error("Group-level export is not supported by this server");
+                throw new NotSupportedError("Group-level export is not supported by this server");
             }
         } else {
             path = await this.getSystemExportEndpoint() ||
                    await this.getPatientExportEndpoint() ||
                    await this.getGroupExportEndpoint();
             if (!path) {
-                throw new Error("No export endpoints defined in configuration");
+                throw new NotSupportedError("No export endpoints defined in configuration");
             }
         }
 
@@ -601,12 +606,6 @@ class BulkDataClient
                                 valueInstant: params[key]
                             });
                         break;
-                        case "_outputFormat":
-                            rest.body.parameter.push({
-                                name: "_outputFormat",
-                                valueString: params[key]
-                            });
-                        break;
                         case "patient":
                             rest.body.parameter = rest.body.parameter.concat(
                                 params[key].map(id => ({
@@ -623,6 +622,15 @@ class BulkDataClient
                                 }))
                             );
                         break;
+                        case "_outputFormat":
+                        case "_elements":
+                        case "_includeAssociatedData":
+                        case "_typeFilter":
+                            rest.body.parameter.push({
+                                name: key,
+                                valueString: params[key]
+                            });
+                        break;
                     }
                 }
             } else {
@@ -631,16 +639,27 @@ class BulkDataClient
                 }
             }
         }
-        this.kickOffRequest = await this.request({
+
+        const requestOptions = {
             url,
             json: true,
+            strictSSL: !!this.options.strictSSL,
             ...rest,
             headers: {
                 accept: "application/fhir+json",
                 prefer: "respond-async",
                 ...rest.headers
             }
-        });
+        };
+
+        // console.log(requestOptions)
+
+        this.kickOffRequest = await this.request(
+            requestOptions,
+            skipAuth === undefined ?
+                Object.keys(requestOptions.headers).some(name => name.toLocaleLowerCase() === "authorization") :
+                !!skipAuth
+        );
         this.testApi.logRequest(this.kickOffRequest, "Kick-off Request");
         const { response } = await this.kickOffRequest.promise();
         this.kickOffResponse = response;
@@ -864,6 +883,8 @@ class BulkDataClient
     }
 }
 
+class NotSupportedError extends Error {}
+
 module.exports = {
     request: customRequest,
     createClientAssertion,
@@ -875,5 +896,6 @@ module.exports = {
     BulkDataClient,
     createJWKS,
     authenticate,
-    getResponseError
+    getResponseError,
+    NotSupportedError
 };

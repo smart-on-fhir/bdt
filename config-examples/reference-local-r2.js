@@ -1,3 +1,5 @@
+// This file will configure BDT to test a locally running instance of the
+// reference bulk data server (https://github.com/smart-on-fhir/bulk-data-server)
 module.exports = {
 
     // REQUIRED: The full URL of the server to which we can append "/$export".

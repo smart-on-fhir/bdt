@@ -110,11 +110,32 @@ module.exports = function(describe, it) {
 
             // The server MAY return an Expires header indicating when the files listed will no longer be available.
             if (client.statusResponse.headers["expires"]) {
+                
                 expect(client.statusResponse.headers["expires"], "the expires header must be a string if present").to.be.a.string();
 
                 // If expires header is present, make sure it is in the future.
-                const expires = moment(client.statusResponse.headers["expires"]).utc(true);
-                const now     = moment().utc(true).format();
+                const expires = moment(client.statusResponse.headers["expires"], [
+
+                    // Preferred HTTP date (Sun, 06 Nov 1994 08:49:37 GMT)
+                    moment.RFC_2822,
+
+                    // Obsolete HTTP date (Sunday, 06-Nov-94 08:49:37 GMT)
+                    "dddd, DD-MMM-YY HH:mm:ss ZZ",
+
+                    // Obsolete HTTP date (Sun  Nov  6    08:49:37 1994)
+                    "ddd MMM D HH:mm:ss YYYY",
+
+                    // The following formats are often used (even though they shouldn't be):
+
+                    // ISO_8601 (2020-12-24 19:50:58 +0000 UTC)
+                    moment.ISO_8601,
+
+                    // ISO_8601 with milliseconds (2020-12-24 19:50:58.997683 +0000 UTC)
+                    "YYYY-MM-DD HH:mm:ss.SSS ZZ",
+                    "YYYY-MM-DDTHH:mm:ss.SSS ZZ"
+                ]).utc(true);
+
+                const now = moment().utc(true);
                 expect(expires.diff(now, "seconds") > 0, "The expires header of the status response should be a date in the future").to.be.true();
 
                 // Note that the above assertion might be unreliable due to small time differences between
@@ -232,6 +253,8 @@ module.exports = function(describe, it) {
                 return api.setNotSupported(`DELETE requests to the status endpoint are not supported by this server`);
             }
 
+            expect(client.cancelResponse.statusCode, "Servers that support export job canceling should reply with 202 status code").to.equal(202);
+
             const cancelRequest = await client.request({
                 uri   : client.kickOffResponse.headers["content-location"],
                 method: "DELETE",
@@ -245,6 +268,75 @@ module.exports = function(describe, it) {
                 "error and an associated FHIR OperationOutcome in JSON format";
             expectStatusCode(response, 404, msg);
             expectOperationOutcome(response, msg);
+        });
+
+        it ({
+            id  : `Status-04`,
+            name: "Includes lenient errors in the payload errors array",
+            version: "1.2",
+            description: "If the request contained invalid or unsupported parameters " +
+                "along with a `Prefer: handling=lenient` header and the server " +
+                "processed the request, the server SHOULD include an OperationOutcome " +
+                "resource for each of these parameters."
+        }, async (cfg, api) => {
+            const client = new BulkDataClient(cfg, api);
+
+            // To properly execute this test we need to find at least one optional
+            // parameter that is not supported by this server
+            const optionalParams = {
+                _typeFilter           : "Patient?status=active",
+                _includeAssociatedData: "LatestProvenanceResources",
+                _elements             : "id",
+                patient               : ["test-patient-id"],
+                _type                 : ["Patient"]
+            };
+
+            let unsupportedParam;
+
+            for (const param of Object.keys(optionalParams)) {
+                await client.kickOff({
+                    method: param === "patient" ? "POST" : "GET",
+                    type: param === "patient" ? "patient" : null,
+                    params: {
+                        [param]: optionalParams[param]
+                    }
+                });
+
+                await client.cancelIfStarted();
+                if (client.kickOffResponse.statusCode >= 400 && client.kickOffResponse.statusCode < 500) {
+                    unsupportedParam = param;
+                    break;
+                }
+            }
+
+            // If all the optional params are supported there is nothing more we can do!
+            if (!unsupportedParam) {
+                return;
+            }
+            
+            // Kick-off with that unsupported param and handling=lenient
+            await client.kickOff({
+                method: unsupportedParam === "patient" ? "POST" : "GET",
+                type: unsupportedParam === "patient" ? "patient" : null,
+                headers: {
+                    prefer: "respond-async,handling=lenient"
+                },
+                params: {
+                    [unsupportedParam]: optionalParams[unsupportedParam]
+                }
+            });
+
+            // console.log(client.kickOffResponse.body)
+
+            client.expectSuccessfulKickOff();
+
+            await client.waitForExport();
+            await client.cancel();
+
+            const outcomes = (client.statusResponse.body.error || []).filter(x => x.resourceType === "OperationOutcome");
+
+            expect(outcomes.length, "No OperationOutcome errors found in the errors array").to.be.greaterThan(0);
+            expect(JSON.stringify(outcomes), `"${unsupportedParam}" should be mentioned in at least one of the OperationOutcome errors`).to.contain(unsupportedParam);
         });
 
     });

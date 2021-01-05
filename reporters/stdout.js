@@ -1,7 +1,6 @@
 require("colors");
 
-const sax = require("sax");
-const md  = require("markdown-it")();
+const md = require("markdown-it")();
 
 
 // Every test that takes more than DURATION_MEDIUM (but less then DURATION_SLOW)
@@ -70,36 +69,54 @@ function getColorForDuration(duration) {
     return "green";
 }
 
+/**
+ * Rounds the given number @n using the specified precision.
+ * @param {Number|String} n
+ * @param {Number} [precision]
+ * @param {Number} [fixed] The number of decimal units for fixed precision. For
+ *   example `roundToPrecision(2.1, 1, 3)` will produce `"2.100"`, while
+ *   `roundToPrecision(2.1, 3)` will produce `2.1`.
+ * @returns {Number|String} Returns a number, unless a fixed precision is used
+ */
+function roundToPrecision(n, precision, fixed) {
+    n = parseFloat(n + "");
+
+    if ( isNaN(n) || !isFinite(n) ) {
+        return NaN;
+    }
+
+    if ( !precision || isNaN(precision) || !isFinite(precision) || precision < 1 ) {
+        n = Math.round( n );
+    }
+    else {
+        const q = Math.pow(10, precision);
+        n = Math.round( n * q ) / q;
+    }
+
+    if (fixed) {
+        n = Number(n).toFixed(fixed);
+    }
+
+    return n;
+}
+
 function formatDuration(ms) {
-    let out = [];
     let meta = [
         { label: "week"  , n: 1000 * 60 * 60 * 24 * 7 },
         { label: "day"   , n: 1000 * 60 * 60 * 24     },
         { label: "hour"  , n: 1000 * 60 * 60          },
         { label: "minute", n: 1000 * 60               },
-        { label: "second", n: 1000                    },
-        { label: "m"     , n: 1                       }
+        { label: "second", n: 1000                    }
     ];
 
-    meta.reduce((prev, cur, i, all) => {
-        let chunk = Math.floor(prev / cur.n);
-        if (chunk) {
-            out.push(`${chunk} ${cur.label}${chunk > 1 ? "s" : ""}`);
-            return prev - chunk * cur.n
+    for (let cur of meta) {
+        let chunk = ms / cur.n;
+        if (chunk > 1) {
+            return `${roundToPrecision(chunk, 1)} ${cur.label}${chunk > 1 ? "s" : ""}`;
         }
-        return prev
-    }, ms);
-
-    if (!out.length) {
-        out.push(`0 ${meta.pop().label}s`);
     }
 
-    if (out.length > 1) {
-        let last = out.pop();
-        out[out.length - 1] += " and " + last;
-    }
-
-    return out.join(", ")
+    return `${ms} milliseconds`;
 }
 
 function duration(node) {
@@ -142,7 +159,7 @@ function wrap(str, linePrefix = "", maxLen = 80) {
     return lines.join("\n" + linePrefix);
 }
 
-function parseHTML(html, linePrefix = "\t") {
+function parseMD(html, linePrefix = "\t") {
 
     function render(tokens, context = {}) {
         let out = "";
@@ -255,6 +272,7 @@ module.exports = function StdoutReporter()
     let notSupported   = 0;
     let warnings       = 0;
     let skipped        = 0;
+    let settings       = {};
 
     function onStart() {
         startTime = Date.now();
@@ -273,7 +291,7 @@ module.exports = function StdoutReporter()
     }
 
     function onGroupStart(node) {
-        if (node.name !== "__ROOT__") {
+        if (!settings.match && node.name !== "__ROOT__") {
             log(`${indent(depth++)} ${icon(node)} ${node.name.bold}`);
         }
     }
@@ -300,7 +318,7 @@ module.exports = function StdoutReporter()
             failed += 1;
             if (node.description) {
                 log(`${indent(depth + 1)} ${"├─".grey} ${
-                    parseHTML(node.description, `${indent(depth + 1)} ${"│ ".grey} `)
+                    parseMD(node.description, `${indent(depth + 1)} ${"│ ".grey} `)
                 }`);    
             }
             log(`${indent(depth + 1)} ${"└⯈".grey} ${node.error.message.red}`);
@@ -311,7 +329,7 @@ module.exports = function StdoutReporter()
                 warnings += len;
                 if (node.description) {
                     log(`${indent(depth + 1)} ${"├─".grey} ${
-                        parseHTML(node.description, `${indent(depth + 1)} ${"│ ".grey} `)
+                        parseMD(node.description, `${indent(depth + 1)} ${"│ ".grey} `)
                     }`);    
                 }
                 node.warnings.forEach((w, i) => {
@@ -338,6 +356,7 @@ module.exports = function StdoutReporter()
     return {
         attach(runner)
         {
+            settings = runner.settings;
             runner.on("start"     , onStart     );
             runner.on("groupStart", onGroupStart);
             runner.on("end"       , onEnd       );

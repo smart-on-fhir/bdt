@@ -1,5 +1,6 @@
-const APP = require("commander");
-const bdt = require("./bdt");
+const Path = require("path");
+const APP  = require("commander");
+const bdt  = require("./bdt");
 
 const settings = {};
 
@@ -22,7 +23,7 @@ APP
 
 
 try {
-    Object.assign(settings, require(APP.config));
+    Object.assign(settings, require(Path.resolve(__dirname, APP.config)));
 } catch (ex) {
     console.error(`Failed to load settings from "${APP.config}". ${ex.message}`);
     process.exit(1);
