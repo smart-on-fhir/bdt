@@ -360,8 +360,8 @@ class Runner extends EventEmitter
         // "publicKey" properties, or a "jwks" array can be provided. If
         // JWKS is used, find the privateKey and publicKey and set them
         // as top-level properties of the instance settings.
-        if (jwks) {
-            const keys = findKeyPair (jwks);
+        if (jwks && Array.isArray(jwks.keys)) {
+            const keys = findKeyPair(jwks.keys);
             if (keys) {
                 Object.assign(this.settings, keys);
             }
