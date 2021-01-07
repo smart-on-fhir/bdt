@@ -307,6 +307,36 @@ function createTestAPI(testNode)
 }
 
 /**
+ * JWKS is just an array of keys. We need to find the last private key that
+ * also has a corresponding public key. The pair is recognized by having the
+ * same "kid" property.
+ * @param {Array} keys JWKS.keys 
+ */
+function findKeyPair(keys) {
+    let out = null;
+
+    keys.forEach(key => {
+        if (!key.kid) return;
+        if (!Array.isArray(key.key_ops)) return;
+        if (key.key_ops.indexOf("sign") === -1) return;
+
+        // If we are here, then key is a private key so look for its matching
+        // public one
+        let publicKey = keys.find(k => (
+            k.kid === key.kid &&
+            Array.isArray(k.key_ops) &&
+            k.key_ops.indexOf("verify") > -1
+        ));
+
+        if (publicKey) {
+            out = { privateKey: key, publicKey };
+        }
+    });
+
+    return out;
+}
+
+/**
  * The test runner class is simple. It just knows its settings and executes the
  * given path (recursively) with those settings.
  */
@@ -320,8 +350,22 @@ class Runner extends EventEmitter
     constructor(settings = {})
     {
         super();
-        this.settings = settings;
+
         this.canceled = false;
+
+        const { jwks, ...rest } = settings;
+        this.settings = rest;
+
+        // Keys can be provided separately in config as "privateKey" and
+        // "publicKey" properties, or a "jwks" array can be provided. If
+        // JWKS is used, find the privateKey and publicKey and set them
+        // as top-level properties of the instance settings.
+        if (jwks) {
+            const keys = findKeyPair (jwks);
+            if (keys) {
+                Object.assign(this.settings, keys);
+            }
+        }
     }
 
     cancel()
