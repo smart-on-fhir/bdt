@@ -281,6 +281,9 @@ module.exports = function(describe, it) {
         }, async (cfg, api) => {
             const client = new BulkDataClient(cfg, api);
 
+            // use a recent data to reduce the possible payload size
+            const _since = moment().subtract(1, "day").format("YYYY-MM-DDTHH:mm:ssZ");
+
             // To properly execute this test we need to find at least one optional
             // parameter that is not supported by this server
             const optionalParams = {
@@ -298,7 +301,8 @@ module.exports = function(describe, it) {
                     method: param === "patient" ? "POST" : "GET",
                     type: param === "patient" ? "patient" : null,
                     params: {
-                        [param]: optionalParams[param]
+                        [param]: optionalParams[param],
+                        _since
                     }
                 });
 
@@ -322,7 +326,8 @@ module.exports = function(describe, it) {
                     prefer: "respond-async,handling=lenient"
                 },
                 params: {
-                    [unsupportedParam]: optionalParams[unsupportedParam]
+                    [unsupportedParam]: optionalParams[unsupportedParam],
+                    _since
                 }
             });
 
