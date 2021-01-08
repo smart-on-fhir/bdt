@@ -411,6 +411,7 @@ module.exports = function(describe, it) {
 
                 // Start an export
                 await client.kickOff({
+                    type: meta.type,
                     params: {
                         _type: ["MissingType"]
                     }
