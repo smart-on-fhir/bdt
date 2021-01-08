@@ -351,9 +351,15 @@ class BulkDataClient
         this.cancelResponse  = null;
         this.accessToken     = null;
 
-        this._systemExportEndpoint  = options.systemExportEndpoint;
-        this._patientExportEndpoint = options.patientExportEndpoint;
-        this._groupExportEndpoint   = options.groupExportEndpoint;
+        if (options.systemExportEndpoint) {
+            this._systemExportEndpoint  = options.systemExportEndpoint;
+        }
+        if (options.patientExportEndpoint) {
+            this._patientExportEndpoint = options.patientExportEndpoint;
+        }
+        if (options.groupExportEndpoint) {
+            this._groupExportEndpoint   = options.groupExportEndpoint;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
