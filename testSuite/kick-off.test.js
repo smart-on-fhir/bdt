@@ -464,8 +464,9 @@ module.exports = function(describe, it) {
                 id  : `${meta.idPrefix}-${count++}`,
                 name: "Accepts the _typeFilter parameter",
                 maxVersion: "1.0",
-                description: "The `_typeFilter` parameter is optional so the servers " +
-                    "should reply with a server error, even if they don't support it"
+                description: "The `_typeFilter` parameter is optional so the servers can " +
+                    "ignore it or reply with an error. Either way, servers should not " +
+                    "reply with a server error (statusCode >= 500), even if they don't support it"
             }, async (cfg, api) => {
 
                 const client = new BulkDataClient(cfg, api);
