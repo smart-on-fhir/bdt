@@ -72,10 +72,15 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     // resource.            
                     response.body.trim().split(/\n+/).forEach(line => {
                         const res = JSON.parse(line); // console.log(res);
-                        expect(res).to.contain("id");
-                        expect(res).to.contain("meta");
-                        expect(res.meta).to.contain("tag");
-                        expect(res.meta.tag[0]).to.contain({
+                        expect(res, "Results must include an 'id' property").to.contain("id");
+                        expect(res, "Results must include a 'meta' property").to.contain("meta");
+                        expect(res.meta, "The meta element must have a 'tag' property").to.contain("tag");
+                        expect(res.meta.tag, "The 'meta.tag' must be an array").to.be.an.array();
+                        expect(
+                            res.meta.tag,
+                            "A tag with code='SUBSETTED' and system='http://terminology.hl7.org/CodeSystem/v3-ObservationValue' " +
+                            "should be found in the 'meta.tag' array"
+                        ).to.contain({
                             "system":"http://terminology.hl7.org/CodeSystem/v3-ObservationValue",
                             "code":"SUBSETTED"
                         });
