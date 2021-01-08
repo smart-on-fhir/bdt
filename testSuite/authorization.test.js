@@ -744,6 +744,11 @@ module.exports = function(describe, it) {
                         `This test is not not applicable for servers using client-credentials authentication`
                     );
                 }
+                if (!cfg.authType || cfg.authType == "none") {
+                    return api.setNotSupported(
+                        `This test is not not applicable for open servers`
+                    );
+                }
                 if (!cfg.privateKey) {
                     return api.setNotSupported(`No privateKey configuration found for this server`);
                 }
