@@ -1,18 +1,20 @@
 module.exports = {
-    "strictSSL": false,
-    "public": true,
-    "name": "LEAP Bulk Data Server",
-    "description": "",
-    "baseURL": "https://34.73.85.246",
-    "fastestResource": "Practitioner",
-    "authType": "backend-services",
-    "jwksAuth": true,
-    "jwksUrlAuth": false,
-    "requiresAuth": true,
-    "tokenEndpoint": "https://34.73.85.246/auth/token",
-    "clientId": "leap-client-id",
-    "clientSecret": "",
-    "jwks": {
+    strictSSL: false,
+    public: true,
+    name: "LEAP Bulk Data Server (deprecated)",
+    description: "",
+    baseURL: "https://34.73.85.246",
+    fastestResource: "Practitioner",
+    authType: "backend-services",
+    jwksAuth: true,
+    jwksUrlAuth: false,
+    requiresAuth: true,
+    tokenEndpoint: "https://34.73.85.246/auth/token",
+    clientId: "leap-client-id",
+    clientSecret: "",
+    systemExportEndpoint: "$export", // do not auto-detect!
+    patientExportEndpoint: "Patient/$export",
+    jwks: {
         "keys": [
             {
                 "kty": "EC",
@@ -40,7 +42,5 @@ module.exports = {
                 "alg": "ES384"
             }
         ]
-    },
-    "scope": "system/*.read",
-    "jwksUrl": "http://localhost:3002/jwks"
+    }
 };

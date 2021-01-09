@@ -9,7 +9,7 @@ module.exports = {
     //   tests will be skipped.
     // - If "client-credentials" most of the authorization tests will be skipped.
     // - If "backend-services" (default) all tests will be executed. `jwks` or
-    //   `jwksUrl` auth must be supported in this case.
+    //   `jwks-url` auth must be supported in this case.
     authType: "backend-services",
 
     /**
@@ -85,11 +85,32 @@ module.exports = {
     // NOTE: These tests ate not available in CLI environment.
     jwksUrlAuth: false,
 
-    // The fill URL on which the JWK keys are hosted. This will not be used
-    // unless `jwksUrlAuth` is set to `true`. Not available in CLI environment.
-    // jwksUrl: "https://...",
+    // ------------------------------------------------------------------------
+    // KEYS
+    // ------------------------------------------------------------------------
+    // We typically only need a private key. Public keys are only used in
+    // JWKS-URL authentication tests which are not available in CLI because the
+    // tester is not online and cannot publicly host keys.
+    // The keys can be specified explicitly as "privateKey" and "publicKey"
+    // settings, or in a "jwks" object.
+    // ------------------------------------------------------------------------
 
     // The Private Key as JWK. Required if authType is set to "backend-services"
-    // and ignored otherwise
-    privateKey: {}
+    // and ignored otherwise. NOTE that if "jwks" is used and a public/private
+    // key pair is found in it, that will take precedence and this "privateKey"
+    // option will be ignored.
+    privateKey: {},
+
+    // The Public Key as JWK. Required if authType is set to "backend-services"
+    // and "jwksUrlAuth" is set true (and if tests are not running in CLI),
+    // and ignored otherwise. NOTE that if "jwks" is used and a public/private
+    // key pair is found in it, that will take precedence and this "publicKey"
+    // option will be ignored.
+    publicKey: {},
+
+    // If set, this should be an object having a "keys" array of JSON Web Keys
+    // containing a valid public/private key pair. NOTE that if "jwks" is used
+    // and a public/private key pair is found in it, those keys will be used
+    // and the "publicKey" and privateKey options (if set) will be ignored.
+    jwks: { keys: [] }
 };
