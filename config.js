@@ -1,25 +1,25 @@
-// See config-examples/template.js for full list of options and
-// their descriptions.
+// This file will configure BDT to test a STU3 instance of the
+// reference bulk data server (https://bulk-data.smarthealthit.org)
 module.exports = {
-    authType             : "backend-services", // backend-services|client-credentials|none
-    baseURL              : "https://bulk-data.smarthealthit.org/eyJlcnIiOiIiLCJwYWdlIjoxMDAwMCwiZHVyIjoxMCwidGx0IjoxNSwibSI6MX0/fhir",
-    tokenEndpoint        : "https://bulk-data.smarthealthit.org/auth/token",
-    clientId             : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InJlZ2lzdHJhdGlvbi10b2tlbiJ9.eyJqd2tzIjp7ImtleXMiOlt7Imt0eSI6IkVDIiwiY3J2IjoiUC0zODQiLCJ4IjoiQ1ZRdkdEcXV1T29WRzJlOE1TLVdFdk1ObXIzajZYNjRTRVQtQ20yQkdFTmhsUFMwQU1wWnhTaVZBaDV0ZnJ2diIsInkiOiJxTG1XZVpRZUJ1aUx5amlmXzdsb3BYLWVhN3dzMGpCNVBxdW1HSkRWSzREWFdqNGFESjdDWDFmTVI4cm13c01vIiwia2V5X29wcyI6WyJ2ZXJpZnkiXSwiZXh0Ijp0cnVlLCJraWQiOiI0NTdlM2IzMzFmYTRkZmU3OTU5MTkyMGFjMTJiY2NjNiIsImFsZyI6IkVTMzg0In0seyJrdHkiOiJFQyIsImNydiI6IlAtMzg0IiwiZCI6ImU4VmNjcE5WNkYtdVpwR1l0X1JVcV9xSjFqRU0xT0t0eDdRaVBVT3hBbEI5VlhuMWlhbGJUVE5HcHpUU01BaFkiLCJ4IjoiQ1ZRdkdEcXV1T29WRzJlOE1TLVdFdk1ObXIzajZYNjRTRVQtQ20yQkdFTmhsUFMwQU1wWnhTaVZBaDV0ZnJ2diIsInkiOiJxTG1XZVpRZUJ1aUx5amlmXzdsb3BYLWVhN3dzMGpCNVBxdW1HSkRWSzREWFdqNGFESjdDWDFmTVI4cm13c01vIiwia2V5X29wcyI6WyJzaWduIl0sImV4dCI6dHJ1ZSwia2lkIjoiNDU3ZTNiMzMxZmE0ZGZlNzk1OTE5MjBhYzEyYmNjYzYiLCJhbGciOiJFUzM4NCJ9XX0sImlzcyI6Imh0dHBzOi8vZ2l0aHViLmNvbS9zbWFydC1vbi1maGlyL3NhbXBsZS1hcHBzLXN0dTMvdHJlZS9tYXN0ZXIvZmhpci1kb3dubG9hZGVyIiwiYWNjZXNzVG9rZW5zRXhwaXJlSW4iOjE1LCJpYXQiOjE1MzYzNDIwOTB9.GjfGpdoT0bkdNpP8zUQNwbu-WIEhIN0NZ1Bnso30S4Q",
-    strictSSL            : false,
-    requiresAuth         : false,
-    groupId              : "6",
-    fastestResource      : "ImagingStudy",
-    privateKey   : {
+    baseURL: "https://bulk-data.smarthealthit.org/eyJlcnIiOiIiLCJwYWdlIjoxMDAwMCwiZHVyIjoxMCwidGx0IjoxNSwibSI6MSwic3R1Ijo0LCJkZWwiOjB9/fhir",
+    authType: "backend-services",
+    tokenEndpoint: "https://bulk-data.smarthealthit.org/auth/token",
+    clientId: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InJlZ2lzdHJhdGlvbi10b2tlbiJ9.eyJqd2tzIjp7ImtleXMiOlt7Imt0eSI6IkVDIiwiY3J2IjoiUC0zODQiLCJ4IjoidzRnTTUyZUE4S0xoUVoyNTgxNmpnV2dHb3U0V1ZRVmRLVk5rUGZTLWNMdU9IRnJlRW5vb1EycHBSNm9kS3lXTiIsInkiOiJuQWw1c1Bmd1YxLW9oaTlYbWRYSHcxa0JEX0I0Tm1sWEVtWmZaNE9TR3lyZjZQeFNhSmxsZDVWUDl3WUE2Y0d0Iiwia2V5X29wcyI6WyJ2ZXJpZnkiXSwiZXh0Ijp0cnVlLCJraWQiOiI3MmIzMWZmMGY2N2I3ZjI4MDU4NDNkMTIwZTIzNWExZSIsImFsZyI6IkVTMzg0In0seyJrdHkiOiJFQyIsImNydiI6IlAtMzg0IiwiZCI6IkxZaXdEVWtrTXZKRVNYZ1VwTW16cERoVS1NeEhNcEtoeFdZNU50ZTc3NXNBQ2ViVVg3cklQeU1OeFZaWnBka3YiLCJ4IjoidzRnTTUyZUE4S0xoUVoyNTgxNmpnV2dHb3U0V1ZRVmRLVk5rUGZTLWNMdU9IRnJlRW5vb1EycHBSNm9kS3lXTiIsInkiOiJuQWw1c1Bmd1YxLW9oaTlYbWRYSHcxa0JEX0I0Tm1sWEVtWmZaNE9TR3lyZjZQeFNhSmxsZDVWUDl3WUE2Y0d0Iiwia2V5X29wcyI6WyJzaWduIl0sImV4dCI6dHJ1ZSwia2lkIjoiNzJiMzFmZjBmNjdiN2YyODA1ODQzZDEyMGUyMzVhMWUiLCJhbGciOiJFUzM4NCJ9XX0sImFjY2Vzc1Rva2Vuc0V4cGlyZUluIjoxNSwiaWF0IjoxNjA4NzUwNzEyfQ.nLFoxnT-lClKwfW4Y-RSxdA6jxCuM5lnM_DzFsFVdl4",
+    strictSSL: false,
+    requiresAuth: false,
+    groupId: "ff7dc35f-79e9-47a0-af22-475cf301a085",
+    fastestResource: "ImagingStudy",
+    privateKey: {
         "kty": "EC",
         "crv": "P-384",
-        "d": "e8VccpNV6F-uZpGYt_RUq_qJ1jEM1OKtx7QiPUOxAlB9VXn1ialbTTNGpzTSMAhY",
-        "x": "CVQvGDquuOoVG2e8MS-WEvMNmr3j6X64SET-Cm2BGENhlPS0AMpZxSiVAh5tfrvv",
-        "y": "qLmWeZQeBuiLyjif_7lopX-ea7ws0jB5PqumGJDVK4DXWj4aDJ7CX1fMR8rmwsMo",
+        "d": "LYiwDUkkMvJESXgUpMmzpDhU-MxHMpKhxWY5Nte775sACebUX7rIPyMNxVZZpdkv",
+        "x": "w4gM52eA8KLhQZ25816jgWgGou4WVQVdKVNkPfS-cLuOHFreEnooQ2ppR6odKyWN",
+        "y": "nAl5sPfwV1-ohi9XmdXHw1kBD_B4NmlXEmZfZ4OSGyrf6PxSaJlld5VP9wYA6cGt",
         "key_ops": [
             "sign"
         ],
         "ext": true,
-        "kid": "457e3b331fa4dfe79591920ac12bccc6",
+        "kid": "72b31ff0f67b7f2805843d120e235a1e",
         "alg": "ES384"
     }
 };

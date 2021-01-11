@@ -47,7 +47,7 @@ bdt.load(APP.pattern);
 
 // 4. Execute tests or output the structure
 if (APP.list) {
-    console.log(JSON.stringify(bdt.getPath()));
+    console.log(JSON.stringify(bdt.getPath(APP.path, APP.apiVersion)));
 } else {
-    runner.run(bdt.getPath(APP.path));
+    runner.run(bdt.getPath(APP.path, APP.apiVersion));
 }

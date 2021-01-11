@@ -162,13 +162,25 @@ function load(pattern)
  * the node at that path. For example getPath("2.1.5") will return the sixth
  * child of the second child of the third child of the root node.
  */
-function getPath(path = "")
+function getPath(path = "", version="1.0")
 {
     if (!path) {
         return groups;
     }
     return path.split(".").reduce(
-        (out, i) => out && out.children ? out.children[+i] : undefined,
+        (out, i) => {
+            const node = out && out.children ? out.children[+i] : undefined;
+            if (node) {
+                if (!versionCheck(node.version, version)) {
+                    return;
+                }
+    
+                if (node.maxVersion && !versionCheck(version, node.maxVersion)) {
+                    return;
+                }
+            }
+            return node;
+        },
         groups
     );
 }

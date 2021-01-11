@@ -116,7 +116,7 @@ function formatDuration(ms) {
         }
     }
 
-    return `${ms} milliseconds`;
+    return `${ms} ms`;
 }
 
 function duration(node) {

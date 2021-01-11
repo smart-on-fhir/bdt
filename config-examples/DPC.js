@@ -4,7 +4,7 @@ module.exports = {
     name: "DPC API",
     description: "Data at the Point of Care Bulk FHIR API",
     authType: "backend-services", // backend-services|client-credentials|none
-    jwksAuth: false,
+    jwksAuth: true,
     baseURL: "https://sandbox.dpc.cms.gov/api/v1",
     tokenEndpoint: "https://sandbox.dpc.cms.gov/api/v1/Token/auth",
     clientId: "W3sidiI6MiwibCI6Imh0dHBzOi8vc2FuZGJveC5kcGMuY21zLmdvdi9hcGkiLCJpIjoiODk5NzBiMDQtMGI4Ni00NGY4LTkzNTUtOWQzMTM2YTFlMmZjIiwiYyI6W3siaTY0IjoiWkhCalgyMWhZMkZ5YjI5dVgzWmxjbk5wYjI0Z1BTQXkifSx7Imk2NCI6IlpYaHdhWEpsY3lBOUlESXdNakV0TURVdE1qZFVNakk2TkRRNk1EVXVNVE00T0RjMVdnIn0seyJpNjQiOiJiM0puWVc1cGVtRjBhVzl1WDJsa0lEMGdNelV4Wm1KaU5XWXRaakptT1MwME1EazBMV0pqTm1ZdE1tSXpOakF3WW1JMU5tVTUifSx7ImwiOiJsb2NhbCIsImk2NCI6IkFxQ0JhSHFnZ1doNmV0cjJmRnRhalg2RWNNaUktUGUydkNGaWNNZjltal9Wcnp0OEJTS1RCRVhzemtLcU11R1lIOEVzNmhjejVleWxOamVzdGhzSHJ2U0NGRnJwTDMwNGpnU2w2YWVZay0xbzJtZDBFWl9SeE1pQkY3S2ZLVHd3S1gxaUdYcjNoRHdCRzJ6UXlDeEJGWnZOdGU2NGFoNGd1aFdkNFVyVm5GV1d4SjZmNkNBZWZsOTBMTTdoc1NxYWxVLUFBM2hnWVhla01lNURWZyIsInY2NCI6IlNaeTI3cm1VeFVJdjlRMXpwZ2FiLU5SWmlIYTRtd09BbWNSaEo5Zkh0bEVfeU5vSXF4V2sxbGlHdlhOZW91QW9FX3N2d2JIcE1DXzhkRExfSFd4TmdBYWNCdlAtSGJsMCJ9XSwiczY0IjoiTEd4a2M2akMtcmtHSjhGSXJqR0tCc25VSFd5X09sTWVaSy1TNXZhUmdGYyJ9XQ==",
@@ -29,5 +29,6 @@ module.exports = {
         ],
         kid: "0d4b972d-1fc5-4231-95dc-1d561de68e0c",
         alg: "RS384"
-    }
+    },
+    groupExportEndpoint  : "Group/e42a540e-f811-411a-b3b5-6c73aadbf9e6/$export",
 };
