@@ -31,7 +31,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     params: {
                         _type: "Patient"
                     }
-                });
+                }, "First ");
 
                 const file = await client.downloadFileAt(0);
                 await client.cancel();
@@ -69,7 +69,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                             }
                         ]
                     }
-                });
+                }, "Second ");
 
                 await client.waitForExport();
                 const file2 = await client.downloadFile(client.statusResponse.body.output[0].url);
