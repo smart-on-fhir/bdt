@@ -566,7 +566,7 @@ class BulkDataClient
      * `{ headers: { accept: undefined }}`.
      * @param {Object} options Custom request options
      */
-    async kickOff(options = {})
+    async kickOff(options = {}, labelPrefix = "")
     {
         const { params, type, skipAuth, ...rest } = options;
 
@@ -666,10 +666,10 @@ class BulkDataClient
                 Object.keys(requestOptions.headers).some(name => name.toLocaleLowerCase() === "authorization") :
                 !!skipAuth
         );
-        this.testApi.logRequest(this.kickOffRequest, "Kick-off Request");
+        this.testApi.logRequest(this.kickOffRequest, labelPrefix + "Kick-off Request");
         const { response } = await this.kickOffRequest.promise();
         this.kickOffResponse = response;
-        this.testApi.logResponse(this.kickOffResponse, "Kick-off Response");
+        this.testApi.logResponse(this.kickOffResponse, labelPrefix + "Kick-off Response");
     }
 
     /**
