@@ -101,7 +101,6 @@ function it(name, fn)
 {
     let node = {
         type: "test",
-        minVersion: "1.0",
         fn
     };
 
