@@ -282,19 +282,12 @@ function createTestAPI(testNode)
          */
         logRequest(req, label = "Request")
         {
-            const headers = { ...req.headers };
-            if (headers.authorization) {
-                headers.authorization = headers.authorization.replace(
-                    /^\s*(Bearer)\s+.*$/i,
-                    "$1 ✸✸✸✸✸✸"
-                );
-            }
             testNode.decorations[label] = {
-                __type: "request",
-                method: req.method,
-                url   : req.uri.href,
-                headers,
-                body: req.body || undefined
+                __type : "request",
+                method : req.method,
+                url    : req.uri.href,
+                headers: req.headers,
+                body   : req.body || undefined
             };
         },
 
