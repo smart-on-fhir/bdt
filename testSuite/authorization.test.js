@@ -9,7 +9,8 @@ const {
     expectStatusCode,
     authenticate,
     getResponseError,
-    BulkDataClient
+    BulkDataClient,
+    NotSupportedError
 } = require("./lib");
 
 
@@ -81,41 +82,6 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     );
                 });
 
-                // TODO: Find a reliable way to test expired tokens!
-                // it ({
-                //     id  : `Auth-01.${i}.${y++}`,
-                //     name: `Rejects expired token`,
-                //     description: `The server should reject expired tokens at the ${type}-level export endpoint. ` +
-                //         "Note that this test will only work properly if the auth server issues access tokens " +
-                //         "with expiration time based on the provided authentication token lifetime.",
-                //     notSupported: cfg => (cfg.authType != "backend-services" ?
-                //         "This test is only applicable for servers that support SMART Backend Services authorization" :
-                //         false),
-                //     before(cfg, api) { this.client = new BulkDataClient(cfg, api); },
-                //     after() { 
-                //         this.client.cancelIfStarted();
-                //         return void 0;
-                //     }
-                // }, async function(cfg) {
-                //     const expiredToken = await getAccessToken(cfg, {}, { expiresIn: 1000 });
-                //     console.log("expiredToken:", expiredToken)
-                //     await wait(1000);
-                //     await this.client.kickOff({ type, headers: { authorization: "Bearer " + expiredToken }});
-                //     console.log(JSON.stringify(this.client.kickOffResponse.body, null, 4))
-                //     expectUnauthorized(
-                //         this.client.kickOffResponse,
-                //         "The server must not accept kick-off requests with expired token in the authorization header"
-                //     );
-                //     expectJson(
-                //         this.client.kickOffResponse,
-                //         "The body SHALL be a FHIR OperationOutcome resource in JSON format"
-                //     );
-                //     expectOperationOutcome(
-                //         this.client.kickOffResponse,
-                //         "The body SHALL be a FHIR OperationOutcome resource in JSON format"
-                //     );
-                // });
-
                 it ({
                     id  : `Auth-01.${i}.${y++}`,
                     name: `Rejects invalid token`,
@@ -155,6 +121,27 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
 
         describe("Token endpoint", () => {
 
+            let hasTokenEndpoint;
+
+            beforeEach(async (cfg, api) => {
+                if (hasTokenEndpoint === undefined) {
+                    if (cfg.tokenEndpoint) {
+                        const req = request({
+                            method   : "POST",
+                            uri      : cfg.tokenEndpoint,
+                            strictSSL: !!cfg.strictSSL
+                        });
+                        const { response } = await req.promise();
+                        hasTokenEndpoint = response.statusCode >= 200 && response.statusCode !== 404;
+                    } else {
+                        hasTokenEndpoint = false;
+                    }
+                }
+
+                if (!hasTokenEndpoint) {
+                    throw new NotSupportedError("No usable token endpoint found");
+                }
+            });
 
             it ({
                 id  : `Auth-02`,
@@ -184,22 +171,13 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                 const { response } = await req.promise();
                 api.logResponse(response);
 
+                expect(response.statusCode, "Token endpoint returned 404 Not Found").to.not.equal(404);
 
                 expect(
                     response.statusCode,
                     "response.statusCode must be >=400 if another content-type " +
                     `request header is sent. ${getResponseError(response)}`
                 ).to.be.above(399);
-
-                // If an error is encountered during the authentication process,
-                // the server SHALL respond with an invalid_client error as
-                // defined by the OAuth 2.0 specification.
-                // expect(
-                //     response.body,
-                //     "The server SHALL respond with an invalid_request OAuth error"
-                // ).to.contain({
-                //     error: "invalid_request"
-                // });
             });
 
             it ({
@@ -245,9 +223,6 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                 description: "The server should reply with 400 Bad Request if the " +
                     "`grant_type parameter` is not `client_credentials`."
             }, async (cfg, api) => {
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
 
                 api.prerequisite({
                     assertion: cfg.authType == "backend-services",
@@ -295,9 +270,6 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     message: "No privateKey configuration found for this server"
                 });
 
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -392,13 +364,6 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     response.statusCode,
                     `response.statusCode must be 400 or 401 if the client_assertion is not a valid JWT. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
-
-                // expect(
-                //     response.body,
-                //     "The server SHALL respond with an invalid_scope OAuth error"
-                // ).to.contain({
-                //     error: "invalid_scope"
-                // });
             });
 
             it ({
@@ -457,9 +422,6 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     message: "No privateKey configuration found for this server"
                 });
 
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -484,13 +446,6 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     response.statusCode,
                     `response.statusCode must be 400 or 401 if the iss claim is not valid. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
-
-                // expect(
-                //     response.body,
-                //     "The server SHALL respond with an invalid_grant OAuth error"
-                // ).to.contain({
-                //     error: "invalid_grant"
-                // });
             });
 
             it ({
@@ -655,13 +610,6 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     "In this case we expect scopes like \"launch\" or \"fhirUser\" to be rejected" +
                     getResponseError(response)
                 ).to.be.within(400, 403);
-
-                // expect(
-                //     response.body,
-                //     "The server SHALL respond with an invalid_scope OAuth error"
-                // ).to.contain({
-                //     error: "invalid_scope"
-                // });
             });
 
             it ({
@@ -741,13 +689,6 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     response.statusCode,
                     `response.statusCode must be 400, 401 or 403 if the scope is not valid. ${getResponseError(response)}`
                 ).to.be.within(400, 403);
-
-                // expect(
-                //     response.body,
-                //     "The server SHALL respond with an invalid_scope OAuth error"
-                // ).to.contain({
-                //     error: "invalid_scope"
-                // });
             });
 
             it ({
@@ -829,13 +770,6 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     "In this case we expect scopes like \"system/UnknownResource.read\" to be rejected" +
                     getResponseError(response)
                 ).to.be.within(400, 403);
-
-                // expect(
-                //     response.body,
-                //     "The server SHALL respond with an invalid_scope OAuth error"
-                // ).to.contain({
-                //     error: "invalid_scope"
-                // });
             });
 
             it ({
@@ -937,13 +871,6 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     "response.statusCode must be 400 or 401 if the token is not signed " +
                     `with the correct private key. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
-
-                // expect(
-                //     response.body,
-                //     "The server SHALL respond with an invalid_request OAuth error"
-                // ).to.contain({
-                //     error: "invalid_request"
-                // });
             });
 
             it ({
