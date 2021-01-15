@@ -251,6 +251,7 @@ function authenticate(tokenUrl, postBody) {
         method: "POST",
         url   : tokenUrl,
         json  : true,
+        headers  :  { ...this.options.customHeaders },
         form  : {
             scope: "system/*.*",
             grant_type: "client_credentials",

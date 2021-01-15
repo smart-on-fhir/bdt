@@ -22,6 +22,7 @@ async function getAccessToken(cfg, body= {}, signOptions = {})
         uri      : cfg.tokenEndpoint,
         json     : true,
         strictSSL: !!cfg.strictSSL,
+        headers  : { ...cfg.customHeaders },
         form     : {
             scope                : cfg.scope || "system/*.read",
             grant_type           : "client_credentials",
@@ -92,10 +93,6 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                         {
                             assertion: cfg.authType != "none",
                             message: "This server does not support authorization"
-                        },
-                        {
-                            assertion: cfg.requiresAuth,
-                            message: "This server does not require authorization"
                         }
                     );
 
@@ -129,7 +126,8 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                         const req = request({
                             method   : "POST",
                             uri      : cfg.tokenEndpoint,
-                            strictSSL: !!cfg.strictSSL
+                            strictSSL: !!cfg.strictSSL,
+                            headers  :  { ...cfg.customHeaders },
                         });
                         const { response } = await req.promise();
                         hasTokenEndpoint = response.statusCode >= 200 && response.statusCode !== 404;
@@ -163,6 +161,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     json     : true,
                     strictSSL: cfg.strictSSL,
                     headers: {
+                        ...cfg.customHeaders,
                         "Content-type": "application/json"
                     }
                 });
@@ -200,6 +199,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form     : {
                         scope                : cfg.scope || "system/*.read",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
@@ -237,6 +237,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form     : {
                         scope                : cfg.scope || "system/*.read",
                         grant_type           : "test-grant_type-value",
@@ -275,6 +276,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         scope           : cfg.scope || "system/*.read",
                         grant_type      : "client_credentials",
@@ -313,6 +315,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         scope                : cfg.scope || "system/*.read",
                         grant_type           : "client_credentials",
@@ -348,6 +351,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         scope                : "system/Patient.read",
                         grant_type           : "client_credentials",
@@ -387,6 +391,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         scope                : cfg.scope || "system/*.read",
                         grant_type           : "client_credentials",
@@ -427,6 +432,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         scope                : cfg.scope || "system/*.read",
                         grant_type           : "client_credentials",
@@ -467,6 +473,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         grant_type           : "client_credentials",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
@@ -507,6 +514,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         grant_type           : "client_credentials",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
@@ -547,6 +555,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         scope                : "",
                         grant_type           : "client_credentials",
@@ -588,6 +597,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         scope                : "launch fhirUser system/Patient.read",
                         grant_type           : "client_credentials",
@@ -631,6 +641,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         scope                : "system/Patient.*",
                         grant_type           : "client_credentials",
@@ -669,6 +680,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         scope                : "system/Patient.unknownAction",
                         grant_type           : "client_credentials",
@@ -710,6 +722,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         scope                : "system/*.read",
                         grant_type           : "client_credentials",
@@ -748,6 +761,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         scope                : "system/UnknownResource.read",
                         grant_type           : "client_credentials",
@@ -794,6 +808,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         grant_type           : "client_credentials",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
@@ -838,6 +853,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     uri      : cfg.tokenEndpoint,
                     json     : true,
                     strictSSL: cfg.strictSSL,
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         grant_type           : "client_credentials",
                         client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
@@ -919,6 +935,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     json: true,
                     strictSSL: cfg.strictSSL,
                     method: "POST",
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         serverId: cfg.id,
                         publicKey: JSON.stringify(publicKey)
@@ -979,6 +996,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                     json: true,
                     strictSSL: cfg.strictSSL,
                     method: "POST",
+                    headers  : { ...cfg.customHeaders },
                     form: {
                         serverId : cfg.id,
                         publicKey: JSON.stringify(publicKey)

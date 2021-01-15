@@ -478,6 +478,7 @@ class Runner extends EventEmitter
                         _node.hookErrors.push(ex);
                     }
                 }
+
                 this.emit("testEnd", _node);
             }
         };
@@ -513,17 +514,27 @@ class Runner extends EventEmitter
 
         // TEST NODE
         else {
-
             
+            if (!versionCheck(_node.version, this.settings.version || "1.0")) {
+                _node.status = "skipped";
+                return;
+            }
+    
+            if (_node.maxVersion && !versionCheck(this.settings.version || "1.0", _node.maxVersion)) {
+                _node.status = "skipped";
+                return;
+            }
+
             // Exit if no match
             if (this.settings.match) {
                 const re = new RegExp(this.settings.match, "i");
                 if (!re.test(_node.name)) {
-                    _node.status      = "skipped";
-                    this.emit("testEnd", _node);
+                    _node.status = "skipped";
                     return;
                 }
             }
+
+            this.emit("testStart", _node);
 
             // Exit if not supported
             if (typeof _node.notSupported == "function") {
@@ -577,7 +588,7 @@ class Runner extends EventEmitter
      * recursively. If the node is a test (leaf) executes it and stops...
      * @param {Object} node 
      */
-    async run(node = groups)
+    run(node = groups)
     {
         // If run is called for a leaf node we don't know its parent so make
         // sure we find it manually and set it as `currentGroup`
@@ -585,13 +596,9 @@ class Runner extends EventEmitter
             let path = node.path.split(".");
             path.pop();
             path = path.join(".");
-            currentGroup = getPath(path);
+            currentGroup = getPath(path, this.settings.version);
         }
-        try {
-            this.runInternal(node);
-        } catch (ex) {
-            console.error(ex); // SHOULD NOT HAPPEN!
-        }
+        return this.runInternal(node).catch(ex => console.error(ex));
     }
 }
 
