@@ -463,7 +463,11 @@ class BulkDataClient
     {
         let requestOptions = {
             strictSSL: this.options.strictSSL,
-            ...options
+            ...options,
+            headers: {
+                ...this.options.customHeaders,
+                ...options.headers
+            }
         };
 
         if (this.options.authType && this.options.authType != "none" && this.options.requiresAuth && !skipAuth) {
@@ -490,6 +494,7 @@ class BulkDataClient
             strictSSL: !!this.options.strictSSL,
             json     : true,
             headers: {
+                ...this.options.customHeaders,
                 authorization: `Basic ${authHeader}`
             }
         });
@@ -532,6 +537,7 @@ class BulkDataClient
             uri      : this.options.tokenEndpoint,
             json     : true,
             strictSSL: !!this.options.strictSSL,
+            headers  :  { ...this.options.customHeaders },
             form     : {
                 scope                : scope || this.options.scope || "system/*.read",
                 grant_type           : "client_credentials",

@@ -376,7 +376,7 @@ class Runner extends EventEmitter
         this.canceled = false;
 
         const { jwks, ...rest } = settings;
-        this.settings = rest;
+        this.settings = { ...{ customHeaders: {} }, ...rest };
 
         // Keys can be provided separately in config as "privateKey" and
         // "publicKey" properties, or a "jwks" array can be provided. If
