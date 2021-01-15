@@ -257,7 +257,8 @@ function createTestAPI(testNode)
         prerequisite(...conditions)
         {
             for (const { assertion, message } of conditions) {
-                if (!(assertion)) {
+                const x = typeof assertion == "function" ? assertion() : assertion;
+                if (!(x)) {
                     throw new NotSupportedError(message);
                 }
             }
