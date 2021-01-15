@@ -247,6 +247,24 @@ function createTestAPI(testNode)
         },
 
         /**
+         * Provide one or more conditions to check for. If `condition.assertion`
+         * evaluates to false, then new `NotSupportedError` will be thrown with
+         * `condition.message` as its message.
+         * @param  {...{ assertion: *, message: string }} conditions 
+         * @returns void
+         * @throws NotSupportedError
+         */
+        prerequisite(...conditions)
+        {
+            for (const { assertion, message } of conditions) {
+                const x = typeof assertion == "function" ? assertion() : assertion;
+                if (!(x)) {
+                    throw new NotSupportedError(message);
+                }
+            }
+        },
+
+        /**
          * Appends log entry to the test output.
          * @param {String} name The unique name of this log entry (multiple
          * entries with the same name override each other)
@@ -358,7 +376,7 @@ class Runner extends EventEmitter
         this.canceled = false;
 
         const { jwks, ...rest } = settings;
-        this.settings = rest;
+        this.settings = { ...{ customHeaders: {} }, ...rest };
 
         // Keys can be provided separately in config as "privateKey" and
         // "publicKey" properties, or a "jwks" array can be provided. If
@@ -378,26 +396,93 @@ class Runner extends EventEmitter
     }
 
     /**
-     * Execute the given node recursively. If no node is given executes the root
-     * node (all the tests). If the node is a group, executes all it's children
-     * recursively. If the node is a test (leaf) executes it and stops...
-     * @param {Object} node 
+     * 
+     * @param {object} node 
      */
-    async run(node = groups, indirect = false)
+    async runInternal(node = groups)
     {
-        const _node = { ...node };
+        const _node = {
+            ...node,
+            startedAt  : Date.now(),
+            status     : "loading",
+            decorations: {},
+            warnings   : [],
+            hookErrors : [],
+            error      : null
+        };
+
         const isRoot = _node.name === "__ROOT__";
 
-        if (!versionCheck(_node.version, this.settings.version || "1.0")) {
-            return;
-        }
+        const api = createTestAPI(_node);
 
-        if (_node.maxVersion && !versionCheck(this.settings.version || "1.0", _node.maxVersion)) {
-            return;
-        }
+        const end = async (error) => {
+            _node.endedAt = Date.now();
 
-        _node.startedAt = Date.now();
+            if (_node.status === "loading") {
+                _node.status = "succeeded";
+            }
 
+            if (_node.status === "not-supported" ||
+                _node.status === "not-implemented") {
+                return this.emit("testEnd", _node);
+            }
+
+            if (error) {
+                if (error instanceof NotSupportedError) {
+                    api.setNotSupported(error.message);
+                } else {
+                    _node.status = "failed";
+                    _node.error = {
+                        ...error,
+                        message: String(error)
+                    };
+                    if (this.settings.bail) {
+                        this.cancel();
+                    }
+                    // console.error(error);
+                    // throw error;
+                }
+            }
+            
+            if (_node.type === "group") {
+
+                // Invoke group after
+                if (_node.after) {
+                    try {
+                        await _node.after(this.settings, api);
+                    } catch (ex) {
+                        _node.hookErrors.push(ex);
+                    }
+                }
+
+                this.emit("groupEnd", _node);
+                if (isRoot) {
+                    this.emit("end");
+                }
+            }
+            else {
+                // Invoke test after
+                if (_node.after) {
+                    try {
+                        await _node.after(this.settings, api);
+                    } catch (ex) {
+                        _node.hookErrors.push(ex);
+                    }
+                }
+
+                // Invoke group afterEach
+                if (currentGroup.afterEach) {
+                    try {
+                        await currentGroup.afterEach(this.settings, api);
+                    } catch (ex) {
+                        _node.hookErrors.push(ex);
+                    }
+                }
+                this.emit("testEnd", _node);
+            }
+        };
+
+        // GROUP NODE
         if (_node.type === "group") {
 
             currentGroup = _node;
@@ -409,125 +494,103 @@ class Runner extends EventEmitter
             this.emit("groupStart", _node);
 
             if (_node.before) {
-                await _node.before();
+                try {
+                    await _node.before(this.settings, api);
+                } catch (ex) {
+                    return await end(ex.message);
+                }
             }
 
             for (const child of _node.children) {
-                await this.run(child, true);
+                await this.runInternal(child);
                 if (this.canceled) {
                     break;
                 }
             }
 
-            if (_node.after) {
-                await _node.after();
-            }
-
-            _node.endedAt = Date.now();
-
-            this.emit("groupEnd", _node);
-
-            if (isRoot) {
-                this.emit("end");
-            }
-
+            await end();
         }
+
+        // TEST NODE
         else {
 
-            _node.status      = "loading";
-            _node.decorations = {};
-            _node.warnings    = [];
-            _node.error       = null;
-
             
-
-            const api = createTestAPI(_node);
-            const next = (error) => {
-                _node.endedAt = Date.now();
-
-                if (error) {
-                    if (error instanceof NotSupportedError) {
-                        api.setNotSupported(error.message);
-                    } else {
-                        _node.status = "failed";
-                        _node.error = {
-                            ...error,
-                            message: String(error)
-                        };
-                        if (this.settings.bail) {
-                            this.cancel();
-                        }
-                    }
-                } else {
-                    if (_node.warnings.length) {
-                        if (_node.status === "loading") {
-                            _node.status = "warned";
-                        }
-                    } else {
-                        _node.status = _node.fn ? "succeeded" : "not-implemented";
-                    }
-                }
-
-                this.emit("testEnd", _node);
-            };
-
-            this.emit("testStart", _node);
-
+            // Exit if no match
             if (this.settings.match) {
                 const re = new RegExp(this.settings.match, "i");
                 if (!re.test(_node.name)) {
                     _node.status      = "skipped";
                     this.emit("testEnd", _node);
-                    return;// next();
+                    return;
                 }
             }
 
+            // Exit if not supported
             if (typeof _node.notSupported == "function") {
                 const check = _node.notSupported(this.settings);
                 if (check !== false) {
                     api.setNotSupported(check || "This test is not supported by this server");
-                    return next();
+                    return await end();
                 }
             }
 
-            if (!indirect && currentGroup.before) {
-                await currentGroup.before();
+            // Exit if not implemented
+            if (typeof _node.fn !== "function") {
+                api.warn("This test is not implemented");
+                api.setStatus("not-implemented");
+                return await end();
             }
 
+            // Invoke group beforeEach
             if (currentGroup.beforeEach) {
-                await currentGroup.beforeEach();
+                try {
+                    await currentGroup.beforeEach(this.settings, api);
+                } catch (ex) {
+                    return await end(ex);
+                }
             }
 
+            // Invoke test before
             if (_node.before) {
-                await _node.before(this.settings, api);
+                try {
+                    await _node.before(this.settings, api);
+                } catch (ex) {
+                    return await end(ex);
+                }
             }
 
+            // execute
+            let execError;
             try {
-                if (typeof _node.fn == "function") {
-                    const p = _node.fn.call(_node, this.settings, api);
-                    if (isPromise(p)) {
-                        await p.then(() => next()).catch(next);
-                    }
-                }
-                else {
-                    api.warn("This test is not implemented");
-                    api.setStatus("not-implemented");
-                    next();
-                }
-            } catch (ex) {
-                next(ex);
-            } finally {
-                if (_node.after) {
-                    await _node.after(this.settings, api);
-                }
-                if (currentGroup.afterEach) {
-                    await currentGroup.afterEach();
-                }
-
-                if (!indirect && currentGroup.after) {
-                    await currentGroup.after();
-                }
+                await _node.fn(this.settings, api);
+            } catch (error) {
+                execError = error;
             }
+
+            await end(execError);
+        }
+    }
+
+    /**
+     * Execute the given node recursively. If no node is given executes the root
+     * node (all the tests). If the node is a group, executes all it's children
+     * recursively. If the node is a test (leaf) executes it and stops...
+     * @param {Object} node 
+     */
+    async run(node = groups)
+    {
+        // If run is called for a leaf node we don't know its parent so make
+        // sure we find it manually and set it as `currentGroup`
+        if (node.type !== "group") {
+            let path = node.path.split(".");
+            path.pop();
+            path = path.join(".");
+            currentGroup = getPath(path);
+        }
+        try {
+            this.runInternal(node);
+        } catch (ex) {
+            console.error(ex); // SHOULD NOT HAPPEN!
         }
     }
 }

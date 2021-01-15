@@ -296,8 +296,9 @@ module.exports = function StdoutReporter()
         }
     }
 
-    function onGroupEnd() {
+    function onGroupEnd(node) {
         --depth;
+        logDetails(node);
     }
 
     function onTestStart(node) {
@@ -313,7 +314,10 @@ module.exports = function StdoutReporter()
 
         count += 1;
         log("\u001b[2K\r" + `${indent(depth)} ${icon(node)} ${text(node)} ${duration(node)}`);
+        logDetails(node);
+    }
 
+    function logDetails(node) {
         if (node.status === "failed") {
             failed += 1;
             if (node.description) {
@@ -350,6 +354,12 @@ module.exports = function StdoutReporter()
                     successful += 1;
                 }
             }
+        }
+
+        if (Array.isArray(node.hookErrors) && node.hookErrors.length) {
+            node.hookErrors.forEach(err => {
+                log(`${indent(depth + 1)} ${" ⯈".red} ${err.stack.red}`);
+            });
         }
     }
 

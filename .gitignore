@@ -62,3 +62,5 @@ typings/
 .vscode/launch.json
 config-examples/hl7-r3.js
 config-examples/DPC.js
+config-examples/onc.js
+config-examples/epic.js

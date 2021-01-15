@@ -9,7 +9,8 @@ const {
     expectStatusCode,
     authenticate,
     getResponseError,
-    BulkDataClient
+    BulkDataClient,
+    NotSupportedError
 } = require("./lib");
 
 
@@ -39,7 +40,7 @@ async function getAccessToken(cfg, body= {}, signOptions = {})
     return response.body.access_token;
 }
 
-module.exports = function(describe, it) {
+module.exports = function(describe, it, before, after, beforeEach, afterEach) {
     describe("Authorization", () => {
         
         // A few tests that are the same for each of the kick-off endpoints
@@ -50,85 +51,68 @@ module.exports = function(describe, it) {
                 it ({
                     id  : `Auth-01.${i}.${y++}`,
                     name: `Requires authorization header`,
-                    description: `The server should require authorization header at the ${type}-level export endpoint`,
-                    notSupported: cfg => (cfg.authType == "none" ?
-                        "This server does not support authorization" :
-                        !cfg.requiresAuth ? "This server does not require authorization" : false),
-                    before(cfg, api) { this.client = new BulkDataClient(cfg, api); },
-                    after() { this.client.cancelIfStarted(); }
-                }, async function() {
-                    await this.client.kickOff({ type, skipAuth: true });
+                    description: `The server should require authorization header at the ${type}-level export endpoint`
+                }, async function(cfg, api) {
+                    api.prerequisite(
+                        {
+                            assertion: cfg.authType != "none",
+                            message: "This server does not support authorization"
+                        },
+                        {
+                            assertion: cfg.requiresAuth,
+                            message: "This server does not require authorization"
+                        }
+                    );
+                    
+                    const client = new BulkDataClient(cfg, api);
+                    await client.kickOff({ type, skipAuth: true });
+                    client.cancelIfStarted();
+
                     expectUnauthorized(
-                        this.client.kickOffResponse,
+                        client.kickOffResponse,
                         "The server must not accept kick-off requests without authorization header"
                     );
                     expectJson(
-                        this.client.kickOffResponse,
+                        client.kickOffResponse,
                         "The body SHALL be a FHIR OperationOutcome resource in JSON format"
                     );
                     expectOperationOutcome(
-                        this.client.kickOffResponse,
+                        client.kickOffResponse,
                         "The body SHALL be a FHIR OperationOutcome resource in JSON format"
                     );
                 });
-
-                // TODO: Find a reliable way to test expired tokens!
-                // it ({
-                //     id  : `Auth-01.${i}.${y++}`,
-                //     name: `Rejects expired token`,
-                //     description: `The server should reject expired tokens at the ${type}-level export endpoint. ` +
-                //         "Note that this test will only work properly if the auth server issues access tokens " +
-                //         "with expiration time based on the provided authentication token lifetime.",
-                //     notSupported: cfg => (cfg.authType != "backend-services" ?
-                //         "This test is only applicable for servers that support SMART Backend Services authorization" :
-                //         false),
-                //     before(cfg, api) { this.client = new BulkDataClient(cfg, api); },
-                //     after() { 
-                //         this.client.cancelIfStarted();
-                //         return void 0;
-                //     }
-                // }, async function(cfg) {
-                //     const expiredToken = await getAccessToken(cfg, {}, { expiresIn: 1000 });
-                //     console.log("expiredToken:", expiredToken)
-                //     await wait(1000);
-                //     await this.client.kickOff({ type, headers: { authorization: "Bearer " + expiredToken }});
-                //     console.log(JSON.stringify(this.client.kickOffResponse.body, null, 4))
-                //     expectUnauthorized(
-                //         this.client.kickOffResponse,
-                //         "The server must not accept kick-off requests with expired token in the authorization header"
-                //     );
-                //     expectJson(
-                //         this.client.kickOffResponse,
-                //         "The body SHALL be a FHIR OperationOutcome resource in JSON format"
-                //     );
-                //     expectOperationOutcome(
-                //         this.client.kickOffResponse,
-                //         "The body SHALL be a FHIR OperationOutcome resource in JSON format"
-                //     );
-                // });
 
                 it ({
                     id  : `Auth-01.${i}.${y++}`,
                     name: `Rejects invalid token`,
                     description: `The server should reject invalid tokens at the ${type}-level export endpoint`,
-                    notSupported: cfg => (cfg.authType != "backend-services" ?
-                        "This test is only applicable for servers that support SMART Backend Services authorization" :
-                        false),
-                    before(cfg, api) { this.client = new BulkDataClient(cfg, api); },
-                    after() { this.client.cancelIfStarted(); }
-                }, async function() {
-                    await this.client.kickOff({ type, headers: { authorization: "Bearer invalidToken" }});
-                    // console.log(JSON.stringify(this.client.kickOffResponse.body, null, 4))
+                }, async function(cfg, api) {
+
+                    api.prerequisite(
+                        {
+                            assertion: cfg.authType != "none",
+                            message: "This server does not support authorization"
+                        },
+                        {
+                            assertion: cfg.requiresAuth,
+                            message: "This server does not require authorization"
+                        }
+                    );
+
+                    const client = new BulkDataClient(cfg, api);
+                    await client.kickOff({ type, headers: { authorization: "Bearer invalidToken" }});
+                    client.cancelIfStarted();
+
                     expectUnauthorized(
-                        this.client.kickOffResponse,
+                        client.kickOffResponse,
                         "The server must not accept kick-off requests with invalid token in the authorization header"
                     );
                     expectJson(
-                        this.client.kickOffResponse,
+                        client.kickOffResponse,
                         "The body SHALL be a FHIR OperationOutcome resource in JSON format"
                     );
                     expectOperationOutcome(
-                        this.client.kickOffResponse,
+                        client.kickOffResponse,
                         "The body SHALL be a FHIR OperationOutcome resource in JSON format"
                     );
                 });
@@ -137,6 +121,27 @@ module.exports = function(describe, it) {
 
         describe("Token endpoint", () => {
 
+            let hasTokenEndpoint;
+
+            beforeEach(async (cfg, api) => {
+                if (hasTokenEndpoint === undefined) {
+                    if (cfg.tokenEndpoint) {
+                        const req = request({
+                            method   : "POST",
+                            uri      : cfg.tokenEndpoint,
+                            strictSSL: !!cfg.strictSSL
+                        });
+                        const { response } = await req.promise();
+                        hasTokenEndpoint = response.statusCode >= 200 && response.statusCode !== 404;
+                    } else {
+                        hasTokenEndpoint = false;
+                    }
+                }
+
+                if (!hasTokenEndpoint) {
+                    throw new NotSupportedError("No usable token endpoint found");
+                }
+            });
 
             it ({
                 id  : `Auth-02`,
@@ -147,9 +152,10 @@ module.exports = function(describe, it) {
                     "`application/x-www-form-urlencoded`."
             }, async (cfg, api) => {
 
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                });
 
                 const req = request({
                     method   : "POST",
@@ -165,22 +171,13 @@ module.exports = function(describe, it) {
                 const { response } = await req.promise();
                 api.logResponse(response);
 
+                expect(response.statusCode, "Token endpoint returned 404 Not Found").to.not.equal(404);
 
                 expect(
                     response.statusCode,
                     "response.statusCode must be >=400 if another content-type " +
                     `request header is sent. ${getResponseError(response)}`
                 ).to.be.above(399);
-
-                // If an error is encountered during the authentication process,
-                // the server SHALL respond with an invalid_client error as
-                // defined by the OAuth 2.0 specification.
-                // expect(
-                //     response.body,
-                //     "The server SHALL respond with an invalid_request OAuth error"
-                // ).to.contain({
-                //     error: "invalid_request"
-                // });
             });
 
             it ({
@@ -190,13 +187,13 @@ module.exports = function(describe, it) {
                     "`grant_type parameter` is not sent by the client."
             }, async (cfg, api) => {
 
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
-
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
 
                 const req = request({
                     method   : "POST",
@@ -226,13 +223,14 @@ module.exports = function(describe, it) {
                 description: "The server should reply with 400 Bad Request if the " +
                     "`grant_type parameter` is not `client_credentials`."
             }, async (cfg, api) => {
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
 
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
 
                 const req = request({
                     method   : "POST",
@@ -264,13 +262,14 @@ module.exports = function(describe, it) {
                     "`client_assertion_type` parameter is not sent by the client."
             }, async (cfg, api) => {
 
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
 
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -301,13 +300,14 @@ module.exports = function(describe, it) {
                     "`urn:ietf:params:oauth:client-assertion-type:jwt-bearer`."
             }, async (cfg, api) => {
 
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
 
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -339,9 +339,10 @@ module.exports = function(describe, it) {
                     "other then a JWT, the server will detect it and reject the request."
             }, async (cfg, api) => {
 
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                });
 
                 const req = request({
                     method   : "POST",
@@ -363,13 +364,6 @@ module.exports = function(describe, it) {
                     response.statusCode,
                     `response.statusCode must be 400 or 401 if the client_assertion is not a valid JWT. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
-
-                // expect(
-                //     response.body,
-                //     "The server SHALL respond with an invalid_scope OAuth error"
-                // ).to.contain({
-                //     error: "invalid_scope"
-                // });
             });
 
             it ({
@@ -379,13 +373,15 @@ module.exports = function(describe, it) {
                     "authorization server's \"token URL\" (the same URL to which " +
                     "this authentication JWT will be posted)."
             }, async (cfg, api) => {
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
 
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
+
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -417,13 +413,15 @@ module.exports = function(describe, it) {
                 name: "Validates authenticationToken.iss",
                 description: "The `iss` claim of the authentication JWT must equal the registered `client_id`"
             }, async (cfg, api) => {
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
 
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
+
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -448,13 +446,6 @@ module.exports = function(describe, it) {
                     response.statusCode,
                     `response.statusCode must be 400 or 401 if the iss claim is not valid. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
-
-                // expect(
-                //     response.body,
-                //     "The server SHALL respond with an invalid_grant OAuth error"
-                // ).to.contain({
-                //     error: "invalid_grant"
-                // });
             });
 
             it ({
@@ -462,13 +453,15 @@ module.exports = function(describe, it) {
                 name: "Only accept registered client IDs",
                 description: "Verify that clients can't use random client id"
             }, async (cfg, api) => {
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
 
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
+
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -500,13 +493,15 @@ module.exports = function(describe, it) {
                 name: "Requires scope",
                 description: "The server should reject requests to the token endpoint that do not specify a scope"
             }, async (cfg, api) => {
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
 
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
+
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -538,13 +533,15 @@ module.exports = function(describe, it) {
                 name: "Rejects empty scope",
                 description: "The server should reject requests to the token endpoint that are requesting an empty scope"
             }, async (cfg, api) => {
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
+                
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
 
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -577,12 +574,15 @@ module.exports = function(describe, it) {
                 name: "Validates scopes",
                 description: "This test verifies that only valid system scopes are accepted by the server"
             }, async (cfg, api) => {
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
+
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
+
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -610,13 +610,6 @@ module.exports = function(describe, it) {
                     "In this case we expect scopes like \"launch\" or \"fhirUser\" to be rejected" +
                     getResponseError(response)
                 ).to.be.within(400, 403);
-
-                // expect(
-                //     response.body,
-                //     "The server SHALL respond with an invalid_scope OAuth error"
-                // ).to.contain({
-                //     error: "invalid_scope"
-                // });
             });
 
             it ({
@@ -624,12 +617,15 @@ module.exports = function(describe, it) {
                 name: "Supports wildcard action scopes",
                 description: "Verifies that scopes like `system/Patient.*` are supported"
             }, async (cfg, api) => {
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
+
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
+
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -659,12 +655,15 @@ module.exports = function(describe, it) {
                 name: "Rejects unknown action scopes",
                 description: "Verifies that scopes like `system/Patient.unknownAction` are rejected"
             }, async (cfg, api) => {
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
+
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
+
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -690,13 +689,6 @@ module.exports = function(describe, it) {
                     response.statusCode,
                     `response.statusCode must be 400, 401 or 403 if the scope is not valid. ${getResponseError(response)}`
                 ).to.be.within(400, 403);
-
-                // expect(
-                //     response.body,
-                //     "The server SHALL respond with an invalid_scope OAuth error"
-                // ).to.contain({
-                //     error: "invalid_scope"
-                // });
             });
 
             it ({
@@ -704,12 +696,15 @@ module.exports = function(describe, it) {
                 name: "Supports wildcard resource scopes",
                 description: "Verifies that scopes like `system/*.read` are supported"
             }, async (cfg, api) => {
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
+                
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
+
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -739,19 +734,15 @@ module.exports = function(describe, it) {
                 name: "Rejects unknown resource scopes",
                 description: "Verifies that scopes like `system/UnknownResource.read` are rejected"
             }, async (cfg, api) => {
-                if (cfg.authType == "client-credentials") {
-                    return api.setNotSupported(
-                        `This test is not not applicable for servers using client-credentials authentication`
-                    );
-                }
-                if (!cfg.authType || cfg.authType == "none") {
-                    return api.setNotSupported(
-                        `This test is not not applicable for open servers`
-                    );
-                }
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
+
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
+
                 const req = request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -779,13 +770,6 @@ module.exports = function(describe, it) {
                     "In this case we expect scopes like \"system/UnknownResource.read\" to be rejected" +
                     getResponseError(response)
                 ).to.be.within(400, 403);
-
-                // expect(
-                //     response.body,
-                //     "The server SHALL respond with an invalid_scope OAuth error"
-                // ).to.contain({
-                //     error: "invalid_scope"
-                // });
             });
 
             it ({
@@ -796,12 +780,15 @@ module.exports = function(describe, it) {
                     "attempts to authorize using `test-bad-jku` as `jky` header value and " +
                     "expects that to produce an error."
             }, async (cfg, api) => {
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
-                if (!cfg.privateKey) {
-                    return api.setNotSupported(`No privateKey configuration found for this server`);
-                }
+                
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: cfg.privateKey,
+                    message: "No privateKey configuration found for this server"
+                });
+
                 const req = await request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -840,9 +827,12 @@ module.exports = function(describe, it) {
                     "request that is completely valid, except that the authentication token " +
                     "is signed with unknown private key."
             }, async (cfg, api) => {
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
+
+                api.prerequisite({
+                    assertion: cfg.authType && cfg.authType != "none",
+                    message: "This test is not applicable for open servers"
+                });
+
                 const req = await request({
                     method   : "POST",
                     uri      : cfg.tokenEndpoint,
@@ -881,13 +871,6 @@ module.exports = function(describe, it) {
                     "response.statusCode must be 400 or 401 if the token is not signed " +
                     `with the correct private key. ${getResponseError(response)}`
                 ).to.be.within(400, 401);
-
-                // expect(
-                //     response.body,
-                //     "The server SHALL respond with an invalid_request OAuth error"
-                // ).to.contain({
-                //     error: "invalid_request"
-                // });
             });
 
             it ({
@@ -897,17 +880,19 @@ module.exports = function(describe, it) {
                     "that JWK keys rotation works because this test will create new key, every time it is executed."
             }, async (cfg, api) => {
 
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
-
-                if (cfg.cli) {
-                    return api.setNotSupported(`This test cannot be executed in CLI`);
-                }
-
-                if (!cfg.jwksUrlAuth || !cfg.jwksUrl) {
-                    return api.setNotSupported(`This server is not configured to support authorization using JWKS URL`);
-                }
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: !cfg.cli,
+                    message: "This test cannot be executed in CLI"
+                }, {
+                    assertion: cfg.jwksUrlAuth && cfg.jwksUrl,
+                    message: "This server is not configured to support authorization using JWKS URL"
+                }, {
+                    assertion: cfg.clientId,
+                    message: "No clientId found in configuration"
+                });
 
                 const jwks = await createJWKS("ES384");
                 const privateKey = jwks.keys.find(k => k.key_ops.indexOf("sign") > -1);
@@ -955,17 +940,19 @@ module.exports = function(describe, it) {
                     "that JWK keys rotation works because this test will create new key, every time it is executed."
             }, async (cfg, api) => {
 
-                if (cfg.authType != "backend-services") {
-                    return api.setNotSupported(`This test is only applicable for servers that support SMART Backend Services authorization`);
-                }
-
-                if (cfg.cli) {
-                    return api.setNotSupported(`This test cannot be executed in CLI`);
-                }
-
-                if (!cfg.jwksUrlAuth || !cfg.jwksUrl) {
-                    return api.setNotSupported(`This server is not configured to support authorization using JWKS URL`);
-                }
+                api.prerequisite({
+                    assertion: cfg.authType == "backend-services",
+                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
+                }, {
+                    assertion: !cfg.cli,
+                    message: "This test cannot be executed in CLI"
+                }, {
+                    assertion: cfg.jwksUrlAuth && cfg.jwksUrl,
+                    message: "This server is not configured to support authorization using JWKS URL"
+                }, {
+                    assertion: cfg.clientId,
+                    message: "No clientId found in configuration"
+                });
 
                 const jwks = await createJWKS("RS384");
                 const privateKey = jwks.keys.find(k => k.key_ops.indexOf("sign") > -1);
