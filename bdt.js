@@ -247,6 +247,23 @@ function createTestAPI(testNode)
         },
 
         /**
+         * Provide one or more conditions to check for. If `condition.assertion`
+         * evaluates to false, then new `NotSupportedError` will be thrown with
+         * `condition.message` as its message.
+         * @param  {...{ assertion: *, message: string }} conditions 
+         * @returns void
+         * @throws NotSupportedError
+         */
+        prerequisite(...conditions)
+        {
+            for (const { assertion, message } of conditions) {
+                if (!(assertion)) {
+                    throw new NotSupportedError(message);
+                }
+            }
+        },
+
+        /**
          * Appends log entry to the test output.
          * @param {String} name The unique name of this log entry (multiple
          * entries with the same name override each other)
