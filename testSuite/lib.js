@@ -246,12 +246,12 @@ function createClientAssertion(claims = {}, signOptions = {}, privateKey)
     return jwt.sign(jwtToken, jwkToPem(privateKey, { private: true }), _signOptions);
 }
 
-function authenticate(tokenUrl, postBody) {
+function authenticate(tokenUrl, postBody, customHeaders = {}) {
     return customRequest({
         method: "POST",
         url   : tokenUrl,
         json  : true,
-        headers  :  { ...this.options.customHeaders },
+        headers  :  { ...customHeaders },
         form  : {
             scope: "system/*.*",
             grant_type: "client_credentials",

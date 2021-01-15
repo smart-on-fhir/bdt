@@ -926,7 +926,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
 
                 const authorizationRequest = authenticate(cfg.tokenEndpoint, {
                     client_assertion: token
-                });
+                }, cfg.customHeaders);
 
                 // Make a special call to our API that will temporarily override
                 // the public key of this server that is hosted at cfg.jwksUrl
@@ -987,7 +987,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
 
                 const authorizationRequest = authenticate(cfg.tokenEndpoint, {
                     client_assertion: token
-                });
+                }, cfg.customHeaders);
 
                 // Make a special call to our API that will temporarily override
                 // the public key of this server that is hosted at cfg.jwksUrl
