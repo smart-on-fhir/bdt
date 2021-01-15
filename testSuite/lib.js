@@ -383,11 +383,12 @@ class BulkDataClient
     {
         if (!this._capabilityStatement) {
             this._capabilityStatement = (await customRequest({
-                uri      : `${this.options.baseURL}/metadata`,
+                uri      : `${this.options.baseURL}/metadata?_format=json`,
                 json     : true,
                 strictSSL: false,
                 headers: {
-                    accept: "application/fhir+json"
+                    ...this.options.customHeaders,
+                    accept: "application/fhir+json,application/json+fhir,application/json"
                 }
             }).promise()).body;
         }

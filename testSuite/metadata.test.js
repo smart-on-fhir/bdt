@@ -3,11 +3,11 @@ const { request } = require("./lib");
 
 async function fetchConformance(cfg, api) {
     const req = await request({
-        uri: `${cfg.baseURL}/metadata`,
+        uri: `${cfg.baseURL}/metadata?_format=json`,
         json: true,
         strictSSL: cfg.strictSSL,
         headers: {
-            accept: "application/fhir+json"
+            accept: "application/fhir+json,application/json+fhir,application/json"
         }
     });
 
