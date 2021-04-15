@@ -365,7 +365,7 @@ class BulkDataClient
 
     ///////////////////////////////////////////////////////////////////////////
 
-    async getCapabilityStatement(cfg, api)
+    async getCapabilityStatement()
     {
         if (!this._capabilityStatement) {
             this._capabilityStatement = (await customRequest({
@@ -579,17 +579,17 @@ class BulkDataClient
         const { params, type, skipAuth, ...rest } = options;
 
         let path;
-        if (type == "system") {
+        if (type === "system") {
             path = await this.getSystemExportEndpoint();
             if (!path) {
                 throw new NotSupportedError("System-level export is not supported by this server");
             }
-        } else if (type == "patient") {
+        } else if (type === "patient") {
             path = await this.getPatientExportEndpoint();
             if (!path) {
                 throw new NotSupportedError("Patient-level export is not supported by this server");
             }
-        } else if (type == "group") {
+        } else if (type === "group") {
             path = await this.getGroupExportEndpoint();
             if (!path) {
                 throw new NotSupportedError("Group-level export is not supported by this server");
@@ -607,7 +607,7 @@ class BulkDataClient
 
         
         if (params && typeof params == "object") {
-            if (rest.method == "POST") {
+            if (rest.method === "POST") {
                 rest.body = {
                     resourceType: "Parameters",
                     parameter: []
@@ -645,6 +645,8 @@ class BulkDataClient
                                 valueString: params[key]
                             });
                         break;
+                        default:
+                            throw new Error(`Unknown parameter ${key}`);
                     }
                 }
             } else {
