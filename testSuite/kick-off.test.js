@@ -428,6 +428,41 @@ module.exports = function(describe, it) {
             it ({
                 id  : `${meta.idPrefix}-${count++}`,
                 version: "1.2",
+                name: "Accepts multiple _type parameters",
+                description: "Clients can use multiple `_type` parameters " +
+                    "instead of single comma-separated lists"
+            }, async (cfg, api) => {
+
+                const client = new BulkDataClient(cfg, api);
+
+                const types = await client.getSupportedResourceTypes();
+
+                if (types.length < 2) {
+                    return api.setNotSupported(
+                        `This test fas skipped because not enough resource ` +
+                        `types were found in the capability statement`
+                    );
+                }
+
+                // Start an export
+                await client.kickOff({
+                    type: meta.type,
+                    params: {
+                        _type: types
+                    }
+                });
+
+                // If the server did not return an error as expected, an export
+                // might actually been started. Make sure we cancel that!
+                await client.cancelIfStarted();
+
+                // Finally check that we have got an error response
+                client.expectSuccessfulKickOff();
+            });
+
+            it ({
+                id  : `${meta.idPrefix}-${count++}`,
+                version: "1.2",
                 name: "Validates the _type parameter in POST requests",
                 description: "Verifies that the request is rejected if the `_type` " +
                     "contains invalid resource type"

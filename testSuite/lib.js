@@ -434,6 +434,15 @@ class BulkDataClient
         return this._patientExportEndpoint;
     }
 
+    async getSupportedResourceTypes()
+    {
+        if (!this._supportedResourceTypes) {
+            const capabilityStatement = await this.getCapabilityStatement();
+            this._supportedResourceTypes = capabilityStatement.rest[0].resource.map(x => x.type);
+        }
+        return this._supportedResourceTypes;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
 
     /**
@@ -651,7 +660,13 @@ class BulkDataClient
                 }
             } else {
                 for (const key in params) {
-                    url.searchParams.append(key, params[key]);
+                    if (Array.isArray(params[key])) {
+                        params[key].forEach(val => {
+                            url.searchParams.append(key, val);
+                        });
+                    } else {
+                        url.searchParams.append(key, params[key]);
+                    }
                 }
             }
         }
