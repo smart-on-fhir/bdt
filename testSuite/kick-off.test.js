@@ -82,7 +82,7 @@ module.exports = function(describe, it) {
                     return api.setNotSupported(`${meta.name} via POST is not supported by this server`);
                 }
 
-                if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
+                if (client.kickOffResponse.statusCode === 404 || client.kickOffResponse.statusCode >= 500) {
                     return api.setNotSupported(`It seems that ${meta.name} via POST is not supported by this server`);
                 }
 
@@ -151,7 +151,7 @@ module.exports = function(describe, it) {
                     return api.setNotSupported(`${meta.name} via POST is not supported by this server`);
                 }
 
-                if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
+                if (client.kickOffResponse.statusCode === 404 || client.kickOffResponse.statusCode >= 500) {
                     return api.setNotSupported(`It seems that ${meta.name} via POST is not supported by this server`);
                 }
 
@@ -210,7 +210,7 @@ module.exports = function(describe, it) {
                         return api.setNotSupported(`${meta.name} via POST is not supported by this server`);
                     }
     
-                    if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
+                    if (client.kickOffResponse.statusCode === 404 || client.kickOffResponse.statusCode >= 500) {
                         return api.setNotSupported(`It seems that ${meta.name} via POST is not supported by this server`);
                     }
 
@@ -276,7 +276,7 @@ module.exports = function(describe, it) {
                         return api.setNotSupported(`${meta.name} via POST is not supported by this server`);
                     }
     
-                    if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
+                    if (client.kickOffResponse.statusCode === 404 || client.kickOffResponse.statusCode >= 500) {
                         return api.setNotSupported(`It seems that ${meta.name} via POST is not supported by this server`);
                     }
 
@@ -334,7 +334,7 @@ module.exports = function(describe, it) {
                     return api.setNotSupported(`${meta.name} via POST is not supported by this server`);
                 }
 
-                if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
+                if (client.kickOffResponse.statusCode === 404 || client.kickOffResponse.statusCode >= 500) {
                     return api.setNotSupported(`It seems that ${meta.name} via POST is not supported by this server`);
                 }
 
@@ -392,7 +392,7 @@ module.exports = function(describe, it) {
                     return api.setNotSupported(`${meta.name} via POST is not supported by this server`);
                 }
 
-                if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
+                if (client.kickOffResponse.statusCode === 404 || client.kickOffResponse.statusCode >= 500) {
                     return api.setNotSupported(`It seems that ${meta.name} via POST is not supported by this server`);
                 }
 
@@ -487,7 +487,7 @@ module.exports = function(describe, it) {
                     return api.setNotSupported(`${meta.name} via POST is not supported by this server`);
                 }
 
-                if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
+                if (client.kickOffResponse.statusCode === 404 || client.kickOffResponse.statusCode >= 500) {
                     return api.setNotSupported(`It seems that ${meta.name} via POST is not supported by this server`);
                 }
 
@@ -656,7 +656,7 @@ module.exports = function(describe, it) {
                     return api.setNotSupported(`${meta.name} via POST is not supported by this server`);
                 }
 
-                if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
+                if (client.kickOffResponse.statusCode === 404 || client.kickOffResponse.statusCode >= 500) {
                     return api.setNotSupported(`It seems that ${meta.name} via POST is not supported by this server`);
                 }
 
@@ -742,7 +742,7 @@ module.exports = function(describe, it) {
                     return api.setNotSupported(`${meta.name} via POST is not supported by this server`);
                 }
 
-                if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
+                if (client.kickOffResponse.statusCode === 404 || client.kickOffResponse.statusCode >= 500) {
                     return api.setNotSupported(`It seems that ${meta.name} via POST is not supported by this server`);
                 }
 
@@ -750,7 +750,7 @@ module.exports = function(describe, it) {
                 client.expectSuccessfulKickOff();
             });
 
-            if (meta.idPrefix == "System-level") {
+            if (meta.idPrefix === "System-level") {
 
                 it ({
                     id  : `${meta.idPrefix}-${count++}`,
@@ -786,7 +786,7 @@ module.exports = function(describe, it) {
                         return api.setNotSupported(`${meta.name} via POST is not supported by this server`);
                     }
         
-                    if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
+                    if (client.kickOffResponse.statusCode === 404 || client.kickOffResponse.statusCode >= 500) {
                         return api.setNotSupported(`It seems that ${meta.name} via POST is not supported by this server`);
                     }
         
@@ -818,7 +818,7 @@ module.exports = function(describe, it) {
                         return api.setNotSupported(`${meta.name} via POST is not supported by this server`);
                     }
         
-                    if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
+                    if (client.kickOffResponse.statusCode === 404 || client.kickOffResponse.statusCode >= 500) {
                         return api.setNotSupported(`It seems that ${meta.name} via POST is not supported by this server`);
                     }
         
