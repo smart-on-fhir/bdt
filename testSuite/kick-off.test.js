@@ -579,6 +579,53 @@ module.exports = function(describe, it) {
 
             it ({
                 id  : `${meta.idPrefix}-${count++}`,
+                name: "Handles multiple _typeFilter parameters",
+                version: "1.2",
+                description: "The `_typeFilter` parameter is optional. Servers that do not support it " +
+                    "should reject it, unless `handling=lenient` is included in the `Prefer` header"
+            }, async (cfg, api) => {
+
+                const client = new BulkDataClient(cfg, api);
+
+                // First attempt
+                await client.kickOff({
+                    type: meta.type,
+                    params: {
+                        _typeFilter: ["Patient?status=active", "Patient?gender=male"]
+                    }
+                });
+
+                await client.cancelIfStarted();
+
+                // If the export was successful assume that _typeFilter is
+                // supported. We have nothing else to do here.
+                if (client.kickOffResponse.statusCode === 202) {
+                    return client.expectSuccessfulKickOff();
+                }
+
+                // Second attempt
+                await client.kickOff({
+                    type: meta.type,
+                    headers: {
+                        prefer: "respond-async,handling=lenient"
+                    },
+                    params: {
+                        _typeFilter: ["Patient?status=active", "Patient?gender=male"]
+                    }
+                });
+
+                await client.cancelIfStarted();
+
+                if (client.kickOffResponse.statusCode !== 202) {
+                    throw new Error("The server was expected to ignore the _typeFilter parameter if handling=lenient is included in the Prefer header");
+                }
+
+                // Verify that we didn't get an error
+                client.expectSuccessfulKickOff();
+            });
+
+            it ({
+                id  : `${meta.idPrefix}-${count++}`,
                 version: "1.2",
                 name: "Accepts the _typeFilter parameter in POST requests",
                 description: "The `_typeFilter` parameter is optional so the servers " +
