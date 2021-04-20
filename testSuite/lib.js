@@ -647,7 +647,7 @@ class BulkDataClient
                         break;
                         case "_outputFormat":
                         case "_elements":
-                        case "_includeAssociatedData":
+                        case "includeAssociatedData":
                         case "_typeFilter":
                             rest.body.parameter.push({
                                 name: key,
@@ -828,12 +828,12 @@ class BulkDataClient
      * Cancels an export by sending a DELETE request to the status endpoint.
      * If an export has not been started does nothing.
      */
-    async cancelIfStarted()
+    async cancelIfStarted(labelPrefix = "")
     {
         if (this.kickOffResponse &&
             this.kickOffResponse.statusCode === 202 &&
             this.kickOffResponse.headers["content-location"]) {
-            await this.cancel();
+            await this.cancel(labelPrefix);
         }
     }
 
@@ -843,7 +843,7 @@ class BulkDataClient
      * otherwise. Use `this.cancelIfStarted()` if you are not sure if an export
      * has been started.
      */
-    async cancel()
+    async cancel(labelPrefix = "")
     {
         if (!this.kickOffResponse) {
             throw new Error(
@@ -864,10 +864,10 @@ class BulkDataClient
             json  : true
         });
 
-        this.testApi.logRequest(this.cancelRequest, "Cancellation Request");
+        this.testApi.logRequest(this.cancelRequest, labelPrefix + "Cancellation Request");
         const { response } = await this.cancelRequest.promise();
         this.cancelResponse = response;
-        this.testApi.logResponse(this.cancelResponse, "Cancellation Response");
+        this.testApi.logResponse(this.cancelResponse, labelPrefix + "Cancellation Response");
     }
 
     /**
@@ -893,7 +893,7 @@ class BulkDataClient
     }
 
     /**
-     * Verifies that a request sent to the kick-off endpoint was not successful.
+     * Verifies that a request sent to the kick-off endpoint was successful.
      */
     expectSuccessfulKickOff()
     {

@@ -288,7 +288,7 @@ module.exports = function(describe, it) {
             // parameter that is not supported by this server
             const optionalParams = {
                 _typeFilter           : "Patient?status=active",
-                _includeAssociatedData: "LatestProvenanceResources",
+                includeAssociatedData : "LatestProvenanceResources",
                 _elements             : "id",
                 patient               : ["test-patient-id"],
                 _type                 : ["Patient"]

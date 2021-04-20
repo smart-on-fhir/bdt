@@ -497,6 +497,125 @@ module.exports = function(describe, it) {
 
             it ({
                 id  : `${meta.idPrefix}-${count++}`,
+                name: "Accepts the includeAssociatedData parameter",
+                version: "1.2",
+                description: "When provided, servers with support for the parameter and " +
+                    "requested values SHALL return or omit a pre-defined set of FHIR " +
+                    "resources associated with the request. The `includeAssociatedData` " +
+                    "parameter is optional so the servers can ignore it or reply with an error. " +
+                    "Either way, servers should not reply with a server error (statusCode >= 500), " +
+                    "even if they don't support it."
+            }, async (cfg, api) => {
+
+                const client = new BulkDataClient(cfg, api);
+
+                // Try standard export with includeAssociatedData=LatestProvenanceResources.
+                await client.kickOff({
+                    type: meta.type,
+                    params: {
+                        includeAssociatedData: "LatestProvenanceResources"
+                    }
+                });
+
+                // Cancel the export immediately
+                await client.cancelIfStarted();
+
+                if (client.kickOffResponse.statusCode === 202) {
+                    // If the export was successful assume that includeAssociatedData
+                    // is supported. We have nothing else to do here.
+                    return client.expectSuccessfulKickOff();
+                }
+
+                // In case the server didn't even return a proper error response
+                if (client.kickOffResponse.statusCode >= 500) {
+                    throw new Error("It appears that the includeAssociatedData parameter is not supported by this server");
+                }
+
+                // Servers unable to support the requested includeAssociatedData
+                // values SHOULD return an error and OperationOutcome resource
+                // so clients can re-submit a request that omits those values
+                // (for example, if a server does not retain provenance data). 
+                client.expectFailedKickOff();
+                
+                // Now try standard export with
+                // includeAssociatedData=LatestProvenanceResources, plus a
+                // "handling=lenient" value in the Prefer header. In this case,
+                // even if the server does not support "includeAssociatedData"
+                // it MAY process the request instead of returning an error.
+                await client.kickOff({
+                    type: meta.type,
+                    headers: {
+                        prefer: "respond-async,handling=lenient"
+                    },
+                    params: {
+                        includeAssociatedData: "LatestProvenanceResources"
+                    }
+                });
+
+                await client.cancelIfStarted();
+
+                // In case the server didn't even return a proper error response
+                if (client.kickOffResponse.statusCode >= 500) {
+                    throw new Error("It appears that the includeAssociatedData parameter (or the handling=lenient value in the prefer header) is not supported by this server");
+                }
+
+                client.expectSuccessfulKickOff();
+            
+                // TODO: We should also verify that Provenance resources are
+                // actually included in the export. However, we cannot know if
+                // Provenance is available for every resource, and if not, which
+                // resources to try to export.
+            });
+
+            it ({
+                id  : `${meta.idPrefix}-${count++}`,
+                name: "Accepts multiple includeAssociatedData values as comma separated list",
+                version: "1.2",
+                description: "When provided, servers with support for the parameter and " +
+                    "requested values SHALL return or omit a pre-defined set of FHIR " +
+                    "resources associated with the request. The `includeAssociatedData` " +
+                    "parameter is optional so the servers can ignore it or reply with an error. " +
+                    "Either way, servers should not reply with a server error (statusCode >= 500), " +
+                    "even if they don't support it."
+            }, async (cfg, api) => {
+                const client = new BulkDataClient(cfg, api);
+                await client.kickOff({
+                    type: meta.type,
+                    params: {
+                        includeAssociatedData: "LatestProvenanceResources,RelevantProvenanceResources"
+                    }
+                }, "Request with multiple comma-separated includeAssociatedData params");
+                await client.cancelIfStarted("Request with multiple comma-separated includeAssociatedData params - ");
+                client.expectSuccessfulKickOff();
+            });
+
+            it ({
+                id  : `${meta.idPrefix}-${count++}`,
+                name: "Accepts multiple includeAssociatedData parameters",
+                version: "1.2",
+                description: "When provided, servers with support for the parameter and " +
+                    "requested values SHALL return or omit a pre-defined set of FHIR " +
+                    "resources associated with the request. The `includeAssociatedData` " +
+                    "parameter is optional so the servers can ignore it or reply with an error. " +
+                    "Either way, servers should not reply with a server error (statusCode >= 500), " +
+                    "even if they don't support it."
+            }, async (cfg, api) => {
+                const client = new BulkDataClient(cfg, api);
+                await client.kickOff({
+                    type: meta.type,
+                    params: {
+                        includeAssociatedData: [
+                            "LatestProvenanceResources",
+                            "RelevantProvenanceResources"
+                        ]
+                    }
+                }, "Request with multiple includeAssociatedData params");
+                await client.cancelIfStarted("Request with multiple includeAssociatedData params - ");
+                client.expectSuccessfulKickOff();
+            });
+
+            it ({
+                id  : `${meta.idPrefix}-${count++}`,
                 name: "Accepts the _typeFilter parameter",
                 maxVersion: "1.0",
                 description: "The `_typeFilter` parameter is optional so the servers can " +
