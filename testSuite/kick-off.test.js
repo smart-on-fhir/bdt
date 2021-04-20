@@ -497,6 +497,58 @@ module.exports = function(describe, it) {
 
             it ({
                 id  : `${meta.idPrefix}-${count++}`,
+                name: "Accepts the includeAssociatedData parameter",
+                version: "1.2",
+                description: "When provided, servers with support for the parameter and " +
+                    "requested values SHALL return or omit a pre-defined set of FHIR " +
+                    "resources associated with the request. The `includeAssociatedData` " +
+                    "parameter is optional so the servers can ignore it or reply with an error. " +
+                    "Either way, servers should not reply with a server error (statusCode >= 500), " +
+                    "even if they don't support it."
+            }, async (cfg, api) => {
+
+                const client = new BulkDataClient(cfg, api);
+
+                // Start an export
+                await client.kickOff({
+                    type: meta.type,
+                    params: {
+                        includeAssociatedData: "LatestProvenanceResources"
+                    }
+                });
+
+                // Cancel the export immediately
+                await client.cancelIfStarted();
+
+                // If the export was successful assume that includeAssociatedData
+                // is supported. We have nothing else to do here.
+                if (client.kickOffResponse.statusCode === 202) {
+                    return client.expectSuccessfulKickOff();
+                }
+
+                // Second attempt
+                await client.kickOff({
+                    type: meta.type,
+                    headers: {
+                        prefer: "respond-async,handling=lenient"
+                    },
+                    params: {
+                        includeAssociatedData: "LatestProvenanceResources"
+                    }
+                });
+
+                await client.cancelIfStarted();
+
+                if (client.kickOffResponse.statusCode !== 202) {
+                    throw new Error("The server was expected to ignore the unsupported includeAssociatedData parameter if handling=lenient is included in the Prefer header");
+                }
+
+                // Verify that we didn't get an error
+                client.expectSuccessfulKickOff();
+            });
+
+            it ({
+                id  : `${meta.idPrefix}-${count++}`,
                 name: "Accepts the _typeFilter parameter",
                 maxVersion: "1.0",
                 description: "The `_typeFilter` parameter is optional so the servers can " +

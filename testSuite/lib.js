@@ -647,7 +647,7 @@ class BulkDataClient
                         break;
                         case "_outputFormat":
                         case "_elements":
-                        case "_includeAssociatedData":
+                        case "includeAssociatedData":
                         case "_typeFilter":
                             rest.body.parameter.push({
                                 name: key,
