@@ -1,0 +1,34 @@
+{
+    "include": [
+        "src",
+        "index.d.ts"
+    ],
+    "compilerOptions": {
+        "allowJs"                     : true,
+        "outDir"                      : "build",
+        "target"                      : "ES2020",
+        "module"                      : "CommonJS",
+        "moduleResolution"            : "Node",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop"             : true,
+        "isolatedModules"             : true,
+        "resolveJsonModule"           : true,
+        "preserveWatchOutput"         : false,
+        "importHelpers"               : false,
+        "incremental"                 : false,
+        "checkJs"                     : true,
+        "noImplicitAny"               : true,
+        "declaration"                 : true,
+        "strict"                      : false,
+        "declarationDir"              : "build/types",
+        // "mapRoot": "./build/maps",
+        "sourceMap": true,
+        // "inlineSourceMap": true
+        // "strict": true
+        // "typeRoots": [
+        //     "./node_modules/@types",
+        // //     "./src"
+        // ]
+    }
+
+}

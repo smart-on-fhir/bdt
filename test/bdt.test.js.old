@@ -1,0 +1,26 @@
+const Lab  = require("@hapi/lab")
+const Code = require("@hapi/code")
+
+const { bdt } = require("../build/bdt")
+
+// const { load, loadCode } = require("../build/index.js")
+// const Group      = require("../build/Group").default
+// const Test       = require("../build/Test").default
+// const Runner     = require("../build/TestRunner").default
+// const JSReporter = require("../build/reporters/js").default
+
+// const { expect } = Code;
+const { it, describe, } = exports.lab = Lab.script();
+
+describe.only("bdt", () => {
+
+    it ("outputs proper JSON", async () => {
+        const tree = await bdt({
+            pattern: "build/testSuite/*.test.js",
+            // reporter: "js"
+            list: true
+        });
+
+        console.log(JSON.stringify(tree, null, 4))
+    })
+})

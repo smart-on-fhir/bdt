@@ -1,25 +1,40 @@
-// This file will configure BDT to test a STU3 instance of the
-// reference bulk data server (https://bulk-data.smarthealthit.org)
+/// <reference path="../index.d.ts" />
+
+/**
+ * This file will configure BDT to test an R4 instance of the
+ * reference bulk data server (https://bulk-data.smarthealthit.org)
+ * @type { BDT.ServerConfig }
+ */
 module.exports = {
     baseURL: "https://bulk-data.smarthealthit.org/eyJlcnIiOiIiLCJwYWdlIjoxMDAwMCwiZHVyIjoxMCwidGx0IjoxNSwibSI6MSwic3R1Ijo0LCJkZWwiOjB9/fhir",
-    authType: "backend-services",
-    tokenEndpoint: "https://bulk-data.smarthealthit.org/auth/token",
-    clientId: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InJlZ2lzdHJhdGlvbi10b2tlbiJ9.eyJqd2tzIjp7ImtleXMiOlt7Imt0eSI6IkVDIiwiY3J2IjoiUC0zODQiLCJ4IjoidzRnTTUyZUE4S0xoUVoyNTgxNmpnV2dHb3U0V1ZRVmRLVk5rUGZTLWNMdU9IRnJlRW5vb1EycHBSNm9kS3lXTiIsInkiOiJuQWw1c1Bmd1YxLW9oaTlYbWRYSHcxa0JEX0I0Tm1sWEVtWmZaNE9TR3lyZjZQeFNhSmxsZDVWUDl3WUE2Y0d0Iiwia2V5X29wcyI6WyJ2ZXJpZnkiXSwiZXh0Ijp0cnVlLCJraWQiOiI3MmIzMWZmMGY2N2I3ZjI4MDU4NDNkMTIwZTIzNWExZSIsImFsZyI6IkVTMzg0In0seyJrdHkiOiJFQyIsImNydiI6IlAtMzg0IiwiZCI6IkxZaXdEVWtrTXZKRVNYZ1VwTW16cERoVS1NeEhNcEtoeFdZNU50ZTc3NXNBQ2ViVVg3cklQeU1OeFZaWnBka3YiLCJ4IjoidzRnTTUyZUE4S0xoUVoyNTgxNmpnV2dHb3U0V1ZRVmRLVk5rUGZTLWNMdU9IRnJlRW5vb1EycHBSNm9kS3lXTiIsInkiOiJuQWw1c1Bmd1YxLW9oaTlYbWRYSHcxa0JEX0I0Tm1sWEVtWmZaNE9TR3lyZjZQeFNhSmxsZDVWUDl3WUE2Y0d0Iiwia2V5X29wcyI6WyJzaWduIl0sImV4dCI6dHJ1ZSwia2lkIjoiNzJiMzFmZjBmNjdiN2YyODA1ODQzZDEyMGUyMzVhMWUiLCJhbGciOiJFUzM4NCJ9XX0sImFjY2Vzc1Rva2Vuc0V4cGlyZUluIjoxNSwiaWF0IjoxNjA4NzUwNzEyfQ.nLFoxnT-lClKwfW4Y-RSxdA6jxCuM5lnM_DzFsFVdl4",
+    
     strictSSL: false,
-    requiresAuth: false,
     groupId: "ff7dc35f-79e9-47a0-af22-475cf301a085",
     fastestResource: "ImagingStudy",
+    
+    authType: "backend-services",
+    tokenEndpoint: "https://bulk-data.smarthealthit.org/auth/token",
+    requiresAuth: false,
+    
+    // FOR JWKS Auth
+    // clientId: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InJlZ2lzdHJhdGlvbi10b2tlbiJ9.eyJqd2tzIjp7ImtleXMiOlt7Imt0eSI6IkVDIiwiY3J2IjoiUC0zODQiLCJ4IjoiM0sxTHc3UWtqajVMV1NrNU5uSXdXbWtiNVlvMkdrY3dWdG5NOHhoaEdkTTBiSTNCNjMyUU1abXF0UkhRNUFQSiIsInkiOiJDQnFpcTVRd0U4RXlVeHcyX29ESnpWSHJZNWoyMm55OUtiUkNLNXZBQnBwYUdPNHg4TXhuVFdmUU10R0liVlFOIiwia2V5X29wcyI6WyJ2ZXJpZnkiXSwiZXh0Ijp0cnVlLCJraWQiOiJiMzdmY2YwYjU4MDFmZGUzYWY0OGJkNTVmZDk1MTE3ZSIsImFsZyI6IkVTMzg0In0seyJrdHkiOiJFQyIsImNydiI6IlAtMzg0IiwiZCI6InRiN3BjUlRoYlo4Z0hNRkxaWEpMTUc0OFUwZXV1aVBxU0hCc09ZUFIyQnFzZHE5ckVxNFBpNkxpT284OTBRbTgiLCJ4IjoiM0sxTHc3UWtqajVMV1NrNU5uSXdXbWtiNVlvMkdrY3dWdG5NOHhoaEdkTTBiSTNCNjMyUU1abXF0UkhRNUFQSiIsInkiOiJDQnFpcTVRd0U4RXlVeHcyX29ESnpWSHJZNWoyMm55OUtiUkNLNXZBQnBwYUdPNHg4TXhuVFdmUU10R0liVlFOIiwia2V5X29wcyI6WyJzaWduIl0sImV4dCI6dHJ1ZSwia2lkIjoiYjM3ZmNmMGI1ODAxZmRlM2FmNDhiZDU1ZmQ5NTExN2UiLCJhbGciOiJFUzM4NCJ9XX0sImFjY2Vzc1Rva2Vuc0V4cGlyZUluIjoxNSwiaWF0IjoxNjIxNTM4OTAwfQ._49HUxLmA0EAUIspaYgiSCm0igM_zAmMOeQLJV2sH48",
+    
+    // For JWKS URL Auth
+    clientId: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InJlZ2lzdHJhdGlvbi10b2tlbiJ9.eyJqd2tzX3VybCI6Imh0dHBzOi8vYnVsay1kYXRhLnNtYXJ0aGVhbHRoaXQub3JnL2tleXMvRVMzODQucHVibGljLmpzb24iLCJhY2Nlc3NUb2tlbnNFeHBpcmVJbiI6MTUsImlhdCI6MTYyMTU0MDgzOX0.xvJ5mQFciD8KJMje3oggdkCUNIeCezDpBAqUzmnTGGY",
+    jwksUrl: "https://bulk-data.smarthealthit.org/keys/ES384.public.json",
+
     privateKey: {
         "kty": "EC",
         "crv": "P-384",
-        "d": "LYiwDUkkMvJESXgUpMmzpDhU-MxHMpKhxWY5Nte775sACebUX7rIPyMNxVZZpdkv",
-        "x": "w4gM52eA8KLhQZ25816jgWgGou4WVQVdKVNkPfS-cLuOHFreEnooQ2ppR6odKyWN",
-        "y": "nAl5sPfwV1-ohi9XmdXHw1kBD_B4NmlXEmZfZ4OSGyrf6PxSaJlld5VP9wYA6cGt",
+        "d": "tb7pcRThbZ8gHMFLZXJLMG48U0euuiPqSHBsOYPR2Bqsdq9rEq4Pi6LiOo890Qm8",
+        "x": "3K1Lw7Qkjj5LWSk5NnIwWmkb5Yo2GkcwVtnM8xhhGdM0bI3B632QMZmqtRHQ5APJ",
+        "y": "CBqiq5QwE8EyUxw2_oDJzVHrY5j22ny9KbRCK5vABppaGO4x8MxnTWfQMtGIbVQN",
         "key_ops": [
             "sign"
         ],
         "ext": true,
-        "kid": "72b31ff0f67b7f2805843d120e235a1e",
+        "kid": "b37fcf0b5801fde3af48bd55fd95117e",
         "alg": "ES384"
-    }
+    },
+
 };

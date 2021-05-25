@@ -1,4 +1,9 @@
-// Use this to template define new configurations
+/// <reference path="../index.d.ts" />
+
+/**
+ * Use this to template define new configurations
+ * @type { BDT.ServerConfig }
+ */
 module.exports = {
 
     // REQUIRED: The full URL of the server to which we can append "/$export".
@@ -21,7 +26,7 @@ module.exports = {
      * relative to the `baseURL` (typically just "$export").
      * @type {string}
      */
-    systemExportEndpoint: undefined, // will be auto-detected if not defined
+    systemExportEndpoint: "", // will be auto-detected if not defined
 
     /**
      * By default BDT will fetch and parse the CapabilityStatement to try to
@@ -32,7 +37,7 @@ module.exports = {
      * a path relative to the `baseURL` (typically "Patient/$export").
      * @type {string}
      */
-    patientExportEndpoint: undefined, // will be auto-detected if not defined
+    patientExportEndpoint: "", // will be auto-detected if not defined
 
     /**
      * By default BDT will fetch and parse the CapabilityStatement to try to
@@ -46,7 +51,7 @@ module.exports = {
      * since the `groupId` is already part of the `groupExportEndpoint` path.
      * @type {string}
      */
-    groupExportEndpoint: undefined, // will be auto-detected if not defined
+    groupExportEndpoint: "", // will be auto-detected if not defined
 
     /**
      * Set this to false if your server does not require authentication. This
