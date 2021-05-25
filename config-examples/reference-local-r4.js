@@ -7,7 +7,6 @@
  */
 module.exports = {
     baseURL: "http://localhost:9443/eyJlcnIiOiIiLCJwYWdlIjoxMDAwMCwiZHVyIjoxMCwidGx0IjoxNSwibSI6MSwic3R1Ijo0fQ/fhir",
-    strictSSL: false,
     groupId: "ff7dc35f-79e9-47a0-af22-475cf301a085",
     fastestResource: "ImagingStudy",
     authentication: {
@@ -28,5 +27,8 @@ module.exports = {
             "alg": "ES384"
         },
         jwksUrl: "https://bulk-data.smarthealthit.org/keys/ES384.public.json",
+    },
+    requests: {
+        strictSSL: false
     }
 };
