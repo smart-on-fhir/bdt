@@ -88,220 +88,188 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Properties</h3>
+							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="assertions.statusresponseassertions.html#ok" class="tsd-kind-icon">OK</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="assertions.statusresponseassertions.html#notempty" class="tsd-kind-icon">not<wbr>Empty</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="assertions.statusresponseassertions.html#notok" class="tsd-kind-icon">notOK</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="assertions.statusresponseassertions.html#pending" class="tsd-kind-icon">pending</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="assertions.statusresponseassertions.html#ok" class="tsd-kind-icon">OK</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="assertions.statusresponseassertions.html#notempty" class="tsd-kind-icon">not<wbr>Empty</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="assertions.statusresponseassertions.html#notok" class="tsd-kind-icon">notOK</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="assertions.statusresponseassertions.html#pending" class="tsd-kind-icon">pending</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
 					<a name="ok" class="tsd-anchor"></a>
 					<h3>OK</h3>
-					<div class="tsd-signature tsd-kind-icon">OK<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>response<span class="tsd-signature-symbol">: </span><a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L64">src/lib/assertions.ts:64</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Asserts that the status endpoint replies with 200 OK and a JSON body
-								that is a valid export manifest and that the <code>expires</code> header is valid
-							if present.</p>
-						</div>
-						<dl class="tsd-comment-tags">
-							<dt>tutorial</dt>
-							<dd><p><a href="https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---complete-status">https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---complete-status</a></p>
-							</dd>
-							<dt>example</dt>
-							<dd><pre><code class="language-ts"><span style="color: #1976D2">assert</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">bulkData</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">status</span><span style="color: #6F42C1">.OK</span><span style="color: #24292EFF">(response, </span><span style="color: #22863A">&quot;Status response is invalid&quot;</span><span style="color: #24292EFF">)</span>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">OK<span class="tsd-signature-symbol">(</span>response<span class="tsd-signature-symbol">: </span><a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L64">src/lib/assertions.ts:64</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Asserts that the status endpoint replies with 200 OK and a JSON body
+										that is a valid export manifest and that the <code>expires</code> header is valid
+									if present.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>tutorial</dt>
+									<dd><p><a href="https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---complete-status">https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---complete-status</a></p>
+									</dd>
+									<dt>example</dt>
+									<dd><pre><code class="language-ts"><span style="color: #1976D2">assert</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">bulkData</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">status</span><span style="color: #6F42C1">.OK</span><span style="color: #24292EFF">(response, </span><span style="color: #22863A">&quot;Status response is invalid&quot;</span><span style="color: #24292EFF">)</span>
 </code></pre>
-							</dd>
-						</dl>
-					</div>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter-signature">
-								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-interface">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>response<span class="tsd-signature-symbol">: </span><a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-								</ul>
-								<ul class="tsd-descriptions">
-									<li class="tsd-description">
-										<h4 class="tsd-parameters-title">Parameters</h4>
-										<ul class="tsd-parameters">
-											<li>
-												<h5>response: <a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span></h5>
-											</li>
-											<li>
-												<h5><span class="tsd-flag ts-flagOptional">Optional</span> prefix: <span class="tsd-signature-type">string</span></h5>
-											</li>
-										</ul>
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-									</li>
-								</ul>
-							</li>
-						</ul>
-					</div>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>response: <a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> prefix: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
 					<a name="notempty" class="tsd-anchor"></a>
 					<h3>not<wbr>Empty</h3>
-					<div class="tsd-signature tsd-kind-icon">not<wbr>Empty<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>response<span class="tsd-signature-symbol">: </span><a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L74">src/lib/assertions.ts:74</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Asserts that the status endpoint reply is valid, but also produces
-							non-empty <code>output</code> array.</p>
-						</div>
-						<dl class="tsd-comment-tags">
-							<dt>example</dt>
-							<dd><pre><code class="language-ts"><span style="color: #1976D2">assert</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">bulkData</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">status</span><span style="color: #6F42C1">.notEmpty</span><span style="color: #24292EFF">(response, </span><span style="color: #22863A">&quot;No files exported&quot;</span><span style="color: #24292EFF">)</span>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">not<wbr>Empty<span class="tsd-signature-symbol">(</span>response<span class="tsd-signature-symbol">: </span><a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L74">src/lib/assertions.ts:74</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Asserts that the status endpoint reply is valid, but also produces
+									non-empty <code>output</code> array.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code class="language-ts"><span style="color: #1976D2">assert</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">bulkData</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">status</span><span style="color: #6F42C1">.notEmpty</span><span style="color: #24292EFF">(response, </span><span style="color: #22863A">&quot;No files exported&quot;</span><span style="color: #24292EFF">)</span>
 </code></pre>
-							</dd>
-						</dl>
-					</div>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter-signature">
-								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-interface">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>response<span class="tsd-signature-symbol">: </span><a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-								</ul>
-								<ul class="tsd-descriptions">
-									<li class="tsd-description">
-										<h4 class="tsd-parameters-title">Parameters</h4>
-										<ul class="tsd-parameters">
-											<li>
-												<h5>response: <a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span></h5>
-											</li>
-											<li>
-												<h5><span class="tsd-flag ts-flagOptional">Optional</span> prefix: <span class="tsd-signature-type">string</span></h5>
-											</li>
-										</ul>
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-									</li>
-								</ul>
-							</li>
-						</ul>
-					</div>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>response: <a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> prefix: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
 					<a name="notok" class="tsd-anchor"></a>
 					<h3>notOK</h3>
-					<div class="tsd-signature tsd-kind-icon">notOK<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>res<span class="tsd-signature-symbol">: </span><a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.fhir.operationoutcome.html" class="tsd-signature-type" data-tsd-kind="Interface">OperationOutcome</a><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L83">src/lib/assertions.ts:83</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<dl class="tsd-comment-tags">
-							<dt>tutorial</dt>
-							<dd><p><a href="https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---error-status-1">https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---error-status-1</a></p>
-							</dd>
-							<dt>example</dt>
-							<dd><pre><code class="language-ts"><span style="color: #1976D2">assert</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">bulkData</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">status</span><span style="color: #6F42C1">.notOK</span><span style="color: #24292EFF">(response, </span><span style="color: #22863A">&quot;The status endpoint was expected to fail&quot;</span><span style="color: #24292EFF">)</span>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">notOK<span class="tsd-signature-symbol">(</span>res<span class="tsd-signature-symbol">: </span><a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.fhir.operationoutcome.html" class="tsd-signature-type" data-tsd-kind="Interface">OperationOutcome</a><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L83">src/lib/assertions.ts:83</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>tutorial</dt>
+									<dd><p><a href="https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---error-status-1">https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---error-status-1</a></p>
+									</dd>
+									<dt>example</dt>
+									<dd><pre><code class="language-ts"><span style="color: #1976D2">assert</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">bulkData</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">status</span><span style="color: #6F42C1">.notOK</span><span style="color: #24292EFF">(response, </span><span style="color: #22863A">&quot;The status endpoint was expected to fail&quot;</span><span style="color: #24292EFF">)</span>
 </code></pre>
-							</dd>
-						</dl>
-					</div>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter-signature">
-								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-interface">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>res<span class="tsd-signature-symbol">: </span><a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.fhir.operationoutcome.html" class="tsd-signature-type" data-tsd-kind="Interface">OperationOutcome</a><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-								</ul>
-								<ul class="tsd-descriptions">
-									<li class="tsd-description">
-										<h4 class="tsd-parameters-title">Parameters</h4>
-										<ul class="tsd-parameters">
-											<li>
-												<h5>res: <a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.fhir.operationoutcome.html" class="tsd-signature-type" data-tsd-kind="Interface">OperationOutcome</a><span class="tsd-signature-symbol">&gt;</span></h5>
-											</li>
-											<li>
-												<h5><span class="tsd-flag ts-flagOptional">Optional</span> prefix: <span class="tsd-signature-type">string</span></h5>
-											</li>
-										</ul>
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-									</li>
-								</ul>
-							</li>
-						</ul>
-					</div>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>res: <a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.fhir.operationoutcome.html" class="tsd-signature-type" data-tsd-kind="Interface">OperationOutcome</a><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> prefix: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
 					<a name="pending" class="tsd-anchor"></a>
 					<h3>pending</h3>
-					<div class="tsd-signature tsd-kind-icon">pending<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>res<span class="tsd-signature-symbol">: </span><a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="bulkdataclient.fhir.operationoutcome.html" class="tsd-signature-type" data-tsd-kind="Interface">OperationOutcome</a><span class="tsd-signature-symbol"> | </span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L104">src/lib/assertions.ts:104</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Asserts that: The status endpoint replies with <code>202 Accepted</code>.</p>
-						</div>
-						<p>Optionally, the server MAY return an <code>X-Progress</code> header with a text
-							description of the status of the request that’s less than 100 characters.
-							The format of this description is at the server’s discretion and may be a
-							percentage complete value, or a more general status such as “in progress”.
-						The client MAY parse the description, display it to the user, or log it.</p>
-						<p><strong>NOTE:</strong> This will only work if called after successful kick-off
-						and before the export is complete!</p>
-						<dl class="tsd-comment-tags">
-							<dt>tutorial</dt>
-							<dd><p><a href="https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---in-progress-status">https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---in-progress-status</a></p>
-							</dd>
-							<dt>todo</dt>
-							<dd><p>Validate the <code>X-Progress</code> header length if present</p>
-							</dd>
-							<dt>todo</dt>
-							<dd><p>Validate the <code>retry-after</code> header if present</p>
-							</dd>
-							<dt>example</dt>
-							<dd><pre><code class="language-ts"><span style="color: #1976D2">assert</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">bulkData</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">status</span><span style="color: #6F42C1">.pending</span><span style="color: #24292EFF">(response, </span><span style="color: #22863A">&quot;The status must be pending&quot;</span><span style="color: #24292EFF">)</span>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">pending<span class="tsd-signature-symbol">(</span>res<span class="tsd-signature-symbol">: </span><a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="bulkdataclient.fhir.operationoutcome.html" class="tsd-signature-type" data-tsd-kind="Interface">OperationOutcome</a><span class="tsd-signature-symbol"> | </span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L104">src/lib/assertions.ts:104</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Asserts that: The status endpoint replies with <code>202 Accepted</code>.</p>
+								</div>
+								<p>Optionally, the server MAY return an <code>X-Progress</code> header with a text
+									description of the status of the request that’s less than 100 characters.
+									The format of this description is at the server’s discretion and may be a
+									percentage complete value, or a more general status such as “in progress”.
+								The client MAY parse the description, display it to the user, or log it.</p>
+								<p><strong>NOTE:</strong> This will only work if called after successful kick-off
+								and before the export is complete!</p>
+								<dl class="tsd-comment-tags">
+									<dt>tutorial</dt>
+									<dd><p><a href="https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---in-progress-status">https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---in-progress-status</a></p>
+									</dd>
+									<dt>example</dt>
+									<dd><pre><code class="language-ts"><span style="color: #1976D2">assert</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">bulkData</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">status</span><span style="color: #6F42C1">.pending</span><span style="color: #24292EFF">(response, </span><span style="color: #22863A">&quot;The status must be pending&quot;</span><span style="color: #24292EFF">)</span>
 </code></pre>
-							</dd>
-						</dl>
-					</div>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter-signature">
-								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-interface">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>res<span class="tsd-signature-symbol">: </span><a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="bulkdataclient.fhir.operationoutcome.html" class="tsd-signature-type" data-tsd-kind="Interface">OperationOutcome</a><span class="tsd-signature-symbol"> | </span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-								</ul>
-								<ul class="tsd-descriptions">
-									<li class="tsd-description">
-										<h4 class="tsd-parameters-title">Parameters</h4>
-										<ul class="tsd-parameters">
-											<li>
-												<h5>res: <a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="bulkdataclient.fhir.operationoutcome.html" class="tsd-signature-type" data-tsd-kind="Interface">OperationOutcome</a><span class="tsd-signature-symbol"> | </span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span></h5>
-											</li>
-											<li>
-												<h5><span class="tsd-flag ts-flagOptional">Optional</span> prefix: <span class="tsd-signature-type">string</span></h5>
-											</li>
-										</ul>
-										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-									</li>
-								</ul>
-							</li>
-						</ul>
-					</div>
+									</dd>
+									<dt>todo</dt>
+									<dd><p>Validate the <code>X-Progress</code> header length if present</p>
+									</dd>
+									<dt>todo</dt>
+									<dd><p>Validate the <code>retry-after</code> header if present</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>res: <a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="bulkdataclient.fhir.operationoutcome.html" class="tsd-signature-type" data-tsd-kind="Interface">OperationOutcome</a><span class="tsd-signature-symbol"> | </span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> prefix: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -370,6 +338,18 @@
 						<a href="assertions.manifestassertions.html" class="tsd-kind-icon">Manifest<wbr>Assertions</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="assertions.manifestbodyassertions.html" class="tsd-kind-icon">Manifest<wbr>Body<wbr>Assertions</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="assertions.manifestdeletedassertions.html" class="tsd-kind-icon">Manifest<wbr>Deleted<wbr>Assertions</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="assertions.manifesterrorassertions.html" class="tsd-kind-icon">Manifest<wbr>Error<wbr>Assertions</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="assertions.manifestoutputassertions.html" class="tsd-kind-icon">Manifest<wbr>Output<wbr>Assertions</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="assertions.responseassertions.html" class="tsd-kind-icon">Response<wbr>Assertions</a>
 					</li>
 				</ul>
@@ -377,16 +357,16 @@
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
 						<a href="assertions.statusresponseassertions.html" class="tsd-kind-icon">Status<wbr>Response<wbr>Assertions</a>
 						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="assertions.statusresponseassertions.html#ok" class="tsd-kind-icon">OK</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="assertions.statusresponseassertions.html#notempty" class="tsd-kind-icon">not<wbr>Empty</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="assertions.statusresponseassertions.html#notok" class="tsd-kind-icon">notOK</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="assertions.statusresponseassertions.html#pending" class="tsd-kind-icon">pending</a>
 							</li>
 						</ul>
@@ -476,7 +456,7 @@
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>

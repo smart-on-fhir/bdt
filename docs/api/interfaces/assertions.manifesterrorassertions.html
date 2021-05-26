@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ManifestAssertions | BDT (Bulk Data Tester)</title>
+	<title>ManifestErrorAssertions | BDT (Bulk Data Tester)</title>
 	<meta name="description" content="Documentation for BDT (Bulk Data Tester)">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,28 +58,21 @@
 					<a href="../modules/assertions.html">assertions</a>
 				</li>
 				<li>
-					<a href="assertions.manifestassertions.html">ManifestAssertions</a>
+					<a href="assertions.manifesterrorassertions.html">ManifestErrorAssertions</a>
 				</li>
 			</ul>
-			<h1>Interface ManifestAssertions</h1>
+			<h1>Interface ManifestErrorAssertions</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>A set of assertions to verify the proper structure of the export manifest</p>
-					</div>
-				</div>
-			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">ManifestAssertions</span>
+						<span class="target">ManifestErrorAssertions</span>
 					</li>
 				</ul>
 			</section>
@@ -88,64 +81,12 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Properties</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="assertions.manifestassertions.html#body" class="tsd-kind-icon">body</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="assertions.manifestassertions.html#deleted" class="tsd-kind-icon">deleted</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="assertions.manifestassertions.html#error" class="tsd-kind-icon">error</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="assertions.manifestassertions.html#output" class="tsd-kind-icon">output</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="assertions.manifestassertions.html#ok" class="tsd-kind-icon">OK</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="assertions.manifesterrorassertions.html#ok" class="tsd-kind-icon">OK</a></li>
 							</ul>
 						</section>
 					</div>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="body" class="tsd-anchor"></a>
-					<h3>body</h3>
-					<div class="tsd-signature tsd-kind-icon">body<span class="tsd-signature-symbol">:</span> <a href="assertions.manifestbodyassertions.html" class="tsd-signature-type" data-tsd-kind="Interface">ManifestBodyAssertions</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L112">src/lib/assertions.ts:112</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="deleted" class="tsd-anchor"></a>
-					<h3>deleted</h3>
-					<div class="tsd-signature tsd-kind-icon">deleted<span class="tsd-signature-symbol">:</span> <a href="assertions.manifestdeletedassertions.html" class="tsd-signature-type" data-tsd-kind="Interface">ManifestDeletedAssertions</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L113">src/lib/assertions.ts:113</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="error" class="tsd-anchor"></a>
-					<h3>error</h3>
-					<div class="tsd-signature tsd-kind-icon">error<span class="tsd-signature-symbol">:</span> <a href="assertions.manifesterrorassertions.html" class="tsd-signature-type" data-tsd-kind="Interface">ManifestErrorAssertions</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L114">src/lib/assertions.ts:114</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="output" class="tsd-anchor"></a>
-					<h3>output</h3>
-					<div class="tsd-signature tsd-kind-icon">output<span class="tsd-signature-symbol">:</span> <a href="assertions.manifestoutputassertions.html" class="tsd-signature-type" data-tsd-kind="Interface">ManifestOutputAssertions</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L115">src/lib/assertions.ts:115</a></li>
-						</ul>
-					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
@@ -154,19 +95,19 @@
 					<a name="ok" class="tsd-anchor"></a>
 					<h3>OK</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">OK<span class="tsd-signature-symbol">(</span>res<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Response</span><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">OK<span class="tsd-signature-symbol">(</span>items<span class="tsd-signature-symbol">: </span><a href="bulkdataclient.bulkdata.exportmanifestfile.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifestFile</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;OperationOutcome&quot;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L111">src/lib/assertions.ts:111</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L130">src/lib/assertions.ts:130</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>res: <span class="tsd-signature-type">Response</span><span class="tsd-signature-symbol">&lt;</span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>items: <a href="bulkdataclient.bulkdata.exportmanifestfile.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifestFile</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;OperationOutcome&quot;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h5>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> prefix: <span class="tsd-signature-type">string</span></h5>
@@ -239,39 +180,27 @@
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="assertions.bulkdataassertion.html" class="tsd-kind-icon">Bulk<wbr>Data<wbr>Assertion</a>
 					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-module">
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="assertions.manifestassertions.html" class="tsd-kind-icon">Manifest<wbr>Assertions</a>
-						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="assertions.manifestassertions.html#body" class="tsd-kind-icon">body</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="assertions.manifestassertions.html#deleted" class="tsd-kind-icon">deleted</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="assertions.manifestassertions.html#error" class="tsd-kind-icon">error</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="assertions.manifestassertions.html#output" class="tsd-kind-icon">output</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="assertions.manifestassertions.html#ok" class="tsd-kind-icon">OK</a>
-							</li>
-						</ul>
 					</li>
-				</ul>
-				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="assertions.manifestbodyassertions.html" class="tsd-kind-icon">Manifest<wbr>Body<wbr>Assertions</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="assertions.manifestdeletedassertions.html" class="tsd-kind-icon">Manifest<wbr>Deleted<wbr>Assertions</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-interface tsd-parent-kind-module">
 						<a href="assertions.manifesterrorassertions.html" class="tsd-kind-icon">Manifest<wbr>Error<wbr>Assertions</a>
+						<ul>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="assertions.manifesterrorassertions.html#ok" class="tsd-kind-icon">OK</a>
+							</li>
+						</ul>
 					</li>
+				</ul>
+				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="assertions.manifestoutputassertions.html" class="tsd-kind-icon">Manifest<wbr>Output<wbr>Assertions</a>
 					</li>
@@ -364,7 +293,6 @@
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
