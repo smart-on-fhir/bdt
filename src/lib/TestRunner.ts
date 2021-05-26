@@ -196,6 +196,14 @@ export default class TestRunner extends EventEmitter
             await test.fn({ config: this.settings, api: new TestAPI(test), context })
             await this.endTest(test, context)
         } catch (error) {
+            const thrownRe = /\: Expected \[Function\] to not throw an error but got \[/g
+            const match = error.message.match(thrownRe)
+            if (match) {
+                error.message = error.message
+                    .replace(/Error\: /g, "")
+                    .replace(thrownRe, `\n✖ `)// 🛈❌
+                    .replace(/\]*$/, "")
+            }
             await this.endTest(test, context, error)
         }
     }

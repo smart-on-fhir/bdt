@@ -113,7 +113,7 @@ module.exports = {
     // mode: "modules",
 
     // Specifies the location the documentation should be written to.
-    out: "./docs/typedoc",
+    out: "./docs/api",
 
     // Define patterns for excluded files when specifying paths.
     // exclude: ["node_modules"],
@@ -172,7 +172,7 @@ module.exports = {
     // --readme                  Path to the readme file that should be displayed on the index page. Pass `none` to disable the index page and start the documentation on the globals page.
     readme: "../README.md",
     // --theme                   Specify the path to the theme that should be used or 'default' or 'minimal' to use built-in themes.
-    theme: "docs/typedoc-theme"
+    theme: "./docs/typedoc-theme"
     // --toc                     Specifies the top level table of contents.
     // --tsconfig                Specify a typescript config file that should be loaded. If not specified TypeDoc will look for 'tsconfig.json' in the current directory.
 };

@@ -9,6 +9,8 @@ cd ./bdt
 npm i
 ```
 
+## [API Docs](https://docs.smarthealthit.org/bdt/api/index.html)
+
 ## CLI Usage
 
 **Quick start**

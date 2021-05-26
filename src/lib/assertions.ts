@@ -3,23 +3,155 @@ import { expect } from "@hapi/code";
 import { getErrorMessageFromResponse, getUnfulfilledScopes, scopeSet } from "./lib";
 import { TestAPI } from "./TestAPI";
 import { OAuth, BulkData, FHIR } from "./BulkDataClient";
+import moment from "moment";
+
+const REGEXP_INSTANT = new RegExp(
+    "([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-" +
+    "(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3])" +
+    ":[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?(Z|(\\+|-)((0[0-9]|1[0-3])" +
+    ":[0-5][0-9]|14:00))"
+);
+
+export interface AssertAPI {
+    bulkData: BulkDataAssertion
+    response: ResponseAssertions
+}
+
+export interface BulkDataAssertion {
+    auth: {
+        OK: (response: Response, prefix?: string) => void;
+        notOK: (response: Response, prefix?: string) => void
+    };
+    cancellation: {
+        OK: (res: Response<unknown>, prefix?: string) => void;
+        notOK: (res: Response<unknown>, prefix?: string) => void
+    };
+    download: {
+        OK: (response: Response, prefix?: string) => void;
+        notOK: (res: Response<unknown>, prefix?: string) => void;
+        withElements: (body: string, elements: string[], prefix?: string) => void
+    };
+    kickOff: {
+        OK: (response: Response, testApi: TestAPI, prefix?: string) => string | void;
+        notOK: (response: Response, testApi: TestAPI, prefix?: string) => void
+    };
+
+    /**
+     * A set of assertions to verify the proper structure of the export manifest
+     */
+    manifest: ManifestAssertions
+
+    /**
+     * A set of assertions to be executed against the status endpoint's response
+     */
+    status: StatusResponseAssertions
+}
+
+/**
+ * A set of assertions to be executed against the status endpoint's response
+ */
+export interface StatusResponseAssertions {
+    /**
+     * Asserts that the status endpoint replies with 200 OK and a JSON body
+     * that is a valid export manifest and that the `expires` header is valid
+     * if present.
+     * @tutorial https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---complete-status
+     * @example
+     * ```ts
+     * assert.bulkData.status.OK(response, "Status response is invalid")
+     * ```
+     */
+    OK: (response: BulkData.StatusResponse<BulkData.ExportManifest>, prefix?: string) => void;
+
+    /**
+     * Asserts that the status endpoint reply is valid, but also produces
+     * non-empty `output` array.
+     * @example
+     * ```ts
+     * assert.bulkData.status.notEmpty(response, "No files exported")
+     * ```
+     */
+    notEmpty: (response: BulkData.StatusResponse<BulkData.ExportManifest>, prefix?: string) => void;
+    
+    /**
+     * @tutorial https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---error-status-1
+     * @example
+     * ```ts
+     * assert.bulkData.status.notOK(response, "The status endpoint was expected to fail")
+     * ```
+     */
+    notOK: (res: BulkData.StatusResponse<FHIR.OperationOutcome>, prefix?: string) => void;
+
+    /**
+     * Asserts that: The status endpoint replies with `202 Accepted`.
+     * 
+     * Optionally, the server MAY return an `X-Progress` header with a text
+     * description of the status of the request that’s less than 100 characters.
+     * The format of this description is at the server’s discretion and may be a
+     * percentage complete value, or a more general status such as “in progress”.
+     * The client MAY parse the description, display it to the user, or log it.
+     * 
+     * **NOTE:** This will only work if called after successful kick-off
+     * and before the export is complete!
+     * @tutorial https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---in-progress-status
+     * @todo Validate the `X-Progress` header length if present
+     * @todo Validate the `retry-after` header if present
+     * @example
+     * ```ts
+     * assert.bulkData.status.pending(response, "The status must be pending")
+     * ```
+     */
+    pending: (res: BulkData.StatusResponse, prefix?: string) => void
+}
+
+/**
+ * A set of assertions to verify the proper structure of the export manifest
+ */
+export interface ManifestAssertions {
+    OK: (res: Response<BulkData.ExportManifest>, prefix?: string) => void;
+    body: {
+        OK: (manifest: BulkData.ExportManifest, kickOffUrl: string, prefix?: string) => void
+    };
+    deleted: {
+        OK: (items: BulkData.ExportManifestFile<"Bundle">[], prefix?: string) => void
+    };
+    error: {
+        OK: (items: BulkData.ExportManifestFile<"OperationOutcome">[], prefix?: string) => void
+    };
+    output: {
+        OK: (items: BulkData.ExportManifestFile<string>[], type: string, prefix?: string) => void
+    }
+}
+
+export interface ResponseAssertions {
+    OperationOutcome: (response: Response, prefix?: string) => void;
+    clientError: (response: Response, prefix?: string) => void;
+    fhirResource: (response: Response, prefix?: string) => void;
+    fhirResourceType: (response: Response, resourceType: string, prefix?: string) => void;
+    json: (response: Response, prefix?: string) => void;
+    ndJson: (response: Response, prefix?: string) => void;
+    oauthError: (response: Response, prefix?: string) => void;
+    oauthErrorType: (response: Response, type: OAuth.errorType, prefix?: string) => void;
+    statusCode: (response: Response, code: number | number[], prefix?: string) => void;
+    statusText: (response: Response, text: string | string[], prefix?: string) => void
+}
 
 
 export function concat(...messages: (string | Error)[]): string {
     // for (let i = 0; i < messages.length; i++) {
     //     let m = String(messages[i]).trim().replace(/^\n\-\s/, "").replace(/[\s\.]*$/, "");
-    //     let a = m.split("\n- ").map(x => x.replace(/^(Assertion|- )/, ""));
+    //     let a = m.split("\n✖ ").map(x => x.replace(/^(Assertion|- )/, ""));
     //     messages[i] = a.shift()
     //     while (a.length) {
     //         messages.splice(i + 1, 0, a.shift())
     //     }
     // }
 
-    // return "\n- " + messages.filter(Boolean).join("\n- ") + "\n- Assertion";
+    // return "\n✖ " + messages.filter(Boolean).join("\n✖ ") + "\n✖ Assertion";
 
-    return "\n- " + messages.map(
-        x => String(x).replace(/\n\-\sAssertion$/, "").replace(/^\n\-\s*/, "").trim()
-    ).filter(Boolean).join("\n- ") + "\n- Assertion";
+    return "\n✖ " + messages.map(
+        x => String(x).replace(/\n✖\sAssertion$/, "").replace(/^\n✖\s*/, "").trim()
+    ).filter(Boolean).join("\n✖ ") + "\n✖ Assertion";
 }
 
 /**
@@ -365,6 +497,54 @@ export function expectSuccessfulExport(response: Response, prefix = "")
     const error = "Got: " + getErrorMessageFromResponse(response)
     expectResponseCode(response, 200, concat(prefix, error))
     expectJsonResponse(response, concat(prefix, error))
+
+    // The server MAY return an Expires header indicating when the files listed will no longer be available.
+    const { expires, date } = response.headers
+    if (expires) {
+        expect(() => {
+            expect(expires, concat(prefix, "the expires header must be a string if present")).to.be.a.string();
+
+            // If expires header is present, make sure it is in the future.
+            const expiresMoment = moment(expires, [
+
+                // Preferred HTTP date (Sun, 06 Nov 1994 08:49:37 GMT)
+                moment.RFC_2822,
+
+                // Obsolete HTTP date (Sunday, 06-Nov-94 08:49:37 GMT)
+                "dddd, DD-MMM-YY HH:mm:ss ZZ",
+
+                // Obsolete HTTP date (Sun  Nov  6    08:49:37 1994)
+                "ddd MMM D HH:mm:ss YYYY",
+
+                // The following formats are often used (even though they shouldn't be):
+
+                // ISO_8601 (2020-12-24 19:50:58 +0000 UTC)
+                moment.ISO_8601,
+
+                // ISO_8601 with milliseconds (2020-12-24 19:50:58.997683 +0000 UTC)
+                "YYYY-MM-DD HH:mm:ss.SSS ZZ",
+                "YYYY-MM-DDTHH:mm:ss.SSS ZZ"
+            ]).utc(true);
+
+            const now = moment().utc(true);
+            expect(
+                expiresMoment.diff(now, "seconds") > 0,
+                concat(prefix, "The expires header of the status response should be a date in the future")
+            ).to.be.true();
+
+            // Note that the above assertion might be unreliable due to small time differences between
+            // the host machine that executes the tests and the server. For that reason we also check if
+            // the server returns a "time" header and if so, we verify that "expires" is after "time".
+            if (date) {
+                const dateMoment = moment(date).utc(true);
+                expect(
+                    expiresMoment.diff(dateMoment, "seconds") > 0,
+                    concat(prefix, "The expires header of the status response should be a date after the one in the date header")
+                ).to.be.true();
+            }
+
+        }, "Invalid expires header")
+    }
 }
 
 /**
@@ -425,7 +605,156 @@ export function expectNDJSONElements(body: string, elements: string[], prefix = 
     });
 }
 
+/**
+ * 
+ * @param item 
+ * @param type 
+ * @param prefix 
+ * @internal
+ */
+export function expectValidManifestEntry(item: BulkData.ExportManifestFile, type: string, prefix = "") {
+    // type - the FHIR resource type that is contained in the file. Note: Each file MUST contain
+    // resources of only one type, but a server MAY create more than one file for each resource
+    // type returned. The number of resources contained in a file MAY vary between servers. If no
+    // data are found for a resource, the server SHOULD NOT return an output item for that resource
+    // in the response.
+    expect(item, concat(prefix, "every item must have 'type' property")).to.include("type");
+    expect(item.type, concat(prefix, `every item's 'type' property must equal "${type}"`)).to.equal(type);
+    
+    // url - the path to the file. The format of the file SHOULD reflect that requested in the
+    // _outputFormat parameter of the initial kick-off request. Note that the files-for-download
+    // MAY be served by a file server other than a FHIR-specific server.
+    expect(item, concat(prefix, "every item must have 'url' property")).to.include("url");
+    expect(item.url, concat(prefix, "every item url must be a string")).to.be.a.string();
+    expect(item.url, concat(prefix, "every item url must be an url")).to.match(/^https?\:\/\/.+/);
+    
+    // Each file item MAY optionally contain the following field:
+    if (item.hasOwnProperty("count")) {
+        // count - the number of resources in the file, represented as a JSON number.
+        expect(item.count, concat(prefix, "if set, item count must be a number greater than 0")).to.be.a.number().above(0);
+    }
+}
 
+export const assert: AssertAPI = {
+    bulkData: {
+        auth: {
+            OK: expectSuccessfulAuth,
+            notOK: expectUnauthorized,
+        },
+        kickOff: {
+            OK: expectSuccessfulKickOff,
+            notOK: expectFailedKickOff
+        },
+        status: {
+            OK: expectSuccessfulExport,
+            notEmpty: expectExportNotEmpty,
+            pending: (res: Response, prefix="") => expectResponseCode(res, 202, prefix),
+            notOK: (res: Response, prefix="") => expectClientError(res, prefix)
+        },
+        download: {
+            OK: expectSuccessfulDownload,
+            notOK: (res: Response, prefix="") => expectClientError(res, prefix),
+            withElements: expectNDJSONElements
+        },
+        cancellation: {
+            OK: (res: Response, prefix="") => {
+                expectResponseCode(res, 202, prefix)
+                if (res.body) {
+                    expectOperationOutcome(res, prefix)
+                }
+            },
+            notOK: (res: Response, prefix="") => {
+                expectResponseCode(res, 404, prefix)
+                expectOperationOutcome(res, prefix)
+            }
+        },
+        manifest: {
+            OK: (res: Response<BulkData.ExportManifest>, prefix="") => {
+                assert.bulkData.manifest.body.OK(res.body, concat(prefix, "Invalid manifest body"))
+            },
+            body: {
+                OK: (manifest: BulkData.ExportManifest, kickOffUrl: string, prefix="") => {
+
+                    // transactionTime - a FHIR instant type that indicates the server's time when the query is run.
+                    // The response SHOULD NOT include any resources modified after this instant, and SHALL include
+                    // any matching resources modified up to (and including) this instant. Note: to properly meet
+                    // these constraints, a FHIR Server might need to wait for any pending transactions to resolve
+                    // in its database, before starting the export process.
+                    expect(manifest, concat(prefix, "the response must contain 'transactionTime'")).to.include("transactionTime");
+                    expect(manifest.transactionTime, concat(prefix, "transactionTime must be a string")).to.be.a.string();
+                    expect(manifest.transactionTime, concat(prefix, "transactionTime must be FHIR instant")).to.match(REGEXP_INSTANT);
+
+                    // the full URI of the original bulk data kick-off request
+                    expect(manifest, concat(prefix, "the response must contain 'request'")).to.include("request");
+                    expect(manifest.request, concat(prefix, "the 'request' property must contain the kick-off URL")).to.equal(kickOffUrl);
+
+                    // requiresAccessToken - boolean value of true or false indicating whether downloading the generated
+                    // files requires a bearer access token. Value MUST be true if both the file server and the FHIR API
+                    // server control access using OAuth 2.0 bearer tokens. Value MAY be false for file servers that use
+                    // access-control schemes other than OAuth 2.0, such as downloads from Amazon S3 bucket URIs or
+                    // verifiable file servers within an organization's firewall.
+                    expect(manifest, concat(prefix, "the response must contain 'requiresAccessToken'")).to.include("requiresAccessToken");
+                    expect(manifest.requiresAccessToken, concat(prefix, "the 'requiresAccessToken' property must have a boolean value")).to.be.boolean();
+                
+                    // array of bulk data file items with one entry for each generated
+                    // file. Note: If no resources are returned from the kick-off
+                    // request, the server SHOULD return an empty array.
+                    expect(manifest, concat(prefix, "the response must contain an 'output' array")).to.include("output");
+                    expect(manifest.output, concat(prefix, "the 'output' property must be an array")).to.be.an.array();
+                    assert.bulkData.manifest.output.OK(manifest.output, prefix)
+    
+                    // Error, warning, and information messages related to the export should be
+                    // included here (not in output). If there are no relevant messages, the server
+                    // SHOULD return an empty array.
+                    // Note: this field may be renamed in a future version of this IG to reflect the
+                    // inclusion of OperationOutcome resources with severity levels other than error.
+                    expect(manifest, concat(prefix, "the response must contain an 'error' array")).to.include("error");
+                    expect(manifest.error, concat(prefix, "the 'error' property must be an array")).to.be.an.array();
+                    assert.bulkData.manifest.error.OK(manifest.error, prefix)
+
+                    if (manifest.deleted) {
+                        expect(manifest.deleted, concat(prefix, "If set, the 'deleted' property must be an array")).to.be.an.array();
+                        assert.bulkData.manifest.deleted.OK(manifest.deleted, prefix)
+                    }
+                }
+            },
+            output: {
+                OK: (items: BulkData.ExportManifestFile[], type: string, prefix="") => {
+                    items.forEach((item, i) => {
+                        expectValidManifestEntry(item, type, concat(prefix, `Invalid manifest entry at manifest.output[${i}]`))
+                    });
+                },
+            },
+            deleted: {
+                OK: (items: BulkData.ExportManifestFile<"Bundle">[], prefix="") => {
+                    items.forEach((item, i) => {
+                        expectValidManifestEntry(item, "Bundle", concat(prefix, `Invalid manifest entry at manifest.deleted[${i}]`))
+                    });
+                },
+            },
+            error: {
+                OK: (items: BulkData.ExportManifestFile<"OperationOutcome">[], prefix="") => {
+                    items.forEach((item, i) => {
+                        expectValidManifestEntry(item, "OperationOutcome", concat(prefix, `Invalid manifest entry at manifest.error[${i}]`))
+                    });
+                },
+            }
+        }
+    },
+
+    response: {
+        statusCode      : expectResponseCode,
+        statusText      : expectResponseText,
+        clientError     : expectClientError,
+        json            : expectJsonResponse,
+        ndJson          : expectNDJsonResponse,
+        fhirResource    : expectFhirResource,
+        fhirResourceType: expectFhirResourceType,
+        OperationOutcome: expectOperationOutcome,
+        oauthError      : expectOAuthError,
+        oauthErrorType  : expectOAuthErrorType,
+    }
+};
 
 
 

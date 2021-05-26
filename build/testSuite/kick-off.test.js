@@ -412,7 +412,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                         assertions_1.expectSuccessfulKickOff(response2, api, "Parameter _typeFilter plus header \"prefer: respond-async,handling=lenient\" was rejected");
                     }
                     catch (ex) {
-                        ex.message = "\n- The server was expected to ignore the _typeFilter parameter if handling=lenient is included in the Prefer header" + ex.message;
+                        ex.message = "\n✖ The server was expected to ignore the _typeFilter parameter if handling=lenient is included in the Prefer header" + ex.message;
                         throw ex;
                     }
                 });
@@ -452,7 +452,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                         assertions_1.expectSuccessfulKickOff(response2, api, "Request with multiple _typeFilter parameters and handling=lenient failed");
                     }
                     catch (ex) {
-                        ex.message = "\n- The server was expected to ignore multiple _typeFilter parameter errors if handling=lenient is included in the Prefer header" + ex.message;
+                        ex.message = "\n✖ The server was expected to ignore multiple _typeFilter parameter errors if handling=lenient is included in the Prefer header" + ex.message;
                         throw ex;
                     }
                 });
@@ -507,7 +507,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                         assertions_1.expectSuccessfulKickOff(response2, api, "Request with _typeFilter parameter and handling=lenient was rejected");
                     }
                     catch (ex) {
-                        ex.message = "\n- The server was expected to ignore _typeFilter parameter errors if handling=lenient is included in the Prefer header" + ex.message;
+                        ex.message = "\n✖ The server was expected to ignore _typeFilter parameter errors if handling=lenient is included in the Prefer header" + ex.message;
                         throw ex;
                     }
                 });

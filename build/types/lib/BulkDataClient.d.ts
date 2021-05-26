@@ -9,6 +9,8 @@ export declare namespace FHIR {
     }
     interface CapabilityStatement extends Resource<"CapabilityStatement"> {
     }
+    interface OperationOutcome extends Resource<"OperationOutcome"> {
+    }
 }
 export declare namespace BulkData {
     /**
@@ -54,7 +56,40 @@ export declare namespace BulkData {
          * supported, so a server SHALL generate files in the same format as
          * bulk data output files that contain OperationOutcome resources.
          */
-        error: ExportManifestFile[];
+        error: ExportManifestFile<"OperationOutcome">[];
+        /**
+         * An array of deleted file items following the same structure as the
+         * output array.
+         *
+         * When a `_since` timestamp is supplied in the export request, this
+         * array SHALL be populated with output files containing FHIR
+         * Transaction Bundles that indicate which FHIR resources would have
+         * been returned, but have been deleted subsequent to that date. If no
+         * resources have been deleted or the _since parameter was not supplied,
+         * the server MAY omit this key or MAY return an empty array.
+         *
+         * Each line in the output file SHALL contain a FHIR Bundle with a type
+         * of transaction which SHALL contain one or more entry items that
+         * reflect a deleted resource. In each entry, the request.url and
+         * request.method elements SHALL be populated. The request.method
+         * element SHALL be set to DELETE.
+         *
+         * Example deleted resource bundle (represents one line in output file):
+         * @example
+         * ```json
+         * {
+         *     "resourceType": "Bundle",
+         *     "id": "bundle-transaction",
+         *     "meta": { "lastUpdated": "2020-04-27T02:56:00Z" },
+         *     "type": "transaction",
+         *     "entry":[{
+         *         "request": { "method": "DELETE", "url": "Patient/123" }
+         *         ...
+         *     }]
+         * }
+         * ```
+         */
+        deleted?: ExportManifestFile<"Bundle">[];
         /**
          * To support extensions, this implementation guide reserves the name
          * extension and will never define a field with that name, allowing
@@ -69,7 +104,7 @@ export declare namespace BulkData {
     /**
      * Each file or output entry in export manifest
      */
-    interface ExportManifestFile {
+    interface ExportManifestFile<Type = string> {
         /**
          * the FHIR resource type that is contained in the file.
          * Each file SHALL contain resources of only one type, but a server MAY
@@ -81,7 +116,7 @@ export declare namespace BulkData {
          * have a "contained" array that includes referenced resources of other
          * types.
          */
-        type: string;
+        type: Type;
         /**
          * the path to the file. The format of the file SHOULD reflect that
          * requested in the _outputFormat parameter of the initial kick-off
@@ -93,6 +128,7 @@ export declare namespace BulkData {
          */
         count?: number;
     }
+    type StatusResponse<T = ExportManifest | FHIR.OperationOutcome | void> = Response<T>;
 }
 export declare namespace OAuth {
     type errorType = (

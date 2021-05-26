@@ -29,6 +29,7 @@ module.exports = {
         jwksUrl: "https://bulk-data.smarthealthit.org/keys/ES384.public.json",
     },
     requests: {
-        strictSSL: false
+        strictSSL: false,
+        timeout: 15000
     }
 };

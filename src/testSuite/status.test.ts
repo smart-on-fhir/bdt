@@ -2,19 +2,7 @@ import moment            from "moment"
 import { expect }        from "@hapi/code"
 import { suite, test }   from "../lib/bdt"
 import { BulkDataClient} from "../lib/BulkDataClient"
-import {
-    expectOperationOutcome,
-    expectSuccessfulKickOff
-} from "../lib/assertions";
-
-
-
-const REGEXP_INSTANT = new RegExp(
-    "([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-" +
-    "(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3])" +
-    ":[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?(Z|(\\+|-)((0[0-9]|1[0-3])" +
-    ":[0-5][0-9]|14:00))"
-);
+import { assert }        from "../lib/assertions";
 
 
 suite("Status Endpoint", () => {
@@ -63,8 +51,8 @@ suite("Status Endpoint", () => {
         // Then make sure we cancel that export
         await client.cancel(kickOffResponse);
 
-        // // Finally check the status code returned by the status endpoint
-        expect(client.statusResponse.statusCode, "The status code returned by the status endpoint must be 202").to.equal(202)
+        // Finally check the status code returned by the status endpoint
+        assert.bulkData.status.pending(client.statusResponse, "When called immediately after kick-off, the status endpoint must reply with '202 Accepted'")
     });
 
     test({
@@ -86,140 +74,12 @@ suite("Status Endpoint", () => {
             "    - Every item has valid `url` property\n" +
             "    - Every item may a `count` number property\n"
     }, async ({ config, api }) => {
-
         const client = new BulkDataClient(config, api)
-
         const resourceType = config.fastestResource;
-        
         const { response: kickOffResponse } =await client.kickOff({ params: { _type: resourceType } });
         await client.waitForExport();
         await client.cancel(kickOffResponse);
-
-        const body = client.statusResponse.body;
-
-        expect(client.statusResponse.statusCode, "Responds with 200 for completed exports").to.equal(200);
-
-        expect(client.statusResponse.headers["content-type"], "responds with JSON").to.match(/^application\/json/i);
-
-        // The server MAY return an Expires header indicating when the files listed will no longer be available.
-        if (client.statusResponse.headers["expires"]) {
-            
-            expect(client.statusResponse.headers["expires"], "the expires header must be a string if present").to.be.a.string();
-
-            // If expires header is present, make sure it is in the future.
-            const expires = moment(client.statusResponse.headers["expires"], [
-
-                // Preferred HTTP date (Sun, 06 Nov 1994 08:49:37 GMT)
-                moment.RFC_2822,
-
-                // Obsolete HTTP date (Sunday, 06-Nov-94 08:49:37 GMT)
-                "dddd, DD-MMM-YY HH:mm:ss ZZ",
-
-                // Obsolete HTTP date (Sun  Nov  6    08:49:37 1994)
-                "ddd MMM D HH:mm:ss YYYY",
-
-                // The following formats are often used (even though they shouldn't be):
-
-                // ISO_8601 (2020-12-24 19:50:58 +0000 UTC)
-                moment.ISO_8601,
-
-                // ISO_8601 with milliseconds (2020-12-24 19:50:58.997683 +0000 UTC)
-                "YYYY-MM-DD HH:mm:ss.SSS ZZ",
-                "YYYY-MM-DDTHH:mm:ss.SSS ZZ"
-            ]).utc(true);
-
-            const now = moment().utc(true);
-            expect(expires.diff(now, "seconds") > 0, "The expires header of the status response should be a date in the future").to.be.true();
-
-            // Note that the above assertion might be unreliable due to small time differences between
-            // the host machine that executes the tests and the server. For that reason we also check if
-            // the server returns a "time" header and if so, we verify that "expires" is after "time".
-            if (client.statusResponse.headers["date"]) {
-                const date = moment(client.statusResponse.headers["date"]).utc(true);
-                expect(expires.diff(date, "seconds") > 0, "The expires header of the status response should be a date after the one in the date header").to.be.true();
-            }
-        }
-
-        // transactionTime - a FHIR instant type that indicates the server's time when the query is run.
-        // The response SHOULD NOT include any resources modified after this instant, and SHALL include
-        // any matching resources modified up to (and including) this instant. Note: to properly meet
-        // these constraints, a FHIR Server might need to wait for any pending transactions to resolve
-        // in its database, before starting the export process.
-        expect(body, "the response contains 'transactionTime'").to.include("transactionTime");
-        expect(body.transactionTime, "transactionTime must be a string").to.be.a.string();
-        expect(body.transactionTime, "transactionTime must be FHIR instant").to.match(REGEXP_INSTANT);
-
-        // the full URI of the original bulk data kick-off request
-        expect(body, "the response contains 'request'").to.include("request");
-        expect(body.request, "the 'request' property must contain the kick-off URL").to.equal(client.kickOffRequest.options.url.href);
-
-        // requiresAccessToken - boolean value of true or false indicating whether downloading the generated
-        // files requires a bearer access token. Value MUST be true if both the file server and the FHIR API
-        // server control access using OAuth 2.0 bearer tokens. Value MAY be false for file servers that use
-        // access-control schemes other than OAuth 2.0, such as downloads from Amazon S3 bucket URIs or
-        // verifiable file servers within an organization's firewall.
-        expect(body, "the response contains 'requiresAccessToken'").to.include("request");
-        expect(body.requiresAccessToken, "the 'requiresAccessToken' property must have a boolean value").to.be.boolean();
-
-        // array of bulk data file items with one entry for each generated
-        // file. Note: If no resources are returned from the kick-off
-        // request, the server SHOULD return an empty array.
-        expect(body, "the response contains an 'output' array").to.include("output");
-        expect(body.output, "the 'output' property must be an array").to.be.an.array();
-
-        body.output.forEach(item => {
-
-            // type - the FHIR resource type that is contained in the file. Note: Each file MUST contain
-            // resources of only one type, but a server MAY create more than one file for each resource
-            // type returned. The number of resources contained in a file MAY vary between servers. If no
-            // data are found for a resource, the server SHOULD NOT return an output item for that resource
-            // in the response.
-            expect(item, "every output item must have 'type' property").to.include("type");
-            expect(item.type, "every output item's 'type' property must equal the exported resource type").to.include(resourceType);
-            
-            // url - the path to the file. The format of the file SHOULD reflect that requested in the
-            // _outputFormat parameter of the initial kick-off request. Note that the files-for-download
-            // MAY be served by a file server other than a FHIR-specific server.
-            expect(item, "every output item must have 'url' property").to.include("url");
-            expect(item.url, "every output item url must be a string").to.be.a.string();
-            
-            // Each file item MAY optionally contain the following field:
-            if (item.hasOwnProperty("count")) {
-                // count - the number of resources in the file, represented as a JSON number.
-                expect(item.count, "if set, output item count must be a number").to.be.a.number();
-            }
-        });
-
-        // array of error file items following the same structure as the
-        // output array. Note: If no errors occurred, the server SHOULD
-        // return an empty array. Note: Only the OperationOutcome resource
-        // type is currently supported, so a server MUST generate files in
-        // the same format as the bulk data output files that contain
-        // OperationOutcome resources.
-        expect(body, "the response contains an 'error' array").to.include("error");
-        expect(body.output, "the 'error' property must be an array").to.be.an.array();
-
-        body.error.forEach(item => {
-            // type - the FHIR resource type that is contained in the file. Note: Each file MUST contain
-            // resources of only one type, but a server MAY create more than one file for each resource
-            // type returned. The number of resources contained in a file MAY vary between servers. If no
-            // data are found for a resource, the server SHOULD NOT return an output item for that resource
-            // in the response.
-            expect(item, "every error item must have 'type' property").to.include("error");
-            expect(item.type, "every error item's 'type' property must equal the exported resource type").to.include(resourceType);
-            
-            // url - the path to the file. The format of the file SHOULD reflect that requested in the
-            // _outputFormat parameter of the initial kick-off request. Note that the files-for-download
-            // MAY be served by a file server other than a FHIR-specific server.
-            expect(item, "every error item must have 'url' property").to.include("url");
-            expect(item.url, "every error item url must be a string").to.be.a.string();
-            
-            // Each file item MAY optionally contain the following field:
-            if (item.hasOwnProperty("count")) {
-                // count - the number of resources in the file, represented as a JSON number.
-                expect(item.count, "if set, error item count must be a number").to.be.a.number();
-            }
-        });
+        assert.bulkData.status.OK(client.statusResponse, "Status response is invalid")
     });
 
     test({
@@ -239,24 +99,25 @@ suite("Status Endpoint", () => {
         const { response: cancelResponse1 } = await client.cancel(kickOffResponse);
 
         // Verify that we didn't get an error
-        expectSuccessfulKickOff(kickOffResponse, api);
+        assert.bulkData.kickOff.OK(kickOffResponse, api)
 
         if (cancelResponse1.statusCode < 200 || cancelResponse1.statusCode >= 300) {
             return api.setNotSupported(`DELETE requests to the status endpoint are not supported by this server`);
         }
 
-        expect(cancelResponse1.statusCode, "Servers that support export job canceling should reply with 202 status code").to.equal(202);
+        assert.bulkData.cancellation.OK(cancelResponse1, "Servers that support export job canceling should reply with 202 status code");
 
         const { response: cancelResponse2 } = await client.request({
-            url   : client.kickOffResponse.headers["content-location"],
+            url: client.kickOffResponse.headers["content-location"],
             method: "DELETE"
         });
 
-        const msg = "Following the delete request, when subsequent requests are " +
+        assert.bulkData.cancellation.notOK(
+            cancelResponse2,
+            "Following the delete request, when subsequent requests are " +
             "made to the polling location, the server SHALL return a 404 " +
-            "error and an associated FHIR OperationOutcome in JSON format";
-        expect(cancelResponse2.statusCode, msg).to.equal(404);
-        expectOperationOutcome(cancelResponse2, msg);
+            "error and an associated FHIR OperationOutcome in JSON format"
+        );
     });
 
     test({
@@ -322,7 +183,7 @@ suite("Status Endpoint", () => {
 
         // console.log(client.kickOffResponse.body)
 
-        expectSuccessfulKickOff(response, api, "Kick-off failed");
+        assert.bulkData.kickOff.OK(response, api, "Kick-off failed");
 
         await client.waitForExport();
         await client.cancel(response);

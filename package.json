@@ -7,7 +7,7 @@
     "test": "lab -v --sourcemaps --transform node_modules/lab-transform-typescript ./test/*.test.ts",
     "build": "tsc --build tsconfig.json",
     "build:watch": "tsc --build tsconfig.json --incremental --watch",
-    "doc": "touch docs/typedoc/.nojekyll && typedoc --watch"
+    "doc": "typedoc --watch && touch docs/api/.nojekyll"
   },
   "keywords": [],
   "author": "",

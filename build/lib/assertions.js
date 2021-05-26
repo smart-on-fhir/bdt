@@ -1,19 +1,27 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.expectNDJSONElements = exports.expectExportNotEmpty = exports.expectSuccessfulDownload = exports.expectSuccessfulExport = exports.expectSuccessfulKickOff = exports.expectFailedKickOff = exports.expectSuccessfulAuth = exports.expectOAuthErrorType = exports.expectOAuthError = exports.expectUnauthorized = exports.expectOperationOutcome = exports.expectFhirResourceType = exports.expectFhirResource = exports.expectNDJsonResponse = exports.expectJsonResponse = exports.expectClientError = exports.expectResponseText = exports.expectResponseCode = exports.concat = void 0;
+exports.assert = exports.expectValidManifestEntry = exports.expectNDJSONElements = exports.expectExportNotEmpty = exports.expectSuccessfulDownload = exports.expectSuccessfulExport = exports.expectSuccessfulKickOff = exports.expectFailedKickOff = exports.expectSuccessfulAuth = exports.expectOAuthErrorType = exports.expectOAuthError = exports.expectUnauthorized = exports.expectOperationOutcome = exports.expectFhirResourceType = exports.expectFhirResource = exports.expectNDJsonResponse = exports.expectJsonResponse = exports.expectClientError = exports.expectResponseText = exports.expectResponseCode = exports.concat = void 0;
 const code_1 = require("@hapi/code");
 const lib_1 = require("./lib");
+const moment_1 = __importDefault(require("moment"));
+const REGEXP_INSTANT = new RegExp("([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-" +
+    "(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3])" +
+    ":[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?(Z|(\\+|-)((0[0-9]|1[0-3])" +
+    ":[0-5][0-9]|14:00))");
 function concat(...messages) {
     // for (let i = 0; i < messages.length; i++) {
     //     let m = String(messages[i]).trim().replace(/^\n\-\s/, "").replace(/[\s\.]*$/, "");
-    //     let a = m.split("\n- ").map(x => x.replace(/^(Assertion|- )/, ""));
+    //     let a = m.split("\n✖ ").map(x => x.replace(/^(Assertion|- )/, ""));
     //     messages[i] = a.shift()
     //     while (a.length) {
     //         messages.splice(i + 1, 0, a.shift())
     //     }
     // }
-    // return "\n- " + messages.filter(Boolean).join("\n- ") + "\n- Assertion";
-    return "\n- " + messages.map(x => String(x).replace(/\n\-\sAssertion$/, "").replace(/^\n\-\s*/, "").trim()).filter(Boolean).join("\n- ") + "\n- Assertion";
+    // return "\n✖ " + messages.filter(Boolean).join("\n✖ ") + "\n✖ Assertion";
+    return "\n✖ " + messages.map(x => String(x).replace(/\n✖\sAssertion$/, "").replace(/^\n✖\s*/, "").trim()).filter(Boolean).join("\n✖ ") + "\n✖ Assertion";
 }
 exports.concat = concat;
 /**
@@ -283,6 +291,37 @@ function expectSuccessfulExport(response, prefix = "") {
     const error = "Got: " + lib_1.getErrorMessageFromResponse(response);
     expectResponseCode(response, 200, concat(prefix, error));
     expectJsonResponse(response, concat(prefix, error));
+    // The server MAY return an Expires header indicating when the files listed will no longer be available.
+    const { expires, date } = response.headers;
+    if (expires) {
+        code_1.expect(() => {
+            code_1.expect(expires, concat(prefix, "the expires header must be a string if present")).to.be.a.string();
+            // If expires header is present, make sure it is in the future.
+            const expiresMoment = moment_1.default(expires, [
+                // Preferred HTTP date (Sun, 06 Nov 1994 08:49:37 GMT)
+                moment_1.default.RFC_2822,
+                // Obsolete HTTP date (Sunday, 06-Nov-94 08:49:37 GMT)
+                "dddd, DD-MMM-YY HH:mm:ss ZZ",
+                // Obsolete HTTP date (Sun  Nov  6    08:49:37 1994)
+                "ddd MMM D HH:mm:ss YYYY",
+                // The following formats are often used (even though they shouldn't be):
+                // ISO_8601 (2020-12-24 19:50:58 +0000 UTC)
+                moment_1.default.ISO_8601,
+                // ISO_8601 with milliseconds (2020-12-24 19:50:58.997683 +0000 UTC)
+                "YYYY-MM-DD HH:mm:ss.SSS ZZ",
+                "YYYY-MM-DDTHH:mm:ss.SSS ZZ"
+            ]).utc(true);
+            const now = moment_1.default().utc(true);
+            code_1.expect(expiresMoment.diff(now, "seconds") > 0, concat(prefix, "The expires header of the status response should be a date in the future")).to.be.true();
+            // Note that the above assertion might be unreliable due to small time differences between
+            // the host machine that executes the tests and the server. For that reason we also check if
+            // the server returns a "time" header and if so, we verify that "expires" is after "time".
+            if (date) {
+                const dateMoment = moment_1.default(date).utc(true);
+                code_1.expect(expiresMoment.diff(dateMoment, "seconds") > 0, concat(prefix, "The expires header of the status response should be a date after the one in the date header")).to.be.true();
+            }
+        }, "Invalid expires header");
+    }
 }
 exports.expectSuccessfulExport = expectSuccessfulExport;
 /**
@@ -334,6 +373,147 @@ function expectNDJSONElements(body, elements, prefix = "") {
     });
 }
 exports.expectNDJSONElements = expectNDJSONElements;
+/**
+ *
+ * @param item
+ * @param type
+ * @param prefix
+ * @internal
+ */
+function expectValidManifestEntry(item, type, prefix = "") {
+    // type - the FHIR resource type that is contained in the file. Note: Each file MUST contain
+    // resources of only one type, but a server MAY create more than one file for each resource
+    // type returned. The number of resources contained in a file MAY vary between servers. If no
+    // data are found for a resource, the server SHOULD NOT return an output item for that resource
+    // in the response.
+    code_1.expect(item, concat(prefix, "every item must have 'type' property")).to.include("type");
+    code_1.expect(item.type, concat(prefix, `every item's 'type' property must equal "${type}"`)).to.equal(type);
+    // url - the path to the file. The format of the file SHOULD reflect that requested in the
+    // _outputFormat parameter of the initial kick-off request. Note that the files-for-download
+    // MAY be served by a file server other than a FHIR-specific server.
+    code_1.expect(item, concat(prefix, "every item must have 'url' property")).to.include("url");
+    code_1.expect(item.url, concat(prefix, "every item url must be a string")).to.be.a.string();
+    code_1.expect(item.url, concat(prefix, "every item url must be an url")).to.match(/^https?\:\/\/.+/);
+    // Each file item MAY optionally contain the following field:
+    if (item.hasOwnProperty("count")) {
+        // count - the number of resources in the file, represented as a JSON number.
+        code_1.expect(item.count, concat(prefix, "if set, item count must be a number greater than 0")).to.be.a.number().above(0);
+    }
+}
+exports.expectValidManifestEntry = expectValidManifestEntry;
+exports.assert = {
+    bulkData: {
+        auth: {
+            OK: expectSuccessfulAuth,
+            notOK: expectUnauthorized,
+        },
+        kickOff: {
+            OK: expectSuccessfulKickOff,
+            notOK: expectFailedKickOff
+        },
+        status: {
+            OK: expectSuccessfulExport,
+            notEmpty: expectExportNotEmpty,
+            pending: (res, prefix = "") => expectResponseCode(res, 202, prefix),
+            notOK: (res, prefix = "") => expectClientError(res, prefix)
+        },
+        download: {
+            OK: expectSuccessfulDownload,
+            notOK: (res, prefix = "") => expectClientError(res, prefix),
+            withElements: expectNDJSONElements
+        },
+        cancellation: {
+            OK: (res, prefix = "") => {
+                expectResponseCode(res, 202, prefix);
+                if (res.body) {
+                    expectOperationOutcome(res, prefix);
+                }
+            },
+            notOK: (res, prefix = "") => {
+                expectResponseCode(res, 404, prefix);
+                expectOperationOutcome(res, prefix);
+            }
+        },
+        manifest: {
+            OK: (res, prefix = "") => {
+                exports.assert.bulkData.manifest.body.OK(res.body, concat(prefix, "Invalid manifest body"));
+            },
+            body: {
+                OK: (manifest, kickOffUrl, prefix = "") => {
+                    // transactionTime - a FHIR instant type that indicates the server's time when the query is run.
+                    // The response SHOULD NOT include any resources modified after this instant, and SHALL include
+                    // any matching resources modified up to (and including) this instant. Note: to properly meet
+                    // these constraints, a FHIR Server might need to wait for any pending transactions to resolve
+                    // in its database, before starting the export process.
+                    code_1.expect(manifest, concat(prefix, "the response must contain 'transactionTime'")).to.include("transactionTime");
+                    code_1.expect(manifest.transactionTime, concat(prefix, "transactionTime must be a string")).to.be.a.string();
+                    code_1.expect(manifest.transactionTime, concat(prefix, "transactionTime must be FHIR instant")).to.match(REGEXP_INSTANT);
+                    // the full URI of the original bulk data kick-off request
+                    code_1.expect(manifest, concat(prefix, "the response must contain 'request'")).to.include("request");
+                    code_1.expect(manifest.request, concat(prefix, "the 'request' property must contain the kick-off URL")).to.equal(kickOffUrl);
+                    // requiresAccessToken - boolean value of true or false indicating whether downloading the generated
+                    // files requires a bearer access token. Value MUST be true if both the file server and the FHIR API
+                    // server control access using OAuth 2.0 bearer tokens. Value MAY be false for file servers that use
+                    // access-control schemes other than OAuth 2.0, such as downloads from Amazon S3 bucket URIs or
+                    // verifiable file servers within an organization's firewall.
+                    code_1.expect(manifest, concat(prefix, "the response must contain 'requiresAccessToken'")).to.include("requiresAccessToken");
+                    code_1.expect(manifest.requiresAccessToken, concat(prefix, "the 'requiresAccessToken' property must have a boolean value")).to.be.boolean();
+                    // array of bulk data file items with one entry for each generated
+                    // file. Note: If no resources are returned from the kick-off
+                    // request, the server SHOULD return an empty array.
+                    code_1.expect(manifest, concat(prefix, "the response must contain an 'output' array")).to.include("output");
+                    code_1.expect(manifest.output, concat(prefix, "the 'output' property must be an array")).to.be.an.array();
+                    exports.assert.bulkData.manifest.output.OK(manifest.output, prefix);
+                    // Error, warning, and information messages related to the export should be
+                    // included here (not in output). If there are no relevant messages, the server
+                    // SHOULD return an empty array.
+                    // Note: this field may be renamed in a future version of this IG to reflect the
+                    // inclusion of OperationOutcome resources with severity levels other than error.
+                    code_1.expect(manifest, concat(prefix, "the response must contain an 'error' array")).to.include("error");
+                    code_1.expect(manifest.error, concat(prefix, "the 'error' property must be an array")).to.be.an.array();
+                    exports.assert.bulkData.manifest.error.OK(manifest.error, prefix);
+                    if (manifest.deleted) {
+                        code_1.expect(manifest.deleted, concat(prefix, "If set, the 'deleted' property must be an array")).to.be.an.array();
+                        exports.assert.bulkData.manifest.deleted.OK(manifest.deleted, prefix);
+                    }
+                }
+            },
+            output: {
+                OK: (items, type, prefix = "") => {
+                    items.forEach((item, i) => {
+                        expectValidManifestEntry(item, type, concat(prefix, `Invalid manifest entry at manifest.output[${i}]`));
+                    });
+                },
+            },
+            deleted: {
+                OK: (items, prefix = "") => {
+                    items.forEach((item, i) => {
+                        expectValidManifestEntry(item, "Bundle", concat(prefix, `Invalid manifest entry at manifest.deleted[${i}]`));
+                    });
+                },
+            },
+            error: {
+                OK: (items, prefix = "") => {
+                    items.forEach((item, i) => {
+                        expectValidManifestEntry(item, "OperationOutcome", concat(prefix, `Invalid manifest entry at manifest.error[${i}]`));
+                    });
+                },
+            }
+        }
+    },
+    response: {
+        statusCode: expectResponseCode,
+        statusText: expectResponseText,
+        clientError: expectClientError,
+        json: expectJsonResponse,
+        ndJson: expectNDJsonResponse,
+        fhirResource: expectFhirResource,
+        fhirResourceType: expectFhirResourceType,
+        OperationOutcome: expectOperationOutcome,
+        oauthError: expectOAuthError,
+        oauthErrorType: expectOAuthErrorType,
+    }
+};
 function checkKickOffSupport(response) {
     const { statusCode } = response;
     const { options } = response.request;
