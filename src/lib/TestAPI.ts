@@ -38,9 +38,11 @@ export class TestAPI
     /**
      * Calling this method will mark the test as not supported.
      */
-    setNotSupported(message = "This test was skipped because " +
-        "the server does not support this functionality") {
-        this.test.console.info(message);
+    setNotSupported(message = "") {
+        // This test was skipped because the server does not support this functionality
+        if (message) {
+            this.test.console.info(message);
+        }
         this.test.status = "not-supported";
     }
 

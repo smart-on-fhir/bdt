@@ -17,6 +17,12 @@ export declare function joinSentences(messages: string[]): string;
 export declare function formatHttpError(error: HTTPError): HTTPError;
 export declare function getErrorMessageFromResponse(response: Response): string;
 /**
+ * Rounds the given number @n using the specified precision.
+ * @param n
+ * @param [precision]
+ */
+export declare function roundToPrecision(n: number | string, precision?: number): number;
+/**
  * Check if the given @response has the desired status @text
  * @param {request.Response} response The response to check
  * @param {String} text The expected status text

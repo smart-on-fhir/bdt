@@ -8,6 +8,7 @@ import TestRunner from "../lib/TestRunner"
 import { ConsoleEntry, LogType } from "../lib/Console";
 import { StdOutReporterOptions } from "../lib/bdt";
 import { count as assertionsCount } from "@hapi/code"
+import { roundToPrecision } from "../lib/lib";
 
 const md = markdownIt();
 
@@ -21,7 +22,7 @@ const DURATION_MEDIUM = 500;
 const DURATION_SLOW = 1000;
 
 // Indent with this character or character sequence
-const INDENT_STRING = "  ";
+const INDENT_STRING = "   ";
 
 const log = console.log;
 
@@ -44,13 +45,13 @@ function clearLine() {
 
 function icon(node: TestNode) {
     if (node.children)
-        return "●".grey;
+        return "📦".grey.bold;// 🮥
 
     if (node.status === "succeeded")
         return "✔".green;
 
     if (node.status === "failed")
-        return "✘".red;
+        return "✘".red.bold;
 
     if (node.status === "not-implemented")
         return "⊖".grey.bold;
@@ -77,29 +78,6 @@ function getColorForDuration(duration: number) {
     }
 
     return "green";
-}
-
-/**
- * Rounds the given number @n using the specified precision.
- * @param n
- * @param [precision]
- */
-function roundToPrecision(n: number|string, precision?: number): number {
-    n = parseFloat(n + "");
-
-    if ( isNaN(n) || !isFinite(n) ) {
-        return NaN;
-    }
-
-    if ( !precision || isNaN(precision) || !isFinite(precision) || precision < 1 ) {
-        n = Math.round( n );
-    }
-    else {
-        const q = Math.pow(10, precision);
-        n = Math.round( n * q ) / q;
-    }
-
-    return n;
 }
 
 function formatDuration(ms: number) {
@@ -349,17 +327,17 @@ export default function StdoutReporter(runner: TestRunner, options: StdOutReport
 
     function text(node: TestNode) {
         if (node.status === "not-implemented") {
-            return node.name.grey + " (not implemented)".dim;
+            return node.name.grey + " (not implemented)".grey.dim;
         }
         if (node.status === "not-supported") {
-            return node.name.grey + " (not supported)".dim;
+            return node.name.grey + " (not supported)".yellow.dim;
         }
         if (node.status === "skipped") {
             return node.name.grey + (
                 isInOnlyMode && !node.only ?
                 " (skipped due to only mode)" :
                 " (skipped)"
-            ).dim.italic;
+            ).grey.dim.italic;
         }
         return node.name;
     }
@@ -374,7 +352,7 @@ export default function StdoutReporter(runner: TestRunner, options: StdOutReport
         const currentIndent = indent(depth)
         const nextIndent = indent(depth + 1)
 
-        log(`${currentIndent} ${wrap(
+        log(`${currentIndent}${wrap(
             consoleEntryLabel(entry) + " " + entry.data.map(x => {
                 let color = getColorForLogType(entry.type)
 
@@ -405,7 +383,7 @@ export default function StdoutReporter(runner: TestRunner, options: StdOutReport
                 }
                 return inspect(x, false, 4, colors.enabled)
             }).join(" "),
-            `${nextIndent} `,
+            nextIndent,
             options.wrap
         )}`)
     }
@@ -449,12 +427,16 @@ export default function StdoutReporter(runner: TestRunner, options: StdOutReport
 
     function onTestStart(node: Test) {
         if (node.status === "skipped" && options.verbose !== "always") return
-        const chars = ["○", "◔", "◑", "◕", "●"];
+        // const chars = ["○", "◔", "◑", "◕", "●"];
+        const chars = "○○○○◓◑◒◐○○○○".split("");// ◒◐◓
+        // const chars = "  ▏▎▍▌▋▊▋▌▍▎▏".split(""); //
+        // const chars = " ▁▂▃▄▅▆▇█▇▆▅▄▃▂▁ ".split("");
+        // const chars = "🌕🌔🌓🌒🌑🌘🌗🌖".split("");⦾⦿
         let prefix = indent(depth)
         function write(i = 0) {
             clearLine();
-            process.stdout.write(`${prefix} ${chars[i].bold} ${text(node)} ${duration(node)}`);
-            timer = setTimeout(() => write(++i % 5), 500)
+            process.stdout.write(`${prefix} ${chars[i].yellow} ${text(node)} ${duration(node)}`);
+            timer = setTimeout(() => write(++i % chars.length), 150)
         }
         write()
     }
@@ -476,7 +458,7 @@ export default function StdoutReporter(runner: TestRunner, options: StdOutReport
         log(`${currentIndent} ${
             wrap(
                 icon(node) + " " + text(node) + " " + duration(node),
-                nextIndent + " ",
+                nextIndent,
                 options.wrap
         )}`);
         
@@ -488,9 +470,9 @@ export default function StdoutReporter(runner: TestRunner, options: StdOutReport
 
         // Tests with errors or warnings also render the description (if any)
         if (node.description && (node.status == "failed" || node.error || node.console.byTags(["warning", "error"]).length)) {
-            log(`${nextIndent} ${wrap(
+            log(`${nextIndent}${wrap(
                 parseMD(node.description).dim,
-                `${nextIndent} `,
+                nextIndent,
                 options.wrap
             )}`);
         }

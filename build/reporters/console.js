@@ -7,6 +7,7 @@ const colors_1 = __importDefault(require("colors"));
 const util_1 = require("util");
 const markdown_it_1 = __importDefault(require("markdown-it"));
 const code_1 = require("@hapi/code");
+const lib_1 = require("../lib/lib");
 const md = markdown_it_1.default();
 // Every test that takes more than DURATION_MEDIUM (but less then DURATION_SLOW)
 // will have it's time rendered in yellow
@@ -15,18 +16,18 @@ const DURATION_MEDIUM = 500;
 // red
 const DURATION_SLOW = 1000;
 // Indent with this character or character sequence
-const INDENT_STRING = "  ";
+const INDENT_STRING = "   ";
 const log = console.log;
 function clearLine() {
     process.stdout.write("\u001b[2K\r");
 }
 function icon(node) {
     if (node.children)
-        return "●".grey;
+        return "📦".grey.bold; // 🮥
     if (node.status === "succeeded")
         return "✔".green;
     if (node.status === "failed")
-        return "✘".red;
+        return "✘".red.bold;
     if (node.status === "not-implemented")
         return "⊖".grey.bold;
     if (node.status === "not-supported")
@@ -46,25 +47,6 @@ function getColorForDuration(duration) {
     }
     return "green";
 }
-/**
- * Rounds the given number @n using the specified precision.
- * @param n
- * @param [precision]
- */
-function roundToPrecision(n, precision) {
-    n = parseFloat(n + "");
-    if (isNaN(n) || !isFinite(n)) {
-        return NaN;
-    }
-    if (!precision || isNaN(precision) || !isFinite(precision) || precision < 1) {
-        n = Math.round(n);
-    }
-    else {
-        const q = Math.pow(10, precision);
-        n = Math.round(n * q) / q;
-    }
-    return n;
-}
 function formatDuration(ms) {
     let meta = [
         { label: "week", n: 1000 * 60 * 60 * 24 * 7 },
@@ -76,7 +58,7 @@ function formatDuration(ms) {
     for (let cur of meta) {
         let chunk = ms / cur.n;
         if (chunk > 1) {
-            return `${roundToPrecision(chunk, 1)} ${cur.label}${chunk > 1 ? "s" : ""}`;
+            return `${lib_1.roundToPrecision(chunk, 1)} ${cur.label}${chunk > 1 ? "s" : ""}`;
         }
     }
     return `${ms} ms`;
@@ -286,15 +268,15 @@ function StdoutReporter(runner, options) {
     }
     function text(node) {
         if (node.status === "not-implemented") {
-            return node.name.grey + " (not implemented)".dim;
+            return node.name.grey + " (not implemented)".grey.dim;
         }
         if (node.status === "not-supported") {
-            return node.name.grey + " (not supported)".dim;
+            return node.name.grey + " (not supported)".yellow.dim;
         }
         if (node.status === "skipped") {
             return node.name.grey + (isInOnlyMode && !node.only ?
                 " (skipped due to only mode)" :
-                " (skipped)").dim.italic;
+                " (skipped)").grey.dim.italic;
         }
         return node.name;
     }
@@ -305,7 +287,7 @@ function StdoutReporter(runner, options) {
             return;
         const currentIndent = indent(depth);
         const nextIndent = indent(depth + 1);
-        log(`${currentIndent} ${wrap(consoleEntryLabel(entry) + " " + entry.data.map(x => {
+        log(`${currentIndent}${wrap(consoleEntryLabel(entry) + " " + entry.data.map(x => {
             let color = getColorForLogType(entry.type);
             if (entry.type === "warn") {
                 counts.warnings++;
@@ -333,7 +315,7 @@ function StdoutReporter(runner, options) {
                 // x.message.replace(/^(\w+)?Error:\s*/, "").red
             }
             return util_1.inspect(x, false, 4, colors_1.default.enabled);
-        }).join(" "), `${nextIndent} `, options.wrap)}`);
+        }).join(" "), nextIndent, options.wrap)}`);
     }
     function onStart({ onlyMode }) {
         startTime = Date.now();
@@ -368,12 +350,16 @@ function StdoutReporter(runner, options) {
     function onTestStart(node) {
         if (node.status === "skipped" && options.verbose !== "always")
             return;
-        const chars = ["○", "◔", "◑", "◕", "●"];
+        // const chars = ["○", "◔", "◑", "◕", "●"];
+        const chars = "○○○○◓◑◒◐○○○○".split(""); // ◒◐◓
+        // const chars = "  ▏▎▍▌▋▊▋▌▍▎▏".split(""); //
+        // const chars = " ▁▂▃▄▅▆▇█▇▆▅▄▃▂▁ ".split("");
+        // const chars = "🌕🌔🌓🌒🌑🌘🌗🌖".split("");⦾⦿
         let prefix = indent(depth);
         function write(i = 0) {
             clearLine();
-            process.stdout.write(`${prefix} ${chars[i].bold} ${text(node)} ${duration(node)}`);
-            timer = setTimeout(() => write(++i % 5), 500);
+            process.stdout.write(`${prefix} ${chars[i].yellow} ${text(node)} ${duration(node)}`);
+            timer = setTimeout(() => write(++i % chars.length), 150);
         }
         write();
     }
@@ -386,14 +372,14 @@ function StdoutReporter(runner, options) {
         const verbose = options.verbose === "always" || (options.verbose === "auto" && node.status === "failed");
         const currentIndent = indent(depth);
         const nextIndent = indent(depth + 1);
-        log(`${currentIndent} ${wrap(icon(node) + " " + text(node) + " " + duration(node), nextIndent + " ", options.wrap)}`);
+        log(`${currentIndent} ${wrap(icon(node) + " " + text(node) + " " + duration(node), nextIndent, options.wrap)}`);
         // counters
         counts.total += 1;
         counts[node.status] += 1;
         depth++;
         // Tests with errors or warnings also render the description (if any)
         if (node.description && (node.status == "failed" || node.error || node.console.byTags(["warning", "error"]).length)) {
-            log(`${nextIndent} ${wrap(parseMD(node.description).dim, `${nextIndent} `, options.wrap)}`);
+            log(`${nextIndent}${wrap(parseMD(node.description).dim, nextIndent, options.wrap)}`);
         }
         node.console.forEach(entry => logConsoleEntry(entry, verbose));
         logDetails(node);

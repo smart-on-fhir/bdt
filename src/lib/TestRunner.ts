@@ -34,7 +34,7 @@ export default class TestRunner extends EventEmitter
             // Not supported
             if (error instanceof NotSupportedError) {
                 test.status = "not-supported"
-                test.console.info(error.message)
+                // test.console.info(error.message)
             }
 
             // Other errors
@@ -162,14 +162,14 @@ export default class TestRunner extends EventEmitter
 
         // Exit if no match
         if (this.settings.match && !test.name.match(new RegExp(this.settings.match, "i"))) {
-            test.console.info(`This test was skipped because it's name does not match the provided regular expression`)
+            // test.console.info(`This test was skipped because it's name does not match the provided regular expression`)
             test.status = "skipped"
             return await this.endTest(test, context)
         }
 
         // Exit if test is skipped
         if (test.skip) {
-            test.console.info("This test was skipped because it has a 'skip' option set")
+            // test.console.info("This test was skipped because it has a 'skip' option set")
             test.status = "skipped"
             return await this.endTest(test, context)
         }

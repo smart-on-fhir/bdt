@@ -97,7 +97,28 @@ export function getErrorMessageFromResponse(response: Response)
     return msg;
 }
 
+/**
+ * Rounds the given number @n using the specified precision.
+ * @param n
+ * @param [precision]
+ */
+export function roundToPrecision(n: number|string, precision?: number): number {
+    n = parseFloat(n + "");
 
+    if ( isNaN(n) || !isFinite(n) ) {
+        return NaN;
+    }
+
+    if ( !precision || isNaN(precision) || !isFinite(precision) || precision < 1 ) {
+        n = Math.round( n );
+    }
+    else {
+        const q = Math.pow(10, precision);
+        n = Math.round( n * q ) / q;
+    }
+
+    return n;
+}
 
 /**
  * Check if the given @response has the desired status @text

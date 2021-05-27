@@ -93,6 +93,9 @@
 							<h3>Other Functions</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="assertions.html#concat" class="tsd-kind-icon">concat</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="assertions.html#expecthttpdate" class="tsd-kind-icon">expect<wbr>Http<wbr>Date</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="assertions.html#expecthttpdateafter" class="tsd-kind-icon">expect<wbr>Http<wbr>Date<wbr>After</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="assertions.html#expecthttpdatebefore" class="tsd-kind-icon">expect<wbr>Http<wbr>Date<wbr>Before</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="assertions.html#expectndjsonelements" class="tsd-kind-icon">expectNDJSONElements</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="assertions.html#expectvalidmanifestentry" class="tsd-kind-icon">expect<wbr>Valid<wbr>Manifest<wbr>Entry</a></li>
 							</ul>
@@ -128,7 +131,7 @@
 					<div class="tsd-signature tsd-kind-icon">assert<span class="tsd-signature-symbol">:</span> <a href="../interfaces/assertions.assertapi.html" class="tsd-signature-type" data-tsd-kind="Interface">AssertAPI</a><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L652">src/lib/assertions.ts:652</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L667">src/lib/assertions.ts:667</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -145,7 +148,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L154">src/lib/assertions.ts:154</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L178">src/lib/assertions.ts:178</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -159,6 +162,90 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="expecthttpdate" class="tsd-anchor"></a>
+					<h3>expect<wbr>Http<wbr>Date</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">expect<wbr>Http<wbr>Date<span class="tsd-signature-symbol">(</span>date<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L530">src/lib/assertions.ts:530</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>date: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>prefix: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;&quot;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="expecthttpdateafter" class="tsd-anchor"></a>
+					<h3>expect<wbr>Http<wbr>Date<wbr>After</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">expect<wbr>Http<wbr>Date<wbr>After<span class="tsd-signature-symbol">(</span>date<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, after<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L536">src/lib/assertions.ts:536</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>date: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>after: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> = null</span></h5>
+								</li>
+								<li>
+									<h5>prefix: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;&quot;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="expecthttpdatebefore" class="tsd-anchor"></a>
+					<h3>expect<wbr>Http<wbr>Date<wbr>Before</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">expect<wbr>Http<wbr>Date<wbr>Before<span class="tsd-signature-symbol">(</span>date<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, before<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L548">src/lib/assertions.ts:548</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>date: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>before: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> = null</span></h5>
+								</li>
+								<li>
+									<h5>prefix: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;&quot;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
 					<a name="expectndjsonelements" class="tsd-anchor"></a>
 					<h3>expectNDJSONElements</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
@@ -168,7 +255,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L584">src/lib/assertions.ts:584</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L599">src/lib/assertions.ts:599</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -197,7 +284,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L629">src/lib/assertions.ts:629</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L644">src/lib/assertions.ts:644</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -235,7 +322,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L202">src/lib/assertions.ts:202</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L226">src/lib/assertions.ts:226</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -267,7 +354,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L577">src/lib/assertions.ts:577</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L592">src/lib/assertions.ts:592</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -293,7 +380,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L445">src/lib/assertions.ts:445</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L469">src/lib/assertions.ts:469</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -322,7 +409,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L284">src/lib/assertions.ts:284</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L308">src/lib/assertions.ts:308</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -348,7 +435,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L293">src/lib/assertions.ts:293</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L317">src/lib/assertions.ts:317</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -377,7 +464,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L212">src/lib/assertions.ts:212</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L236">src/lib/assertions.ts:236</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -403,7 +490,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L249">src/lib/assertions.ts:249</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L273">src/lib/assertions.ts:273</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -429,7 +516,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L329">src/lib/assertions.ts:329</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L353">src/lib/assertions.ts:353</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -455,7 +542,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L369">src/lib/assertions.ts:369</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L393">src/lib/assertions.ts:393</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -484,7 +571,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L302">src/lib/assertions.ts:302</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L326">src/lib/assertions.ts:326</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -510,7 +597,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L177">src/lib/assertions.ts:177</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L201">src/lib/assertions.ts:201</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -548,7 +635,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L191">src/lib/assertions.ts:191</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L215">src/lib/assertions.ts:215</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -586,7 +673,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L381">src/lib/assertions.ts:381</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L405">src/lib/assertions.ts:405</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -612,7 +699,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L567">src/lib/assertions.ts:567</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L582">src/lib/assertions.ts:582</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -638,7 +725,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L509">src/lib/assertions.ts:509</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L563">src/lib/assertions.ts:563</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -664,7 +751,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L473">src/lib/assertions.ts:473</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L497">src/lib/assertions.ts:497</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -693,7 +780,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L310">src/lib/assertions.ts:310</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L334">src/lib/assertions.ts:334</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -813,6 +900,15 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="assertions.html#expectfhirresourcetype" class="tsd-kind-icon">expect<wbr>Fhir<wbr>Resource<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="assertions.html#expecthttpdate" class="tsd-kind-icon">expect<wbr>Http<wbr>Date</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="assertions.html#expecthttpdateafter" class="tsd-kind-icon">expect<wbr>Http<wbr>Date<wbr>After</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="assertions.html#expecthttpdatebefore" class="tsd-kind-icon">expect<wbr>Http<wbr>Date<wbr>Before</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="assertions.html#expectjsonresponse" class="tsd-kind-icon">expect<wbr>Json<wbr>Response</a>

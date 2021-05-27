@@ -110,7 +110,15 @@ b, strong {
   font-weight: bold; }
 
 blockquote {
-  margin: 1em 40px; }
+  margin: 0em 0px 0em 0px;
+  border-left: 5px solid #DDD;
+  padding: 10px 10px 10px 20px;
+  background: #F6F6F6;
+  box-shadow: 2px 0 0 0 #fff inset;
+  color: #666;
+  font-size: 90%;
+  text-shadow: 0 1px 0px #fff;
+}
 
 /**
  * Address styling not present in Safari 5 and Chrome. */
@@ -1685,7 +1693,7 @@ dl.tsd-comment-tags {
   dl.tsd-comment-tags dt {
     float: left;
     padding: 1px 5px;
-    margin: 0 10px 0 0;
+    margin: 0 10px 4px 0;
     border-radius: 4px;
     border: 1px solid rgba(0, 0, 0, 0.08);
     color: #404040;

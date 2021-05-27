@@ -111,7 +111,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L64">src/lib/assertions.ts:64</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L85">src/lib/assertions.ts:85</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -153,7 +153,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L74">src/lib/assertions.ts:74</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L95">src/lib/assertions.ts:95</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -191,7 +191,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L83">src/lib/assertions.ts:83</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L104">src/lib/assertions.ts:104</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -222,25 +222,34 @@
 					<a name="pending" class="tsd-anchor"></a>
 					<h3>pending</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">pending<span class="tsd-signature-symbol">(</span>res<span class="tsd-signature-symbol">: </span><a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="bulkdataclient.fhir.operationoutcome.html" class="tsd-signature-type" data-tsd-kind="Interface">OperationOutcome</a><span class="tsd-signature-symbol"> | </span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">pending<span class="tsd-signature-symbol">(</span>res<span class="tsd-signature-symbol">: </span><a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span>, prefix<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/fd55e05/src/lib/assertions.ts#L104">src/lib/assertions.ts:104</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/assertions.ts#L128">src/lib/assertions.ts:128</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Asserts that: The status endpoint replies with <code>202 Accepted</code>.</p>
+									<p>Asserts that:</p>
+									<ul>
+										<li>The status endpoint replies with <code>202 Accepted</code>.</li>
+										<li>No <code>content-location</code> header is present</li>
+										<li>If set, the <code>x-progress</code> header is less than than 100 characters long</li>
+										<li>If set, the <code>retry-after</code> header is valid HTTP Date in the future, or
+										a positive decimal integer</li>
+									</ul>
 								</div>
-								<p>Optionally, the server MAY return an <code>X-Progress</code> header with a text
-									description of the status of the request that’s less than 100 characters.
-									The format of this description is at the server’s discretion and may be a
-									percentage complete value, or a more general status such as “in progress”.
-								The client MAY parse the description, display it to the user, or log it.</p>
-								<p><strong>NOTE:</strong> This will only work if called after successful kick-off
+								<blockquote>
+									<p>Optionally, the server MAY return an <code>X-Progress</code> header with a text
+										description of the status of the request that’s less than 100 characters.
+										The format of this description is at the server’s discretion and may be a
+										percentage complete value, or a more general status such as “in progress”.
+									The client MAY parse the description, display it to the user, or log it.</p>
+								</blockquote>
+								<p><strong>NOTE:</strong> This will only work properly if called after successful kick-off
 								and before the export is complete!</p>
 								<dl class="tsd-comment-tags">
 									<dt>tutorial</dt>
@@ -250,18 +259,12 @@
 									<dd><pre><code class="language-ts"><span style="color: #1976D2">assert</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">bulkData</span><span style="color: #6F42C1">.</span><span style="color: #1976D2">status</span><span style="color: #6F42C1">.pending</span><span style="color: #24292EFF">(response, </span><span style="color: #22863A">&quot;The status must be pending&quot;</span><span style="color: #24292EFF">)</span>
 </code></pre>
 									</dd>
-									<dt>todo</dt>
-									<dd><p>Validate the <code>X-Progress</code> header length if present</p>
-									</dd>
-									<dt>todo</dt>
-									<dd><p>Validate the <code>retry-after</code> header if present</p>
-									</dd>
 								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>res: <a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="bulkdataclient.fhir.operationoutcome.html" class="tsd-signature-type" data-tsd-kind="Interface">OperationOutcome</a><span class="tsd-signature-symbol"> | </span><a href="bulkdataclient.bulkdata.exportmanifest.html" class="tsd-signature-type" data-tsd-kind="Interface">ExportManifest</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>res: <a href="../modules/bulkdataclient.bulkdata.html#statusresponse" class="tsd-signature-type" data-tsd-kind="Type alias">StatusResponse</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> prefix: <span class="tsd-signature-type">string</span></h5>
@@ -393,6 +396,15 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="../modules/assertions.html#expectfhirresourcetype" class="tsd-kind-icon">expect<wbr>Fhir<wbr>Resource<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/assertions.html#expecthttpdate" class="tsd-kind-icon">expect<wbr>Http<wbr>Date</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/assertions.html#expecthttpdateafter" class="tsd-kind-icon">expect<wbr>Http<wbr>Date<wbr>After</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/assertions.html#expecthttpdatebefore" class="tsd-kind-icon">expect<wbr>Http<wbr>Date<wbr>Before</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="../modules/assertions.html#expectjsonresponse" class="tsd-kind-icon">expect<wbr>Json<wbr>Response</a>

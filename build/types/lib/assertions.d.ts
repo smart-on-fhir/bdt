@@ -65,25 +65,28 @@ export interface StatusResponseAssertions {
      */
     notOK(res: BulkData.StatusResponse<FHIR.OperationOutcome>, prefix?: string): void;
     /**
-     * Asserts that: The status endpoint replies with `202 Accepted`.
+     * Asserts that:
+     * - The status endpoint replies with `202 Accepted`.
+     * - No `content-location` header is present
+     * - If set, the `x-progress` header is less than than 100 characters long
+     * - If set, the `retry-after` header is valid HTTP Date in the future, or
+     *   a positive decimal integer
      *
-     * Optionally, the server MAY return an `X-Progress` header with a text
-     * description of the status of the request that’s less than 100 characters.
-     * The format of this description is at the server’s discretion and may be a
-     * percentage complete value, or a more general status such as “in progress”.
-     * The client MAY parse the description, display it to the user, or log it.
+     * > Optionally, the server MAY return an `X-Progress` header with a text
+     *   description of the status of the request that’s less than 100 characters.
+     *   The format of this description is at the server’s discretion and may be a
+     *   percentage complete value, or a more general status such as “in progress”.
+     *   The client MAY parse the description, display it to the user, or log it.
      *
-     * **NOTE:** This will only work if called after successful kick-off
+     * **NOTE:** This will only work properly if called after successful kick-off
      * and before the export is complete!
      * @tutorial https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---in-progress-status
      * @example
      * ```ts
      * assert.bulkData.status.pending(response, "The status must be pending")
      * ```
-     * @todo Validate the `X-Progress` header length if present
-     * @todo Validate the `retry-after` header if present
      */
-    pending(res: BulkData.StatusResponse, prefix?: string): void;
+    pending(res: BulkData.StatusResponse<any>, prefix?: string): void;
 }
 /**
  * A set of assertions to verify the proper structure of the export manifest
@@ -190,6 +193,9 @@ export declare function expectFailedKickOff(response: Response, testApi: TestAPI
  * @category Response Assertion
  */
 export declare function expectSuccessfulKickOff(response: Response, testApi: TestAPI, prefix?: string): string | void;
+export declare function expectHttpDate(date: string, prefix?: string): void;
+export declare function expectHttpDateAfter(date: string, after?: string | null, prefix?: string): void;
+export declare function expectHttpDateBefore(date: string, before?: string | null, prefix?: string): void;
 /**
  * @category Response Assertion
  */

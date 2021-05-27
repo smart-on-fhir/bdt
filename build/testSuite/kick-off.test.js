@@ -737,10 +737,12 @@ bdt_1.suite("Kick-off Endpoint", () => {
                         });
                         await client.cancelIfStarted(response);
                         if (client.kickOffResponse.statusCode === 405) { // Method Not Allowed
-                            return api.setNotSupported(`system-level export via POST is not supported by this server`);
+                            // system-level export via POST is not supported by this server
+                            return api.setNotSupported();
                         }
                         if (client.kickOffResponse.statusCode == 404 || client.kickOffResponse.statusCode >= 500) {
-                            return api.setNotSupported(`It seems that system-level export via POST is not supported by this server`);
+                            // It seems that system-level export via POST is not supported by this server
+                            return api.setNotSupported();
                         }
                         assertions_1.expectFailedKickOff(response, api, "This kick-off request should have failed");
                     });

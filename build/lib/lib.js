@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUnfulfilledScopes = exports.scopeSet = exports.wait = exports.expectStatusText = exports.getErrorMessageFromResponse = exports.formatHttpError = exports.joinSentences = exports.truncate = exports.getPath = void 0;
+exports.getUnfulfilledScopes = exports.scopeSet = exports.wait = exports.expectStatusText = exports.roundToPrecision = exports.getErrorMessageFromResponse = exports.formatHttpError = exports.joinSentences = exports.truncate = exports.getPath = void 0;
 const code_1 = require("@hapi/code");
 /**
  * Walks thru an object (ar array) and returns the value found at the
@@ -85,6 +85,26 @@ function getErrorMessageFromResponse(response) {
     return msg;
 }
 exports.getErrorMessageFromResponse = getErrorMessageFromResponse;
+/**
+ * Rounds the given number @n using the specified precision.
+ * @param n
+ * @param [precision]
+ */
+function roundToPrecision(n, precision) {
+    n = parseFloat(n + "");
+    if (isNaN(n) || !isFinite(n)) {
+        return NaN;
+    }
+    if (!precision || isNaN(precision) || !isFinite(precision) || precision < 1) {
+        n = Math.round(n);
+    }
+    else {
+        const q = Math.pow(10, precision);
+        n = Math.round(n * q) / q;
+    }
+    return n;
+}
+exports.roundToPrecision = roundToPrecision;
 /**
  * Check if the given @response has the desired status @text
  * @param {request.Response} response The response to check

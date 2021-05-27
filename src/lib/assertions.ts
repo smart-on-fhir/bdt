@@ -1,6 +1,6 @@
 import { Response } from "got/dist/source"
 import { expect } from "@hapi/code";
-import { getErrorMessageFromResponse, getUnfulfilledScopes, scopeSet } from "./lib";
+import { getErrorMessageFromResponse, getUnfulfilledScopes, roundToPrecision, scopeSet } from "./lib";
 import { TestAPI } from "./TestAPI";
 import { OAuth, BulkData, FHIR } from "./BulkDataClient";
 import moment from "moment";
@@ -11,6 +11,27 @@ const REGEXP_INSTANT = new RegExp(
     ":[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?(Z|(\\+|-)((0[0-9]|1[0-3])" +
     ":[0-5][0-9]|14:00))"
 );
+
+const HTTP_DATE_FORMATS = [
+
+    // Preferred HTTP date (Sun, 06 Nov 1994 08:49:37 GMT)
+    moment.RFC_2822,
+
+    // Obsolete HTTP date (Sunday, 06-Nov-94 08:49:37 GMT)
+    "dddd, DD-MMM-YY HH:mm:ss ZZ",
+
+    // Obsolete HTTP date (Sun  Nov  6    08:49:37 1994)
+    "ddd MMM D HH:mm:ss YYYY",
+
+    // The following formats are often used (even though they shouldn't be):
+
+    // ISO_8601 (2020-12-24 19:50:58 +0000 UTC)
+    moment.ISO_8601,
+
+    // ISO_8601 with milliseconds (2020-12-24 19:50:58.997683 +0000 UTC)
+    "YYYY-MM-DD HH:mm:ss.SSS ZZ",
+    "YYYY-MM-DDTHH:mm:ss.SSS ZZ"
+];
 
 export interface AssertAPI {
     bulkData: BulkDataAssertion
@@ -83,25 +104,28 @@ export interface StatusResponseAssertions {
     notOK(res: BulkData.StatusResponse<FHIR.OperationOutcome>, prefix?: string): void
 
     /**
-     * Asserts that: The status endpoint replies with `202 Accepted`.
+     * Asserts that:
+     * - The status endpoint replies with `202 Accepted`.
+     * - No `content-location` header is present
+     * - If set, the `x-progress` header is less than than 100 characters long
+     * - If set, the `retry-after` header is valid HTTP Date in the future, or
+     *   a positive decimal integer
      * 
-     * Optionally, the server MAY return an `X-Progress` header with a text
-     * description of the status of the request that’s less than 100 characters.
-     * The format of this description is at the server’s discretion and may be a
-     * percentage complete value, or a more general status such as “in progress”.
-     * The client MAY parse the description, display it to the user, or log it.
+     * > Optionally, the server MAY return an `X-Progress` header with a text
+     *   description of the status of the request that’s less than 100 characters.
+     *   The format of this description is at the server’s discretion and may be a
+     *   percentage complete value, or a more general status such as “in progress”.
+     *   The client MAY parse the description, display it to the user, or log it.
      * 
-     * **NOTE:** This will only work if called after successful kick-off
+     * **NOTE:** This will only work properly if called after successful kick-off
      * and before the export is complete!
      * @tutorial https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---in-progress-status
      * @example
      * ```ts
      * assert.bulkData.status.pending(response, "The status must be pending")
      * ```
-     * @todo Validate the `X-Progress` header length if present
-     * @todo Validate the `retry-after` header if present
      */
-    pending(res: BulkData.StatusResponse, prefix?: string): void
+    pending(res: BulkData.StatusResponse<any>, prefix?: string): void
 }
 
 /**
@@ -503,6 +527,36 @@ export function expectSuccessfulKickOff(response: Response, testApi: TestAPI, pr
     }
 }
 
+export function expectHttpDate(date: string, prefix = "")
+{
+    const parsed = moment(date, HTTP_DATE_FORMATS).utc(true);
+    expect(parsed.isValid(), concat(prefix, `"${date}" is not valid HTTP date`)).to.be.true()
+}
+
+export function expectHttpDateAfter(date: string, after: string|null = null, prefix = "")
+{
+    expectHttpDate(date, prefix)
+    const parsed = moment(date, HTTP_DATE_FORMATS).utc(true);
+    const now = moment(after).utc(true);
+            
+    expect(
+        parsed.diff(now, "seconds") >= 0,
+        concat(prefix, `"${date}" should be at least a second after "${now}"`)
+    ).to.be.true();
+}
+
+export function expectHttpDateBefore(date: string, before: string|null = null, prefix = "")
+{
+    expectHttpDate(date, prefix)
+    const parsed = moment(date, HTTP_DATE_FORMATS).utc(true);
+    const now = moment(before).utc(true);
+            
+    expect(
+        now.diff(parsed, "seconds") >= 0,
+        concat(prefix, `"${date}" should be at least a second before "${now}"`)
+    ).to.be.true();
+}
+
 /**
  * @category Response Assertion
  */
@@ -513,51 +567,12 @@ export function expectSuccessfulExport(response: Response, prefix = "")
     expectJsonResponse(response, concat(prefix, error))
 
     // The server MAY return an Expires header indicating when the files listed will no longer be available.
+    // Note that comparing with "now" might be unreliable due to small time differences between
+    // the host machine that executes the tests and the server. For that reason we also check if
+    // the server returns a "date" header and if so, we verify that "expires" is after "date".
     const { expires, date } = response.headers
     if (expires) {
-        expect(() => {
-            expect(expires, concat(prefix, "the expires header must be a string if present")).to.be.a.string();
-
-            // If expires header is present, make sure it is in the future.
-            const expiresMoment = moment(expires, [
-
-                // Preferred HTTP date (Sun, 06 Nov 1994 08:49:37 GMT)
-                moment.RFC_2822,
-
-                // Obsolete HTTP date (Sunday, 06-Nov-94 08:49:37 GMT)
-                "dddd, DD-MMM-YY HH:mm:ss ZZ",
-
-                // Obsolete HTTP date (Sun  Nov  6    08:49:37 1994)
-                "ddd MMM D HH:mm:ss YYYY",
-
-                // The following formats are often used (even though they shouldn't be):
-
-                // ISO_8601 (2020-12-24 19:50:58 +0000 UTC)
-                moment.ISO_8601,
-
-                // ISO_8601 with milliseconds (2020-12-24 19:50:58.997683 +0000 UTC)
-                "YYYY-MM-DD HH:mm:ss.SSS ZZ",
-                "YYYY-MM-DDTHH:mm:ss.SSS ZZ"
-            ]).utc(true);
-
-            const now = moment().utc(true);
-            expect(
-                expiresMoment.diff(now, "seconds") > 0,
-                concat(prefix, "The expires header of the status response should be a date in the future")
-            ).to.be.true();
-
-            // Note that the above assertion might be unreliable due to small time differences between
-            // the host machine that executes the tests and the server. For that reason we also check if
-            // the server returns a "time" header and if so, we verify that "expires" is after "time".
-            if (date) {
-                const dateMoment = moment(date).utc(true);
-                expect(
-                    expiresMoment.diff(dateMoment, "seconds") > 0,
-                    concat(prefix, "The expires header of the status response should be a date after the one in the date header")
-                ).to.be.true();
-            }
-
-        }, "Invalid expires header")
+        expectHttpDateAfter(expires, date || null, concat(prefix, "Invalid 'expires' header"))
     }
 }
 
@@ -662,7 +677,41 @@ export const assert: AssertAPI = {
         status: {
             OK: expectSuccessfulExport,
             notEmpty: expectExportNotEmpty,
-            pending: (res: Response, prefix="") => expectResponseCode(res, 202, prefix),
+            pending: (res: Response, prefix="") => {
+                expectResponseCode(res, 202, concat(prefix, "While pending, the status endpoint should reply with 202 status code"))
+
+                const xProgress  = res.headers["x-progress"]
+                if (xProgress) {
+                    expect(xProgress.length, concat(prefix, "The x-progress cannot be more than 100 characters long")).to.be.below(100)
+                }
+
+                // The Retry-After response HTTP header indicates how long the user agent
+                // should wait before making a follow-up request.
+                let retryAfter = res.headers["retry-after"]
+                if (retryAfter) {
+                    const isDate = retryAfter.indexOf("-") > 0;
+
+                    // http-date
+                    if (isDate) {
+                        expectHttpDateBefore(retryAfter, null, "Invalid retry-after header")
+                    }
+
+                    // delay-seconds
+                    else {
+                        const seconds = parseFloat(retryAfter)
+
+                        expect(
+                            !isNaN(seconds) && isFinite(seconds) && seconds > 0,
+                            concat(prefix, "A numeric retry-after header should be valid positive number")
+                        ).to.be.true()
+
+                        expect(
+                            retryAfter,
+                            concat(prefix, "A numeric retry-after header should be an integer or decimal integer")
+                        ).to.equal(String(roundToPrecision(retryAfter, 2)))
+                    }
+                }
+            },
             notOK: (res: Response, prefix="") => expectClientError(res, prefix)
         },
         download: {
