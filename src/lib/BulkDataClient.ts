@@ -1,5 +1,5 @@
 import Request, { NormalizedOptions } from "got/dist/source/core"
-import got, { HTTPError, OptionsOfJSONResponseBody, RequestError, Response } from "got"
+import got, { HTTPError, OptionsOfJSONResponseBody, OptionsOfUnknownResponseBody, RequestError, Response } from "got"
 import { NotSupportedError } from "./errors"
 import {
     formatHttpError,
@@ -7,9 +7,10 @@ import {
     wait
 } from "./lib";
 import { TestAPI } from "./TestAPI"
-import { expectSuccessfulKickOff } from "./assertions"
+import { expectSuccessfulKickOff, HTTP_DATE_FORMATS } from "./assertions"
 import { createAuthToken, createAuthTokenOptions, SupportedJWKAlgorithm } from "./auth"
 import { NormalizedConfig } from "./Config"
+import moment from "moment";
 
 export namespace FHIR {
     
@@ -259,10 +260,11 @@ export namespace OAuth {
 
 export type exportType = "system" | "patient" | "group"
 
-export interface requestOptions extends OptionsOfJSONResponseBody {
+export interface requestOptions extends OptionsOfUnknownResponseBody {
     skipAuth?: boolean
     requestLabel?: string
     responseLabel?: string
+    
 }
 
 export interface requestOptionsWithUrl extends requestOptions {
@@ -422,9 +424,10 @@ export class BulkDataClient
 
         let requestError: RequestError;
         
-        let requestOptions: OptionsOfJSONResponseBody = {
+        let requestOptions: OptionsOfUnknownResponseBody = {
             isStream: false,
             resolveBodyOnly: false,
+            responseType: "text",
             timeout: this.options.requests.timeout,
             retry: {
                 limit: 0
@@ -439,8 +442,8 @@ export class BulkDataClient
             ...gotOptions,
             headers: {
                 'user-agent': 'BDT (https://github.com/smart-on-fhir/bdt)',
+                ...this.options.requests.customHeaders,
                 ...gotOptions.headers,
-                ...this.options.requests.customHeaders
             },
             hooks: {
                 beforeRequest: [
@@ -486,21 +489,32 @@ export class BulkDataClient
             };
         }
 
-        // console.log(requestOptions)
+        // requestOptions.responseType = requestOptions.headers.accept ? "json" : "text"
 
-        const result = await got<BodyType>(requestOptions)
+        // if (requestOptions.method == "POST")
+        //     console.log(requestOptions)
+        // console.log(requestOptions.url.toString(), requestOptions)
+
+        const result = await got(requestOptions)
+
+        if (result.statusCode === 401 && requestOptions.headers.authorization) {
+            this.accessToken = null
+            return this.request<BodyType>(options)
+        }
+
+        // console.log(result.request.requestUrl, result.request.options.headers)
 
         // let body = result.body
-        if (typeof result.body === "string" && result.headers["content-type"]?.match(/^application\/(json|fhir+json)/)) {
+        if (typeof result.body === "string" && result.headers["content-type"]?.match(/^application\/(json|fhir+json|json+fhir)/)) {
             result.body = JSON.parse(result.body)
         }
 
         return {
-            response: result,
+            response: <unknown>result as Response<BodyType>,
             request : result.request,
             options : result.request.options,
             error   : requestError || null,
-            body    : result.body
+            body    : <unknown>result.body as BodyType
         }
     }
  
@@ -679,14 +693,16 @@ export class BulkDataClient
         }
  
         const url = new URL(path, baseURL.replace(/\/*$/, "/"));
+
+        if (rest.method === "POST") {
+            rest.json = rest.json || {
+                resourceType: "Parameters",
+                parameter: []
+            };
+        }
         
         if (params && typeof params == "object") {
             if (rest.method === "POST") {
-                rest.json = {
-                    resourceType: "Parameters",
-                    parameter: []
-                };
-
                 function asArray(x: any): any[] {
                     return Array.isArray(x) ? x : [x]
                 }
@@ -774,6 +790,8 @@ export class BulkDataClient
             requestLabel : labelPrefix + "Kick-off Request",
             responseLabel: labelPrefix + "Kick-off Response",
             skipAuth,
+            followRedirect: false,
+            maxRedirects: 0,
             headers: {
                 accept: "application/fhir+json",
                 prefer: "respond-async",
@@ -782,6 +800,8 @@ export class BulkDataClient
         };
 
         const result = await this.request<Record<string, any>>(requestOptions) 
+
+        // console.log(result.request.requestUrl, result.request.options.headers, result.response.statusCode, result.body)
 
         this.kickOffRequest  = result.request
         this.kickOffResponse = result.response
@@ -890,6 +910,47 @@ export class BulkDataClient
             return this.waitForExport(suffix + 1);
         }
     }
+
+    /**
+     */
+     async getExportManifest(res: Response, suffix = 1): Promise<BulkData.ExportManifest>
+     {
+         if (!res.headers["content-location"]) {
+             throw new Error(
+                 "Trying to wait for export but the kick-off response did " +
+                 "not include a content-location header"
+             );
+         }
+ 
+         const { response } = await this.request<BulkData.ExportManifest>({
+             url : res.headers["content-location"],
+             responseType : "json",
+             requestLabel : "Status Request "  + suffix,
+             responseLabel: "Status Response " + suffix
+         });
+ 
+         if (response.statusCode === 202) {
+             let retryAfterSeconds = 0; 
+             let retryAfter = response.headers["retry-after"] || ""
+             if (retryAfter.match(/^\d(\.\d+)$/)) {
+                retryAfterSeconds = Math.floor(parseFloat(retryAfter))
+             } else if (retryAfter) {
+                retryAfterSeconds = moment(retryAfter, HTTP_DATE_FORMATS).diff(moment(), "seconds")
+             } else {
+                retryAfterSeconds = Math.min(1 + suffix, 10);
+             }
+
+             await wait(retryAfterSeconds * 1000);
+             return this.getExportManifest(res, suffix + 1);
+         }
+
+         if (response.statusCode === 200) {
+             return response.body
+         }
+
+         console.log(response.statusCode, response.body)
+         throw new Error("Could not get export manifest")
+     }
  
     /**
      * Starts an export if not started already and resolves with the response
@@ -941,6 +1002,7 @@ export class BulkDataClient
             url: fileUrl,
             requestLabel: "Download Request",
             responseLabel: "Download Response",
+            responseType: "text",
             ...options,
             headers: {
                 accept: "application/fhir+ndjson",

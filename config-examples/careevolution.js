@@ -2,7 +2,7 @@
 
 /**
  * Use this to template define new configurations
- * @type { BDT.ServerConfig }
+ * @type { import("../src/lib/Config").ServerConfig }
  */
 module.exports = {
 

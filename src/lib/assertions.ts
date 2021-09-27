@@ -12,7 +12,7 @@ const REGEXP_INSTANT = new RegExp(
     ":[0-5][0-9]|14:00))"
 );
 
-const HTTP_DATE_FORMATS = [
+export const HTTP_DATE_FORMATS = [
 
     // Preferred HTTP date (Sun, 06 Nov 1994 08:49:37 GMT)
     moment.RFC_2822,

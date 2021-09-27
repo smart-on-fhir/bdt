@@ -753,7 +753,7 @@ suite("Kick-off Endpoint", () => {
                     
                 });
 
-                // patient ----------------------------------------------------
+                // patient -----------------------------------------------------
                 if (type !== "system") {
                     test({
                         name: `Supports the patient parameter via the ${type}-export endpoint`,
@@ -769,10 +769,10 @@ suite("Kick-off Endpoint", () => {
                                 _type: "Patient"
                             }
                         });
-        
+
                         const file = await client.downloadFileAt(0);
                         await client.cancel(kickOffResponse1);
-        
+
                         const lines = file.body.split(/\r?\n/);
         
                         let patient;
@@ -808,7 +808,7 @@ suite("Kick-off Endpoint", () => {
                                 ]
                             }
                         });
-        
+
                         await client.waitForExport();
                         const file2 = await client.downloadFile(client.statusResponse.body.output[0].url);
                         await client.cancel(kickOffResponse2);
