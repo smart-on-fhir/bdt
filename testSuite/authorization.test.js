@@ -626,44 +626,44 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                 ).to.be.within(400, 403);
             });
 
-            it ({
-                id  : `Auth-14`,
-                name: "Supports wildcard action scopes",
-                description: "Verifies that scopes like `system/Patient.*` are supported"
-            }, async (cfg, api) => {
+            // it ({
+            //     id  : `Auth-14`,
+            //     name: "Supports wildcard action scopes",
+            //     description: "Verifies that scopes like `system/Patient.*` are supported"
+            // }, async (cfg, api) => {
 
-                api.prerequisite({
-                    assertion: cfg.authType == "backend-services",
-                    message: "This test is only applicable for servers that support SMART Backend Services authorization"
-                }, {
-                    assertion: cfg.privateKey,
-                    message: "No privateKey configuration found for this server"
-                });
+            //     api.prerequisite({
+            //         assertion: cfg.authType == "backend-services",
+            //         message: "This test is only applicable for servers that support SMART Backend Services authorization"
+            //     }, {
+            //         assertion: cfg.privateKey,
+            //         message: "No privateKey configuration found for this server"
+            //     });
 
-                const req = request({
-                    method   : "POST",
-                    uri      : cfg.tokenEndpoint,
-                    json     : true,
-                    strictSSL: cfg.strictSSL,
-                    headers  : { ...cfg.customHeaders },
-                    form: {
-                        scope                : "system/Patient.*",
-                        grant_type           : "client_credentials",
-                        client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-                        client_assertion     : createClientAssertion({
-                            aud: cfg.tokenEndpoint,
-                            iss: cfg.clientId,
-                            sub: cfg.clientId
-                        }, {}, cfg.privateKey)
-                    }
-                });
+            //     const req = request({
+            //         method   : "POST",
+            //         uri      : cfg.tokenEndpoint,
+            //         json     : true,
+            //         strictSSL: cfg.strictSSL,
+            //         headers  : { ...cfg.customHeaders },
+            //         form: {
+            //             scope                : "system/Patient.*",
+            //             grant_type           : "client_credentials",
+            //             client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+            //             client_assertion     : createClientAssertion({
+            //                 aud: cfg.tokenEndpoint,
+            //                 iss: cfg.clientId,
+            //                 sub: cfg.clientId
+            //             }, {}, cfg.privateKey)
+            //         }
+            //     });
 
-                api.logRequest(req);
-                const { response } = await req.promise();
-                api.logResponse(response);
+            //     api.logRequest(req);
+            //     const { response } = await req.promise();
+            //     api.logResponse(response);
 
-                expect(response.statusCode, getResponseError(response)).to.equal(200);
-            });
+            //     expect(response.statusCode, getResponseError(response)).to.equal(200);
+            // });
 
             it ({
                 id  : `Auth-15`,
