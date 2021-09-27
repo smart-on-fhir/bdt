@@ -10,7 +10,8 @@ const {
     authenticate,
     getResponseError,
     BulkDataClient,
-    NotSupportedError
+    NotSupportedError,
+    isJsonResponse
 } = require("./lib");
 
 
@@ -73,14 +74,17 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                         client.kickOffResponse,
                         "The server must not accept kick-off requests without authorization header"
                     );
-                    expectJson(
-                        client.kickOffResponse,
-                        "The body SHALL be a FHIR OperationOutcome resource in JSON format"
-                    );
-                    expectOperationOutcome(
-                        client.kickOffResponse,
-                        "The body SHALL be a FHIR OperationOutcome resource in JSON format"
-                    );
+
+                    // The body SHALL be a FHIR OperationOutcome resource in JSON format
+                    // but replying with an OperationOutcome is optional. This should
+                    // mean that if the server replies with JSON, then the body must be
+                    // an OperationOutcome.
+                    if (isJsonResponse(client.kickOffResponse)) {
+                        expectOperationOutcome(
+                            client.kickOffResponse,
+                            "The body SHALL be a FHIR OperationOutcome resource in JSON format"
+                        );
+                    }
                 });
 
                 it ({

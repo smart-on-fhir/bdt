@@ -161,14 +161,21 @@ function expectJson(
         "application/json, application/json+fhir or application/fhir+json)"
 )
 {
-    expect(
-        [
-            "application/json",
-            "application/json+fhir",
-            "application/fhir+json"
-        ],
-        message + "." + getResponseError(response)
-    ).to.include(String(response.headers["content-type"] || "").toLowerCase().split(";").shift());
+    expect(isJsonResponse(response), message + "." + getResponseError(response)).to.be.true();
+}
+
+/**
+ * Check if the response comes with a JSON(-like) content-type header
+ * @param {request.Response} response The response to check
+ * @returns {boolean}
+ */
+function isJsonResponse(response) {
+    const ct = String(response.headers["content-type"] || "").toLowerCase().split(";").shift();
+    return [
+        "application/json",
+        "application/json+fhir",
+        "application/fhir+json"
+    ].includes(ct + "");
 }
 
 /**
@@ -194,7 +201,7 @@ function expectOperationOutcome(response, message = "")
             );
         }
     }
-    else if (response.headers["content-type"].startsWith("application/json")) {
+    else if (isJsonResponse(response)) {
         let body;
         if (typeof response.body == "string") {
             try {    
@@ -919,6 +926,7 @@ class NotSupportedError extends Error {}
 module.exports = {
     request: customRequest,
     createClientAssertion,
+    isJsonResponse,
     expectOperationOutcome,
     expectStatusCode,
     expectUnauthorized,
