@@ -21,7 +21,6 @@ APP
     .option("-m, --match [RegExp]"       , "JS case-insensitive RegExp to run against the test name", "");
 
 APP.action(args => {
-    console.log(args)
 
     const { config, apiVersion, bail, match, reporter, pattern, list, path } = args;
 
