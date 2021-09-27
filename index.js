@@ -18,36 +18,41 @@ APP
     .option("-c, --config [path]"        , "Path to the config file to load. Defaults to './config.js'", "./config.js")
     .option("-v, --api-version [version]", "Bulk Data API version to test for. Example \"1.0\", \"1.2\", \"1.5\"", "1.0")
     .option("-b, --bail"                 , "Exit on first error")
-    .option("-m, --match [RegExp]"       , "JS case-insensitive RegExp to run against the test name", "")
-    .parse(process.argv);
+    .option("-m, --match [RegExp]"       , "JS case-insensitive RegExp to run against the test name", "");
 
+APP.action(args => {
+    console.log(args)
 
-try {
-    Object.assign(settings, require(Path.resolve(__dirname, APP.config)));
-} catch (ex) {
-    console.error(`Failed to load settings from "${APP.config}". ${ex.message}`);
-    process.exit(1);
-}
+    const { config, apiVersion, bail, match, reporter, pattern, list, path } = args;
 
-// 1. Create a runner with the given settings
-const runner = new bdt.Runner({
-    ...settings,
-    cli: true,
-    version: APP.apiVersion,
-    bail: !!APP.bail,
-    match: APP.match
+    try {
+        Object.assign(settings, require(Path.resolve(__dirname, config)));
+    } catch (ex) {
+        console.error(`Failed to load settings from "${config}". ${ex.message}`);
+        process.exit(1);
+    }
+    
+    // 1. Create a runner with the given settings
+    const runner = new bdt.Runner({
+        ...settings,
+        cli: true,
+        version: apiVersion,
+        bail: !!bail,
+        match: match
+    });
+    
+    // 2. Create and attach a reporter
+    reporters[reporter]().attach(runner);
+    
+    // 3. Load tests
+    bdt.load(pattern);
+    
+    // 4. Execute tests or output the structure
+    if (list) {
+        console.log(JSON.stringify(bdt.getPath(path, apiVersion)));
+    } else {
+        runner.run(bdt.getPath(path, apiVersion));
+    }
 });
 
-// 2. Create and attach a reporter
-const reporter = reporters[APP.reporter]();
-reporter.attach(runner);
-
-// 3. Load tests
-bdt.load(APP.pattern);
-
-// 4. Execute tests or output the structure
-if (APP.list) {
-    console.log(JSON.stringify(bdt.getPath(APP.path, APP.apiVersion)));
-} else {
-    runner.run(bdt.getPath(APP.path, APP.apiVersion));
-}
+APP.parse(process.argv);
