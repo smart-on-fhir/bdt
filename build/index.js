@@ -26,6 +26,7 @@ const path_1 = __importDefault(require("path"));
 const commander_1 = __importStar(require("commander"));
 const bdt_1 = require("./lib/bdt");
 const Config_1 = __importDefault(require("./lib/Config"));
+const index_1 = __importDefault(require("./lib/audit/index"));
 require("colors");
 const program = new commander_1.Command();
 program.version("2.0.0");
@@ -39,6 +40,28 @@ program
     .description('output loaded test tree structure as JSON')
     .action(() => {
     console.log('read config from %s', program.opts().config);
+});
+program
+    .command("audit")
+    .description('Generates audit report')
+    .action(async () => {
+    const args = program.opts();
+    const options = {
+        cli: true,
+        apiVersion: args.apiVersion
+    };
+    const configPath = path_1.default.resolve(process.cwd(), args.config);
+    try {
+        const serverOptions = require(configPath);
+        const config = new Config_1.default(serverOptions);
+        const normalizedConfig = await config.normalize();
+        Object.assign(options, normalizedConfig);
+    }
+    catch (ex) {
+        console.error(`Failed to load settings from "${configPath}".\n`, ex.message.red);
+        process.exit(1);
+    }
+    index_1.default(options);
 });
 program
     .command('test') // { isDefault: true }

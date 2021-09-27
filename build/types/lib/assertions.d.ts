@@ -1,6 +1,8 @@
 import { Response } from "got/dist/source";
 import { TestAPI } from "./TestAPI";
 import { OAuth, BulkData, FHIR } from "./BulkDataClient";
+import moment from "moment";
+export declare const HTTP_DATE_FORMATS: (string | moment.MomentBuiltinFormat)[];
 export interface AssertAPI {
     bulkData: BulkDataAssertion;
     response: ResponseAssertions;

@@ -9,6 +9,7 @@ const errors_1 = require("./errors");
 const lib_1 = require("./lib");
 const assertions_1 = require("./assertions");
 const auth_1 = require("./auth");
+const moment_1 = __importDefault(require("moment"));
 /**
  * Implements all the interactions with a bulk-data server that tests may need
  * to use. Helps keeping the tests clean and readable.
@@ -106,6 +107,7 @@ class BulkDataClient {
         let requestOptions = {
             isStream: false,
             resolveBodyOnly: false,
+            responseType: "text",
             timeout: this.options.requests.timeout,
             retry: {
                 limit: 0
@@ -119,8 +121,8 @@ class BulkDataClient {
             ...gotOptions,
             headers: {
                 'user-agent': 'BDT (https://github.com/smart-on-fhir/bdt)',
+                ...this.options.requests.customHeaders,
                 ...gotOptions.headers,
-                ...this.options.requests.customHeaders
             },
             hooks: {
                 beforeRequest: [
@@ -161,10 +163,18 @@ class BulkDataClient {
                 authorization: "Bearer " + accessToken
             };
         }
-        // console.log(requestOptions)
+        // requestOptions.responseType = requestOptions.headers.accept ? "json" : "text"
+        // if (requestOptions.method == "POST")
+        //     console.log(requestOptions)
+        // console.log(requestOptions.url.toString(), requestOptions)
         const result = await got_1.default(requestOptions);
+        if (result.statusCode === 401 && requestOptions.headers.authorization) {
+            this.accessToken = null;
+            return this.request(options);
+        }
+        // console.log(result.request.requestUrl, result.request.options.headers)
         // let body = result.body
-        if (typeof result.body === "string" && result.headers["content-type"]?.match(/^application\/(json|fhir+json)/)) {
+        if (typeof result.body === "string" && result.headers["content-type"]?.match(/^application\/(json|fhir+json|json+fhir)/)) {
             result.body = JSON.parse(result.body);
         }
         return {
@@ -308,12 +318,14 @@ class BulkDataClient {
             }
         }
         const url = new URL(path, baseURL.replace(/\/*$/, "/"));
+        if (rest.method === "POST") {
+            rest.json = rest.json || {
+                resourceType: "Parameters",
+                parameter: []
+            };
+        }
         if (params && typeof params == "object") {
             if (rest.method === "POST") {
-                rest.json = {
-                    resourceType: "Parameters",
-                    parameter: []
-                };
                 function asArray(x) {
                     return Array.isArray(x) ? x : [x];
                 }
@@ -389,6 +401,8 @@ class BulkDataClient {
             requestLabel: labelPrefix + "Kick-off Request",
             responseLabel: labelPrefix + "Kick-off Response",
             skipAuth,
+            followRedirect: false,
+            maxRedirects: 0,
             headers: {
                 accept: "application/fhir+json",
                 prefer: "respond-async",
@@ -396,6 +410,7 @@ class BulkDataClient {
             }
         };
         const result = await this.request(requestOptions);
+        // console.log(result.request.requestUrl, result.request.options.headers, result.response.statusCode, result.body)
         this.kickOffRequest = result.request;
         this.kickOffResponse = result.response;
         if (result.error) {
@@ -483,6 +498,40 @@ class BulkDataClient {
         }
     }
     /**
+     */
+    async getExportManifest(res, suffix = 1) {
+        if (!res.headers["content-location"]) {
+            throw new Error("Trying to wait for export but the kick-off response did " +
+                "not include a content-location header");
+        }
+        const { response } = await this.request({
+            url: res.headers["content-location"],
+            responseType: "json",
+            requestLabel: "Status Request " + suffix,
+            responseLabel: "Status Response " + suffix
+        });
+        if (response.statusCode === 202) {
+            let retryAfterSeconds = 0;
+            let retryAfter = response.headers["retry-after"] || "";
+            if (retryAfter.match(/^\d(\.\d+)$/)) {
+                retryAfterSeconds = Math.floor(parseFloat(retryAfter));
+            }
+            else if (retryAfter) {
+                retryAfterSeconds = moment_1.default(retryAfter, assertions_1.HTTP_DATE_FORMATS).diff(moment_1.default(), "seconds");
+            }
+            else {
+                retryAfterSeconds = Math.min(1 + suffix, 10);
+            }
+            await lib_1.wait(retryAfterSeconds * 1000);
+            return this.getExportManifest(res, suffix + 1);
+        }
+        if (response.statusCode === 200) {
+            return response.body;
+        }
+        console.log(response.statusCode, response.body);
+        throw new Error("Could not get export manifest");
+    }
+    /**
      * Starts an export if not started already and resolves with the response
      * of the completed status request
      */
@@ -531,6 +580,7 @@ class BulkDataClient {
             url: fileUrl,
             requestLabel: "Download Request",
             responseLabel: "Download Response",
+            responseType: "text",
             ...options,
             headers: {
                 accept: "application/fhir+ndjson",

@@ -3,6 +3,7 @@ import commander, { Command } from "commander"
 import { bdt }     from "./lib/bdt"
 import Config from "./lib/Config";
 import { Config as ConfigType } from "./lib/bdt"
+import audit from "./lib/audit/index"
 import "colors"
 
 
@@ -23,6 +24,33 @@ program
     .description('output loaded test tree structure as JSON')
     .action(() => {
         console.log('read config from %s', program.opts().config);
+    });
+
+program
+    .command("audit")
+    .description('Generates audit report')
+    .action(async () => {
+        const args = program.opts();
+        const options: Partial<ConfigType> = {
+            cli       : true,
+            apiVersion: args.apiVersion
+        };
+
+        const configPath = Path.resolve(process.cwd(), args.config);
+        try {
+            const serverOptions = require(configPath);
+            const config = new Config(serverOptions)
+            const normalizedConfig = await config.normalize()
+            Object.assign(options, normalizedConfig)
+        } catch (ex) {
+            console.error(
+                `Failed to load settings from "${configPath}".\n`,
+                ex.message.red
+            );
+            process.exit(1);
+        }
+
+        audit(options as ConfigType)
     });
 
 program

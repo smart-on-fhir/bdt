@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.assert = exports.expectValidManifestEntry = exports.expectNDJSONElements = exports.expectExportNotEmpty = exports.expectSuccessfulDownload = exports.expectSuccessfulExport = exports.expectHttpDateBefore = exports.expectHttpDateAfter = exports.expectHttpDate = exports.expectSuccessfulKickOff = exports.expectFailedKickOff = exports.expectSuccessfulAuth = exports.expectOAuthErrorType = exports.expectOAuthError = exports.expectUnauthorized = exports.expectOperationOutcome = exports.expectFhirResourceType = exports.expectFhirResource = exports.expectNDJsonResponse = exports.expectJsonResponse = exports.expectClientError = exports.expectResponseText = exports.expectResponseCode = exports.concat = void 0;
+exports.assert = exports.expectValidManifestEntry = exports.expectNDJSONElements = exports.expectExportNotEmpty = exports.expectSuccessfulDownload = exports.expectSuccessfulExport = exports.expectHttpDateBefore = exports.expectHttpDateAfter = exports.expectHttpDate = exports.expectSuccessfulKickOff = exports.expectFailedKickOff = exports.expectSuccessfulAuth = exports.expectOAuthErrorType = exports.expectOAuthError = exports.expectUnauthorized = exports.expectOperationOutcome = exports.expectFhirResourceType = exports.expectFhirResource = exports.expectNDJsonResponse = exports.expectJsonResponse = exports.expectClientError = exports.expectResponseText = exports.expectResponseCode = exports.concat = exports.HTTP_DATE_FORMATS = void 0;
 const code_1 = require("@hapi/code");
 const lib_1 = require("./lib");
 const moment_1 = __importDefault(require("moment"));
@@ -11,7 +11,7 @@ const REGEXP_INSTANT = new RegExp("([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9
     "(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3])" +
     ":[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?(Z|(\\+|-)((0[0-9]|1[0-3])" +
     ":[0-5][0-9]|14:00))");
-const HTTP_DATE_FORMATS = [
+exports.HTTP_DATE_FORMATS = [
     // Preferred HTTP date (Sun, 06 Nov 1994 08:49:37 GMT)
     moment_1.default.RFC_2822,
     // Obsolete HTTP date (Sunday, 06-Nov-94 08:49:37 GMT)
@@ -300,20 +300,20 @@ function expectSuccessfulKickOff(response, testApi, prefix = "") {
 }
 exports.expectSuccessfulKickOff = expectSuccessfulKickOff;
 function expectHttpDate(date, prefix = "") {
-    const parsed = moment_1.default(date, HTTP_DATE_FORMATS).utc(true);
+    const parsed = moment_1.default(date, exports.HTTP_DATE_FORMATS).utc(true);
     code_1.expect(parsed.isValid(), concat(prefix, `"${date}" is not valid HTTP date`)).to.be.true();
 }
 exports.expectHttpDate = expectHttpDate;
 function expectHttpDateAfter(date, after = null, prefix = "") {
     expectHttpDate(date, prefix);
-    const parsed = moment_1.default(date, HTTP_DATE_FORMATS).utc(true);
+    const parsed = moment_1.default(date, exports.HTTP_DATE_FORMATS).utc(true);
     const now = moment_1.default(after).utc(true);
     code_1.expect(parsed.diff(now, "seconds") >= 0, concat(prefix, `"${date}" should be at least a second after "${now}"`)).to.be.true();
 }
 exports.expectHttpDateAfter = expectHttpDateAfter;
 function expectHttpDateBefore(date, before = null, prefix = "") {
     expectHttpDate(date, prefix);
-    const parsed = moment_1.default(date, HTTP_DATE_FORMATS).utc(true);
+    const parsed = moment_1.default(date, exports.HTTP_DATE_FORMATS).utc(true);
     const now = moment_1.default(before).utc(true);
     code_1.expect(now.diff(parsed, "seconds") >= 0, concat(prefix, `"${date}" should be at least a second before "${now}"`)).to.be.true();
 }

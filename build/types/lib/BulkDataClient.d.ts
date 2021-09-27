@@ -1,5 +1,5 @@
 import Request, { NormalizedOptions } from "got/dist/source/core";
-import { OptionsOfJSONResponseBody, RequestError, Response } from "got";
+import { OptionsOfUnknownResponseBody, RequestError, Response } from "got";
 import { TestAPI } from "./TestAPI";
 import { createAuthTokenOptions } from "./auth";
 import { NormalizedConfig } from "./Config";
@@ -217,7 +217,7 @@ export declare namespace OAuth {
     }
 }
 export declare type exportType = "system" | "patient" | "group";
-export interface requestOptions extends OptionsOfJSONResponseBody {
+export interface requestOptions extends OptionsOfUnknownResponseBody {
     skipAuth?: boolean;
     requestLabel?: string;
     responseLabel?: string;
@@ -373,6 +373,9 @@ export declare class BulkDataClient {
      * @todo: Use the retry-after header if available
      */
     waitForExport(suffix?: number): Promise<void>;
+    /**
+     */
+    getExportManifest(res: Response, suffix?: number): Promise<BulkData.ExportManifest>;
     /**
      * Starts an export if not started already and resolves with the response
      * of the completed status request

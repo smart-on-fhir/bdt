@@ -643,7 +643,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     //     });
                     // });
                 });
-                // patient ----------------------------------------------------
+                // patient -----------------------------------------------------
                 if (type !== "system") {
                     bdt_1.test({
                         name: `Supports the patient parameter via the ${type}-export endpoint`,
