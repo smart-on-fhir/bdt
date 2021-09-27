@@ -64,7 +64,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                             message: "This server does not require authorization"
                         }
                     );
-                    
+
                     const client = new BulkDataClient(cfg, api);
                     await client.kickOff({ type, skipAuth: true });
                     client.cancelIfStarted();
@@ -73,14 +73,17 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                         client.kickOffResponse,
                         "The server must not accept kick-off requests without authorization header"
                     );
-                    expectJson(
-                        client.kickOffResponse,
-                        "The body SHALL be a FHIR OperationOutcome resource in JSON format"
-                    );
-                    expectOperationOutcome(
-                        client.kickOffResponse,
-                        "The body SHALL be a FHIR OperationOutcome resource in JSON format"
-                    );
+
+                    // @see https://github.com/smart-on-fhir/bdt/issues/7
+                    // TODO: if JSON body, then expect oo...
+                    // expectJson(
+                    //     client.kickOffResponse,
+                    //     "The body SHALL be a FHIR OperationOutcome resource in JSON format"
+                    // );
+                    // expectOperationOutcome(
+                    //     client.kickOffResponse,
+                    //     "The body SHALL be a FHIR OperationOutcome resource in JSON format"
+                    // );
                 });
 
                 it ({
@@ -495,7 +498,7 @@ module.exports = function(describe, it, before, after, beforeEach, afterEach) {
                 ).to.be.within(400, 401);
             });
 
-            it ({
+            it ({ // @see https://chat.fhir.org/#narrow/stream/179250-bulk-data/topic/Can.20an.20auth.20server.20allow.20requests.20with.20no.20scope.3F
                 id  : `Auth-11`,
                 name: "Requires scope",
                 description: "The server should reject requests to the token endpoint that do not specify a scope"
