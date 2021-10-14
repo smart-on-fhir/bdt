@@ -497,9 +497,9 @@ export class BulkDataClient
 
         const result = await got(requestOptions)
 
-        if (result.statusCode === 401 && requestOptions.headers.authorization) {
+        if (result.statusCode === 401 && requestOptions.headers.authorization && !options.context?.retried) {
             this.accessToken = null
-            return this.request<BodyType>(options)
+            return this.request<BodyType>({ ...options, context: { ...options.context, retried: true }})
         }
 
         // console.log(result.request.requestUrl, result.request.options.headers)
@@ -792,6 +792,7 @@ export class BulkDataClient
             skipAuth,
             followRedirect: false,
             maxRedirects: 0,
+            // throwHttpErrors: true,
             headers: {
                 accept: "application/fhir+json",
                 prefer: "respond-async",
@@ -806,7 +807,7 @@ export class BulkDataClient
         this.kickOffRequest  = result.request
         this.kickOffResponse = result.response
 
-        
+        // console.log(result)
         if (result.error) {
             if (result.response.statusCode === 401 && !skipAuth) {
                 const { optional, clientId, type, privateKey, clientSecret } = this.options.authentication

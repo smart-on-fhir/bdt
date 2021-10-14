@@ -3,6 +3,9 @@
   "version": "2.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": ">=14"
+  },
   "scripts": {
     "test": "lab -v --sourcemaps --transform node_modules/lab-transform-typescript ./test/*.test.ts",
     "build": "tsc --build tsconfig.json",

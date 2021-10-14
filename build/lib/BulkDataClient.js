@@ -168,9 +168,9 @@ class BulkDataClient {
         //     console.log(requestOptions)
         // console.log(requestOptions.url.toString(), requestOptions)
         const result = await got_1.default(requestOptions);
-        if (result.statusCode === 401 && requestOptions.headers.authorization) {
+        if (result.statusCode === 401 && requestOptions.headers.authorization && !options.context?.retried) {
             this.accessToken = null;
-            return this.request(options);
+            return this.request({ ...options, context: { ...options.context, retried: true } });
         }
         // console.log(result.request.requestUrl, result.request.options.headers)
         // let body = result.body
