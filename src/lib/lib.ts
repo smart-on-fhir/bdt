@@ -71,7 +71,7 @@ export function getErrorMessageFromResponse(response: Response)
             }
 
             if (json.resourceType === "OperationOutcome") {
-                msg = json.issue.map((i:any) => i.details?.text || i.diagnostics).join("; ");
+                msg = json.issue.map((i:any) => i.details?.text || i.diagnostics || "Unknown error").join("; ");
             }
             else if (typeof json.error === "string") {
                 msg = json.error;
