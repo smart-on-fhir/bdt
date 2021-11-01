@@ -278,7 +278,7 @@ export function expectNDJsonResponse(response: Response, prefix = "")
         prefix,
         `The server must reply with FHIR NDJSON content-type header. Got "${contentType}"`,
         getErrorMessageFromResponse(response)
-    )).to.startWith("application/fhir+ndjson");
+    )).to.match(/^application\/(x-|fhir\+)?ndjson/i);
 
     expect(response.body, concat(prefix, "The response body is not a string")).to.be.string()
     expect(response.body, concat(prefix, "The response body is empty")).to.not.be.empty()
