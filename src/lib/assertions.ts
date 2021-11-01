@@ -192,6 +192,23 @@ export function concat(...messages: (string | Error)[]): string {
     ).filter(Boolean).join("\n✖ ") + "\n✖ Assertion";
 }
 
+// Checks ----------------------------------------------------------------------
+
+/**
+ * Check if the response comes with a JSON(-like) content-type header
+ * @param response The response to check
+ */
+export function isJsonResponse(response: Response): Boolean {
+    const ct = String(response.headers["content-type"] || "").toLowerCase().split(";").shift();
+    return [
+        "application/json",
+        "application/json+fhir",
+        "application/fhir+json"
+    ].includes(ct + "");
+}
+
+// Assertions ------------------------------------------------------------------
+
 /**
  * Asserts that the `statusCode` of the given response is either:
  * 1. Equal to the given `code` argument, if that code is a number

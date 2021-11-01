@@ -2,12 +2,12 @@ import { suite, test, beforeEach } from "../lib/bdt"
 import { BulkDataClient, exportType, OAuth } from "../lib/BulkDataClient"
 import jose   from "node-jose"
 import {
-    expectJsonResponse,
     expectOAuthError,
     expectOAuthErrorType,
     expectOperationOutcome,
     expectSuccessfulAuth,
-    expectUnauthorized
+    expectUnauthorized,
+    isJsonResponse
 } from "../lib/assertions"
 
 interface TokenTestsContext {
@@ -51,10 +51,16 @@ suite("Authorization", () => {
                     "The server must not accept kick-off requests without authorization header"
                 );
 
-                expectJsonResponse(
-                    client.kickOffResponse,
-                    "The response body SHALL be a FHIR OperationOutcome resource in JSON format."
-                );
+                // The body SHALL be a FHIR OperationOutcome resource in JSON format
+                // but replying with an OperationOutcome is optional. This should
+                // mean that if the server replies with JSON, then the body must be
+                // an OperationOutcome.
+                if (isJsonResponse(client.kickOffResponse)) {
+                    expectOperationOutcome(
+                        client.kickOffResponse,
+                        "The body SHALL be a FHIR OperationOutcome resource in JSON format"
+                    );
+                }
             });
 
             test({
