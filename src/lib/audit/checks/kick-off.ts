@@ -156,7 +156,7 @@ export const suite: suiteFunction = async function({ config, check }) {
                 name: `${type}-level ${method} kick-off allows the "prefer" header to contain "respond-async,handling=lenient"`,
                 weights: { reliability: 4, compliance: 5 }
             }, async () => {
-                const { response } = await client.kickOff({ type, method, headers: { prefer: "respond-async,handling=lenient" }})
+                const { response } = await client.kickOff({ type, method, headers: { prefer: ["respond-async", "handling=lenient"] }})
                 await client.cancelIfStarted(response)
                 return response.statusCode === 202
             })

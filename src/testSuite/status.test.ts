@@ -173,7 +173,7 @@ suite("Status Endpoint", () => {
             method : unsupportedParam === "patient" ? "POST" : "GET",
             type   : unsupportedParam === "patient" ? "patient" : null,
             headers: {
-                prefer: "respond-async,handling=lenient"
+                prefer: ["respond-async", "handling=lenient" ]
             },
             params: {
                 [unsupportedParam]: optionalParams[unsupportedParam as keyof typeof optionalParams],

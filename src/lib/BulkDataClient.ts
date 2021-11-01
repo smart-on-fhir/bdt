@@ -652,7 +652,7 @@ export class BulkDataClient
      *     method: "POST",
      *     type: "group",
      *     headers: {
-     *         prefer: "respond-async,handling=lenient"
+     *         prefer: ["respond-async", "handling=lenient"]
      *     },
      *     params: {
      *         includeAssociatedData: "LatestProvenanceResources",

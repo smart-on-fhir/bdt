@@ -133,7 +133,7 @@ suite("Kick-off Endpoint", () => {
                 });
 
                 test({
-                    name: 'Allows the Prefer header to contain "respond-async,handling=lenient"'
+                    name: 'Allows the Prefer header to contain "handling=lenient"'
                 }, async ({ config, api }) => {
     
                     const client = new BulkDataClient(config, api);
@@ -144,7 +144,7 @@ suite("Kick-off Endpoint", () => {
                     const { response } = await client.kickOff({
                         type,
                         params: { _type: [config.fastestResource] },
-                        headers: { prefer: "respond-async,handling=lenient" }
+                        headers: { prefer: ["respond-async", "handling=lenient"] }
                     });
     
                     // If the server did not return an error as expected, an export
@@ -152,7 +152,7 @@ suite("Kick-off Endpoint", () => {
                     await client.cancelIfStarted(response);
     
                     // Finally check that we have got an error response
-                    expectSuccessfulKickOff(response, api, "The 'handling=lenient' portion of the prefer header is not supported");
+                    expectSuccessfulKickOff(response, api, "The 'handling=lenient' Prefer header is not supported");
                 });
             })
 
@@ -333,7 +333,7 @@ suite("Kick-off Endpoint", () => {
                     const { response: response2 } = await client.kickOff({
                         type,
                         headers: {
-                            prefer: "respond-async,handling=lenient"
+                            prefer: ["respond-async", "handling=lenient"]
                         },
                         params: {
                             includeAssociatedData: "LatestProvenanceResources"
@@ -468,7 +468,7 @@ suite("Kick-off Endpoint", () => {
                     const { response: response2 } = await client.kickOff({
                         type,
                         headers: {
-                            prefer: "respond-async,handling=lenient"
+                            prefer: ["respond-async", "handling=lenient"]
                         },
                         params: {
                             _typeFilter: "Patient?status=active"
@@ -479,7 +479,7 @@ suite("Kick-off Endpoint", () => {
                     await client.cancelIfStarted(response2);
     
                     try {
-                        expectSuccessfulKickOff(response2, api, "Parameter _typeFilter plus header \"prefer: respond-async,handling=lenient\" was rejected");
+                        expectSuccessfulKickOff(response2, api, "Parameter _typeFilter plus header \"prefer: respond-async, handling=lenient\" was rejected");
                     } catch (ex) {
                         ex.message = "\n✖ The server was expected to ignore the _typeFilter parameter if handling=lenient is included in the Prefer header" + ex.message
                         throw ex
@@ -515,7 +515,7 @@ suite("Kick-off Endpoint", () => {
                     const { response: response2 } = await client.kickOff({
                         type,
                         headers: {
-                            prefer: "respond-async,handling=lenient"
+                            prefer: ["respond-async", "handling=lenient"]
                         },
                         params: {
                             _typeFilter: ["Patient?status=active", "Patient?gender=male"]
@@ -571,7 +571,7 @@ suite("Kick-off Endpoint", () => {
                         method: "POST",
                         type,
                         headers: {
-                            prefer: "respond-async,handling=lenient"
+                            prefer: ["respond-async", "handling=lenient"]
                         },
                         json: {
                             resourceType: "Parameters",
