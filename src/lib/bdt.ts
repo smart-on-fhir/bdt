@@ -20,8 +20,8 @@ export interface Config extends NormalizedConfig {
     apiVersion: string
 
     /**
-     * A glob pattern to load test files from. Defaults to
-     * `testSuite\/**\/*.test.js`
+     * A glob pattern to load test files from, relative to cwd. Defaults to
+     * `./build/testSuite\/**\/*.test.js`
      */
     pattern?: string
 
@@ -36,7 +36,7 @@ export interface Config extends NormalizedConfig {
     list?: boolean
 
     /**
-     * Path to the test node to execute made up of zer-based indexes and dots.
+     * Path to the test node to execute made up of zero-based indexes and dots.
      * Examples:
      * - `""` - Root node, meaning all tests (default)
      * - `1.2` - the third child of the second child of the root node
