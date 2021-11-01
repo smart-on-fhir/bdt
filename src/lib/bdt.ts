@@ -1,15 +1,15 @@
-import slug            from "slug"
-import { sync }        from "glob"
-import path            from "path"
-import TestRunner      from "./TestRunner"
-import stdoutReporter  from "../reporters/stdout"
-import jsonReporter    from "../reporters/json-stream"
-import consoleReporter from "../reporters/console"
-import ctx             from "./globalContext"
+import slug                  from "slug"
+import { sync }              from "glob"
+import path                  from "path"
+import TestRunner            from "./TestRunner"
+import stdoutReporter        from "../reporters/stdout"
+import jsonReporter          from "../reporters/json-stream"
+import consoleReporter       from "../reporters/console"
+import ctx                   from "./globalContext"
 import { Test, TestOptions } from "./Test"
-import { TestNodeOptions } from "./TestNode"
+import { TestNodeOptions }   from "./TestNode"
 import { Suite, SetupCallbackFn, TestCallbackFn } from "./Suite"
-import { NormalizedConfig } from "./Config"
+import { NormalizedConfig }  from "./Config"
 
 export interface Config extends NormalizedConfig {
 
@@ -122,9 +122,7 @@ function load(pattern: string): Suite
     const paths = sync(pattern);
     paths.forEach((file: string) => {
         const fullPath = path.resolve(file);
-        // console.log(fullPath)
         try {
-            // requireUncached(fullPath);
             require(fullPath);
         }
         catch (e) {
@@ -184,7 +182,7 @@ export function suite(nameOrOptions: string | TestNodeOptions, fn: () => void): 
         path: [
             globalContext.currentGroup.path,
             globalContext.currentGroup.children.length + ""
-    ].filter(Boolean).join(".")
+        ].filter(Boolean).join(".")
     });
     
     globalContext.currentGroup.children.push(group);

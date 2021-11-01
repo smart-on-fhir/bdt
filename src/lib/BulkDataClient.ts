@@ -907,7 +907,7 @@ export class BulkDataClient
         this.statusResponse = response
 
         if (response.statusCode === 202) {
-            await wait(Math.min(1000 + 1000 * suffix, 10000));
+            await wait(Math.min(2000 + 1000 * suffix, 10000));
             return this.waitForExport(suffix + 1);
         }
     }
@@ -1052,6 +1052,7 @@ export class BulkDataClient
         return await this.request({
             url   : kickOffResponse.headers["content-location"],
             method: "DELETE",
+            responseType: "json",
             requestLabel: labelPrefix + "Cancellation Request",
             responseLabel: labelPrefix + "Cancellation Response"
         });

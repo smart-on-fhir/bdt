@@ -436,14 +436,15 @@ export default function StdoutReporter(runner: TestRunner, options: StdOutReport
     function onTestStart(node: Test) {
         if (node.status === "skipped" && options.verbose !== "always") return
         // const chars = ["○", "◔", "◑", "◕", "●"];
-        const chars = "○○○○◓◑◒◐○○○○".split("");// ◒◐◓
+        const chars = "○○◓◑◒◐○○".split("");// ◒◐◓
         // const chars = "  ▏▎▍▌▋▊▋▌▍▎▏".split(""); //
         // const chars = " ▁▂▃▄▅▆▇█▇▆▅▄▃▂▁ ".split("");
         // const chars = "🌕🌔🌓🌒🌑🌘🌗🌖".split("");⦾⦿
         let prefix = indent(depth)
         function write(i = 0) {
             clearLine();
-            process.stdout.write(`${prefix} ${chars[i].yellow} ${text(node)} ${duration(node)}`);
+            process.stdout.write(
+                `${prefix} ${chars[i].yellow} ${text(node)} ${duration(node)}`);
             timer = setTimeout(() => write(++i % chars.length), 150)
         }
         write()

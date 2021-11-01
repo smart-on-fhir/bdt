@@ -636,7 +636,7 @@ suite("Kick-off Endpoint", () => {
 
                         expectSuccessfulExport(client.statusResponse, "Export failed")
 
-                        if (!client.statusResponse?.body.output.length) {
+                        if (!client.statusResponse?.body.output?.length) {
                             return api.setNotSupported("Unable to find enough data to export and complete this test");
                         }
     
@@ -715,7 +715,7 @@ suite("Kick-off Endpoint", () => {
 
                     expectSuccessfulExport(client.statusResponse, "Export failed")
 
-                    if (!client.statusResponse?.body.output.length) {
+                    if (!client.statusResponse?.body.output?.length) {
                         return api.setNotSupported("Unable to find enough data to export and complete this test");
                     }
     

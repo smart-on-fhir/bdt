@@ -3,7 +3,7 @@ import { suite, test } from "../lib/bdt"
 import { BulkDataClient } from "../lib/BulkDataClient"
 import isBase64        from "is-base64"
 import { getErrorMessageFromResponse } from "../lib/lib"
-import { expectSuccessfulDownload, expectSuccessfulKickOff } from "../lib/assertions"
+import { expectResponseCode, expectSuccessfulDownload, expectSuccessfulExport, expectSuccessfulKickOff } from "../lib/assertions"
 
 
 suite("Download Endpoint", () => {
@@ -59,7 +59,9 @@ suite("Download Endpoint", () => {
         } catch (ex) {
             throw ex;
         } finally {
-            await client.cancel(kickOffResponse);
+            if (kickOffResponse) {
+                await client.cancel(kickOffResponse);
+            }
         }
     });
 
@@ -102,7 +104,9 @@ suite("Download Endpoint", () => {
         } catch (ex) {
             throw ex;
         } finally {
-            await client.cancel(kickOffResponse);
+            if (kickOffResponse) {
+                await client.cancel(kickOffResponse);
+            }
         }
     });
 
@@ -191,6 +195,8 @@ suite("Download Endpoint", () => {
             // If we got here, it mans the kick-off was successful. We now have
             // to wait for the export to complete
             await client.waitForExport();
+
+            expectSuccessfulExport(client.statusResponse, "Export was not successful")
 
             // Inspect and validate the export response
             expect(client.statusResponse.body.output, "The output property of the status response must be an array").to.be.an.array();
@@ -303,11 +309,16 @@ suite("Download Endpoint", () => {
 
     test({
         name: "Requesting deleted files returns 404 responses",
-        description: "If the export has been completed, a server MAY send a DELETE request " +
-            "to the status endpoint as a signal that a client is done retrieving files and " +
-            "that it is safe for the sever to remove those from storage. Following the " +
-            "delete request, when subsequent requests are made to the download location, " +
-            "the server SHALL return a 404 error and an associated FHIR OperationOutcome in JSON format."
+        description: "After a bulk data request has been started, a client **MAY** " +
+            "send a **DELETE** request to the URL provided in the `Content-Location` " +
+            "header to cancel the request as described in the [FHIR Asynchronous " +
+            "Request Pattern](https://www.hl7.org/fhir/R4/async.html). If the " +
+            "request has been completed, a server **MAY** use the request as a signal " +
+            "that a client is done retrieving files and that it is safe for the " +
+            "sever to remove those from storage. Following the delete request, " +
+            "when subsequent requests are made to the polling location, the server " +
+            "**SHALL return a 404** error and an associated FHIR OperationOutcome " +
+            "in JSON format."
     }, async ({ config, api }) => {
         const client = new BulkDataClient(config, api);
         let kickOffResponse
@@ -318,7 +329,13 @@ suite("Download Endpoint", () => {
             await client.cancel(kickOffResponse);
             let fileUrl = client.statusResponse.body.output[0].url;
             const resp2 = await client.downloadFile(fileUrl);
-            expect(resp2.statusCode, "Files remain accessible after the export is deleted! " + getErrorMessageFromResponse(resp2)).to.equal(404);
+            expectResponseCode(
+                resp2,
+                404,
+                "Files remain accessible after the export is deleted. " +
+                "Requesting them should return a 404 status code but we got " +
+                resp2.statusCode + " " + resp2.statusMessage + "."
+            );
         } catch (ex) {
             throw ex;
         } finally {
