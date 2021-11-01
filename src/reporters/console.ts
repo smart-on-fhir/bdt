@@ -37,6 +37,7 @@ interface TestNode {
     hookErrors?: Error[]
     error?: Error
     only?: boolean
+    path?: string
 }
 
 function clearLine() {
@@ -326,20 +327,27 @@ export default function StdoutReporter(runner: TestRunner, options: StdOutReport
     }
 
     function text(node: TestNode) {
+        let name = node.name;
+        let info = "path: " + node.path;
+
         if (node.status === "not-implemented") {
-            return node.name.grey + " (not implemented)".grey.dim;
+            name = name.grey
+            info += ", not implemented".grey;
         }
-        if (node.status === "not-supported") {
-            return node.name.grey + " (not supported)".yellow.dim;
+        else if (node.status === "not-supported") {
+            name = name.grey
+            info += ", not supported".yellow;
         }
-        if (node.status === "skipped") {
-            return node.name.grey + (
+        else if (node.status === "skipped") {
+            name = name.grey
+            info += (
                 isInOnlyMode && !node.only ?
-                " (skipped due to only mode)" :
-                " (skipped)"
-            ).grey.dim.italic;
+                ", skipped due to only mode" :
+                ", skipped"
+            ).grey.italic;
         }
-        return node.name;
+
+        return name + (" (" + info + ")").dim;
     }
 
     function logConsoleEntry(entry: ConsoleEntry, verbose?: boolean)
@@ -413,7 +421,7 @@ export default function StdoutReporter(runner: TestRunner, options: StdOutReport
             let prefix = indent(depth++)
             log(`${prefix} ${icon(node)} ${wrap(
                 // @ts-ignore
-                node.name.bold,
+                node.name.bold + ` (path: ${node.path})`.dim,
                 prefix,
                 options.wrap
             )}`);
