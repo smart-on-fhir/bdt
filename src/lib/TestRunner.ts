@@ -4,6 +4,7 @@ import { NotSupportedError } from "./errors";
 import { Suite } from "./Suite";
 import { Test } from "./Test";
 import { TestAPI } from "./TestAPI";
+import ctx                   from "./globalContext"
 
 
 export default class TestRunner extends EventEmitter
@@ -104,6 +105,13 @@ export default class TestRunner extends EventEmitter
     async run(node: Test | Suite, context: Record<string, any> = {})
     {
         if (node instanceof Test) {
+            
+            // If run is called for a leaf node we don't know its parent so make
+            // sure we find it manually and set it as `currentGroup`
+            let path = node.path.split(".");
+            path.pop();
+            // @ts-ignore
+            this.currentGroup = ctx.root.getNodeAt(path.join(".")) as Suite;
             return await this.runTest(node, context)
         }
         

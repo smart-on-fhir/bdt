@@ -10,6 +10,7 @@ import { Test, TestOptions } from "./Test"
 import { TestNodeOptions }   from "./TestNode"
 import { Suite, SetupCallbackFn, TestCallbackFn } from "./Suite"
 import { NormalizedConfig }  from "./Config"
+import { Version }           from "./Version"
 
 export interface Config extends NormalizedConfig {
 
@@ -92,16 +93,22 @@ export async function bdt(options: Config): Promise<Suite>
     // load --------------------------------------------------------------------
     load(options.pattern)
 
-    // runner ------------------------------------------------------------------
-    const runner = new TestRunner(config, !!globalContext.onlyMode);
+    let node: any = getPath(options.path || "")
+    if (node) {
+        if (options.list) {
+            if (options.apiVersion) {
+                node = filterByVersion(node.toJSON(), options.apiVersion)
+            }
+            console.log(JSON.stringify(node, null, 4))
+        } else {
+            // runner ------------------------------------------------------------------
+            const runner = new TestRunner(config, !!globalContext.onlyMode);
+            
+            // reporter ----------------------------------------------------------------
+            reporters[options.reporter](runner, config.reporterOptions);
 
-    // reporter ----------------------------------------------------------------
-    reporters[options.reporter](runner, config.reporterOptions);
-
-    if (options.list) {
-        // console.log()
-    } else {
-        await runner.run(globalContext.root)
+            await runner.run(node)
+        }
     }
 
     return globalContext.root
@@ -131,6 +138,37 @@ function load(pattern: string): Suite
     });
 
     return globalContext.root
+}
+
+/**
+ * Given a path (which is a dot-separated list of indexes), finds and returns
+ * the node at that path. For example getPath("2.1.5") will return the sixth
+ * child of the second child of the third child of the root node.
+ */
+function getPath(path = "")
+{
+    if (!path) {
+        return globalContext.root;
+    }
+    return path.split(".").reduce(
+        (out, i) => out && out.children ? out.children[+i] : undefined,
+        globalContext.root
+    );
+}
+
+function filterByVersion(node: Record<string, any>, version: string | Version)
+{
+    if (node.minVersion && new Version(node.minVersion).isAbove(version)) {
+        return undefined
+    }
+    if (node.maxVersion && new Version(node.maxVersion).isBelow(version)) {
+        return undefined
+    }
+    const out = { ...node }
+    if (Array.isArray(out.children)) {
+        out.children = out.children.map((child: Record<string, any>) => filterByVersion(child, version)).filter(Boolean)
+    }
+    return out
 }
 
 /**

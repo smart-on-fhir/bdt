@@ -1,6 +1,8 @@
-import * as Lab   from "@hapi/lab"
-import { expect } from "@hapi/code"
-import { Response } from "got/dist/source";
+import * as Lab     from "@hapi/lab"
+import { expect }   from "@hapi/code"
+import { Response } from "got/dist/source"
+import { OAuth }    from "../src/lib/BulkDataClient"
+import { TestAPI }  from "../src/lib/TestAPI"
 import {
     expectResponseCode,
     expectResponseText,
@@ -21,8 +23,7 @@ import {
     expectExportNotEmpty,
     expectNDJSONElements
 } from "../src/lib/assertions"
-import { OAuth } from "../src/lib/BulkDataClient";
-import { TestAPI } from "../src/lib/TestAPI";
+
 
 const lab = Lab.script();
 const { describe, it } = lab;
@@ -33,7 +34,7 @@ describe('assertions', () => {
 
     it ("expectResponseCode", () => {
         expect(() => expectResponseCode({ statusCode: 200 } as Response, 201), "does not throw for different code").to.throw();
-        expect(() => expectResponseCode({ statusCode: 200 } as Response, 201, "test-prefix"), "does not include the prefix in the message").to.throw(/^\n- test-prefix\n- Unexpected status code/);
+        expect(() => expectResponseCode({ statusCode: 200 } as Response, 201, "test-prefix"), "does not include the prefix in the message").to.throw(/test-prefix/);
         expect(() => expectResponseCode({ statusCode: 200 } as Response, [201, 300]), "does not throw if code is not listed").to.throw();
         expect(() => expectResponseCode({ statusCode: 200 } as Response, [100, 200]), "throws if code is listed").not.to.throw();
         expect(() => expectResponseCode({ statusCode: 200 } as Response, 200), "throws if code matches").not.to.throw();
@@ -41,7 +42,7 @@ describe('assertions', () => {
 
     it ("expectResponseText", () => {
         expect(() => expectResponseText({ statusMessage: "x" } as Response, "y"), "does not throw for different text").to.throw();
-        expect(() => expectResponseText({ statusMessage: "x" } as Response, "y", "test-prefix"), "does not include the prefix in the message").to.throw(/^\n- test-prefix\n- Unexpected status text/);
+        expect(() => expectResponseText({ statusMessage: "x" } as Response, "y", "test-prefix"), "does not include the prefix in the message").to.throw(/test-prefix/);
         expect(() => expectResponseText({ statusMessage: "x" } as Response, ["y", "z"]), "does not throw if text is not listed").to.throw();
         expect(() => expectResponseText({ statusMessage: "x" } as Response, ["x", "y"]), "throws if text is listed").not.to.throw();
         expect(() => expectResponseText({ statusMessage: "x" } as Response, "x"), "throws if text matches").not.to.throw();
@@ -49,7 +50,7 @@ describe('assertions', () => {
 
     it ("expectClientError", () => {
         expect(() => expectClientError({ statusCode: 200 } as Response), "should throw").to.throw(/Expected client error \(4XX status code\)\. Got 200/);
-        expect(() => expectClientError({ statusCode: 200 } as Response, "test-prefix"), "does not include the prefix in the message").to.throw(/^\n- test-prefix\n- Expected client error/);
+        expect(() => expectClientError({ statusCode: 200 } as Response, "test-prefix"), "does not include the prefix in the message").to.throw(/test-prefix/);
         expect(() => expectClientError({ statusCode: 399 } as Response), "should throw for 399").to.throw();
         expect(() => expectClientError({ statusCode: 500 } as Response), "should throw for 500").to.throw();
         expect(() => expectClientError({ statusCode: 400 } as Response), "should not throw for 400").not.to.throw();
@@ -57,8 +58,8 @@ describe('assertions', () => {
     })
 
     it ("expectJsonResponse", () => {
-        expect(() => expectJsonResponse({ headers: { "content-type": "application/json" }, body: "" } as Response), "should throw").to.throw(/^\n- The response body is not an object/);
-        expect(() => expectJsonResponse({ headers: { "content-type": "application/json" }, body: 200 } as Response, "test-prefix"), "does not include the prefix in the message").to.throw(/^\n- test-prefix\n- The response body is not an object/);
+        expect(() => expectJsonResponse({ headers: { "content-type": "application/json" }, body: "" } as Response), "should throw").to.throw(/The response body is not an object/);
+        expect(() => expectJsonResponse({ headers: { "content-type": "application/json" }, body: 200 } as Response, "test-prefix"), "does not include the prefix in the message").to.throw(/test-prefix/);
         expect(() => expectJsonResponse({ headers: { "content-type": "application/json" }, body: undefined } as Response), "should throw for undefined").to.throw(/The response body is undefined/);
         expect(() => expectJsonResponse({ headers: { "content-type": "application/json" }, body: null } as Response), "should throw for null").to.throw(/The response body is null/);
         expect(() => expectJsonResponse({ headers: { "content-type": "application/json" }, body: "" } as Response), "should throw for ''").to.throw(/The response body is not an object/);
@@ -70,43 +71,43 @@ describe('assertions', () => {
     })
 
     it ("expectNDJsonResponse", () => {
-        expect(() => expectNDJsonResponse({ headers: { "content-type": "application/fhir+ndjson" }, body: 200 } as Response), "should throw").to.throw(/^\n- The response body is not a string/);
-        expect(() => expectNDJsonResponse({ headers: { "content-type": "application/fhir+ndjson" }, body: 200 } as Response, "test-prefix"), "does not include the prefix in the message").to.throw(/^\n- test-prefix\n- The response body is not a string/);
-        expect(() => expectNDJsonResponse({ headers: { "content-type": "application/fhir+ndjson" }, body: "" } as Response), "should throw").to.throw(/^\n- The response body is empty/);
+        expect(() => expectNDJsonResponse({ headers: { "content-type": "application/fhir+ndjson" }, body: 200 } as Response), "should throw").to.throw(/The response body is not a string/);
+        expect(() => expectNDJsonResponse({ headers: { "content-type": "application/fhir+ndjson" }, body: 200 } as Response, "test-prefix"), "does not include the prefix in the message").to.throw(/test-prefix/);
+        expect(() => expectNDJsonResponse({ headers: { "content-type": "application/fhir+ndjson" }, body: "" } as Response), "should throw").to.throw(/The response body is empty/);
         expect(() => expectNDJsonResponse({ headers: { "content-type": "application/fhir+json" }, body: "" } as Response), "should throw for application/fhir+json").to.throw();
         expect(() => expectNDJsonResponse({ headers: { "content-type": "application/ndjson" }, body: "" } as Response), "should throw for application/ndjson").to.throw();
         expect(() => expectNDJsonResponse({ headers: { "content-type": "application/fhir+ndjson" }, body: "{}\n{x}\n{}\n" } as Response), "should throw for invalid json line").to.throw(/Error parsing NDJSON at line 2\:/);
-        expect(() => expectNDJsonResponse({ headers: { "content-type": "application/fhir+ndjson" }, body: 200 } as Response, "test-prefix"), "does not include prefix").to.throw(/^\n- test-prefix\n- The response body is not a string/);
+        expect(() => expectNDJsonResponse({ headers: { "content-type": "application/fhir+ndjson" }, body: 200 } as Response, "test-prefix"), "does not include prefix").to.throw(/test-prefix/);
     })
 
     it ("expectFhirResource", () => {
-        expect(() => expectFhirResource({ headers: { "content-type": "application/json" }, body: {} } as Response), "should throw").to.throw(/^\n- The response body has no "resourceType"/);
-        expect(() => expectFhirResource({ headers: { "content-type": "application/json" }, body: {} } as Response, "test-prefix"), "does not include the prefix in the message").to.throw(/^\n- test-prefix\n- The response body has no "resourceType"/);
+        expect(() => expectFhirResource({ headers: { "content-type": "application/json" }, body: {} } as Response), "should throw").to.throw(/The response body has no "resourceType"/);
+        expect(() => expectFhirResource({ headers: { "content-type": "application/json" }, body: {} } as Response, "test-prefix"), "does not include the prefix in the message").to.throw(/test-prefix/);
         expect(() => expectFhirResource({ headers: { "content-type": "application/json" }, body: { resourceType: "x" } } as Response), "should not throw").not.to.throw();
     })
 
     it ("expectFhirResourceType", () => {
-        expect(() => expectFhirResourceType({ headers: { "content-type": "application/json" }, body: { resourceType: "y" } } as Response, "x"), "should throw").to.throw(/^\n- Unexpected resourceType/);
-        expect(() => expectFhirResourceType({ headers: { "content-type": "application/json" }, body: { resourceType: "y" } } as Response, "x", "test-prefix"), "does not include the prefix in the message").to.throw(/^\n- test-prefix\n- Unexpected resourceType/);
+        expect(() => expectFhirResourceType({ headers: { "content-type": "application/json" }, body: { resourceType: "y" } } as Response, "x"), "should throw").to.throw(/Unexpected resourceType/);
+        expect(() => expectFhirResourceType({ headers: { "content-type": "application/json" }, body: { resourceType: "y" } } as Response, "x", "test-prefix"), "does not include the prefix in the message").to.throw(/test-prefix/);
         expect(() => expectFhirResourceType({ headers: { "content-type": "application/json" }, body: { resourceType: "x" } } as Response, "x"), "should not throw").not.to.throw();
     })
     
     it ("expectOperationOutcome", () => {
-        expect(() => expectOperationOutcome({ headers: { "content-type": "application/json" }, body: { resourceType: "y" } } as Response), "should throw").to.throw(/^\n- Unexpected resourceType/);
-        expect(() => expectOperationOutcome({ headers: { "content-type": "application/json" }, body: { resourceType: "y" } } as Response, "test-prefix"), "does not include the prefix in the message").to.throw(/^\n- test-prefix\n- Unexpected resourceType/);
+        expect(() => expectOperationOutcome({ headers: { "content-type": "application/json" }, body: { resourceType: "y" } } as Response), "should throw").to.throw(/Unexpected resourceType/);
+        expect(() => expectOperationOutcome({ headers: { "content-type": "application/json" }, body: { resourceType: "y" } } as Response, "test-prefix"), "does not include the prefix in the message").to.throw(/test-prefix/);
         expect(() => expectOperationOutcome({ headers: { "content-type": "application/json" }, body: { resourceType: "OperationOutcome" } } as Response), "should not throw").not.to.throw();
     })
 
     it ("expectUnauthorized", () => {
-        expect(() => expectUnauthorized({ statusCode: 400 } as Response), "should throw").to.throw(/^\n- Unexpected status code/);
-        expect(() => expectUnauthorized({ statusCode: 400 } as Response, "test-prefix"), "does not include the prefix in the message").to.throw(/^\n- test-prefix\n- Unexpected status code/);
+        expect(() => expectUnauthorized({ statusCode: 400 } as Response), "should throw").to.throw(/Unexpected status code/);
+        expect(() => expectUnauthorized({ statusCode: 400 } as Response, "test-prefix"), "does not include the prefix in the message").to.throw(/test-prefix/);
         expect(() => expectUnauthorized({ statusCode: 401 } as Response), "should not throw").not.to.throw();
         expect(() => expectUnauthorized({ statusCode: 406 } as Response), "should not throw").not.to.throw();
     })
 
     it ("expectOAuthError", () => {
         expect(() => expectOAuthError({ statusCode: 400, headers: { "content-type": "application/json" }, body: {} } as Response), "should throw if no error").to.throw(/The 'error' property of OAuth error responses is required/);
-        expect(() => expectOAuthError({ statusCode: 400, headers: { "content-type": "application/json" }, body: {} } as Response, "test-prefix"), "does not include the prefix in the message").to.throw(/^\n- test-prefix\n- .+/);
+        expect(() => expectOAuthError({ statusCode: 400, headers: { "content-type": "application/json" }, body: {} } as Response, "test-prefix"), "does not include the prefix in the message").to.throw(/test-prefix/);
         expect(() => expectOAuthError({ statusCode: 400, headers: { "content-type": "application/json" }, body: { error: 4 } } as Response), "should throw on invalid error").to.throw(/The 'error' property of OAuth error responses must be a string/);
         expect(() => expectOAuthError({ statusCode: 400, headers: { "content-type": "application/json" }, body: { error: "xx" } } as Response), "should throw on invalid error string").to.throw(/Invalid OAuth error 'error' property/);
         expect(() => expectOAuthError({
@@ -144,9 +145,7 @@ describe('assertions', () => {
             statusCode: 400,
             headers: { "content-type": "application/json" },
             body: { error: "invalid_grant" }
-        } as Response<OAuth.ErrorResponse>, "invalid_scope", "xx"), "did not include prefix").to.throw(
-            /\n- xx\n- .+/
-        );
+        } as Response<OAuth.ErrorResponse>, "invalid_scope", "xx"), "did not include prefix").to.throw(/xx/);
         expect(() => expectOAuthErrorType({
             statusCode: 400,
             headers: { "content-type": "application/json" },
