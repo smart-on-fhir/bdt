@@ -110,8 +110,6 @@ export interface ServerConfig {
         customHeaders: Record<string, any>
     }
 
-    groupId?: string
-
     /**
      * By default BDT will fetch and parse the CapabilityStatement to try to
      * detect if the server supports system-level export and at what endpoint.
@@ -133,17 +131,12 @@ export interface ServerConfig {
     patientExportEndpoint?: string // will be auto-detected if not defined
 
     /**
-     * By default BDT will fetch and parse the CapabilityStatement to try to
-     * detect if the server supports group-level export. If so, and if `groupId`
-     * is set group-level tests will be enabled.
-     * However, if the server does not have a CapabilityStatement or if it is
-     * not properly declaring the group export support, you can skip that
-     * check by declaring the `groupExportEndpoint` below. The value should be
-     * a path relative to the `baseURL` (typically "Group/{GroupID}/$export").
-     * Note that if you set this, then the `groupId` option will not be used
-     * since the `groupId` is already part of the `groupExportEndpoint` path.
+     * Set this to your group-level export endpoint to enable the group-level
+     * tests. The value should be a path relative to the `baseURL` (typically
+     * "Group/{GroupID}/$export"), where {GroupID} is the ID of the group you'd
+     * like to to test.
      */
-    groupExportEndpoint?: string // will be auto-detected if not defined
+    groupExportEndpoint?: string
 
     fastestResource?: string
     
@@ -225,7 +218,6 @@ export interface NormalizedConfig {
         customHeaders: Record<string, any>
         timeout: number
     }
-    // groupId?: string
 
     /**
      * By default BDT will fetch and parse the CapabilityStatement to try to
@@ -248,17 +240,12 @@ export interface NormalizedConfig {
     patientExportEndpoint?: string // will be auto-detected if not defined
 
     /**
-     * By default BDT will fetch and parse the CapabilityStatement to try to
-     * detect if the server supports group-level export. If so, and if `groupId`
-     * is set group-level tests will be enabled.
-     * However, if the server does not have a CapabilityStatement or if it is
-     * not properly declaring the group export support, you can skip that
-     * check by declaring the `groupExportEndpoint` below. The value should be
-     * a path relative to the `baseURL` (typically "Group/{GroupID}/$export").
-     * Note that if you set this, then the `groupId` option will not be used
-     * since the `groupId` is already part of the `groupExportEndpoint` path.
+     * Set this to your group-level export endpoint to enable the group-level
+     * tests. The value should be a path relative to the `baseURL` (typically
+     * "Group/{GroupID}/$export"), where {GroupID} is the ID of the group you'd
+     * like to to test.
      */
-    groupExportEndpoint?: string // will be auto-detected if not defined
+    groupExportEndpoint?: string
 
     fastestResource: string
 
@@ -467,9 +454,6 @@ export default class Config
         if (options.groupExportEndpoint) {
             expect(options.groupExportEndpoint, "options.groupExportEndpoint must be a string").to.be.string()
             out.groupExportEndpoint = options.groupExportEndpoint
-        } else if (options.groupId) {
-            expect(options.groupId, "options.groupId must be a string").to.be.string()
-            out.groupExportEndpoint = await this.getGroupExportEndpoint(out, options.groupId)
         }
 
         // supportedResourceTypes
@@ -546,26 +530,6 @@ export default class Config
                 e.definition === "http://hl7.org/fhir/uv/bulkdata/OperationDefinition/export"    
             ));
             return definition ? "$export" : ""
-        }
-        return ""
-    }
-
-    private async getGroupExportEndpoint(options: Partial<NormalizedConfig>, groupId: string)
-    {
-        const capabilityStatement = await this.getCapabilityStatement(options);
-        if (capabilityStatement) {
-            let supported;
-            try {
-                supported = !!capabilityStatement.rest[0].resource.find(
-                    (x: any) => x.type === "Group"
-                ).operation.find((x: any) => (
-                    x.name === "group-export" &&
-                    x.definition === "http://hl7.org/fhir/uv/bulkdata/OperationDefinition/group-export"
-                ));
-            } catch {
-                supported = false;
-            }
-            return supported ? `Group/${groupId}/$export` : "";
         }
         return ""
     }

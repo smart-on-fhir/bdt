@@ -5,6 +5,7 @@ import Config, { NormalizedConfig, ServerConfig }                        from ".
 import audit                         from "./lib/audit/index"
 import "colors"
 import { writeFileSync } from "fs"
+import prompt from "prompt-sync"
 
 
 async function getConfig(path: string): Promise<NormalizedConfig> {
@@ -129,20 +130,23 @@ program
     .command('init') // { isDefault: true }
     .description('Generates a configuration file')
     .action(async (commandOptions) => {
-        const txt = 'module.exports = {\n' +
+        const txt = '/**\n' +
+        ' * @type { import("./src/lib/Config").ServerConfig }\n' +
+        ' */\n' +
+        'module.exports = {\n\n' +
         '    /**\n' +
         '     * FHIR server base URL.\n' +
         '     */\n' +
-        '    baseURL: "",\n' +
+        '    baseURL: "http://my-fhir-server.com/",\n' +
         '\n' +
-        '    authentication: {\n' +
+        '    authentication: {\n\n' +
         '        /**\n' +
         '         * Can be:\n' +
         '         * - `backend-services` (*default*) all tests will be executed.\n' +
-        '         * - `client-credentials` - uses client_id and client_secret. Most of the\n' +
+        '         * - `client-credentials` - uses client_id and client_secret. Most of\n' +
+        '         *    the authorization tests will be skipped.\n' +
+        '         * - `none` - no authorization will be performed and all the\n' +
         '         *    authorization tests will be skipped.\n' +
-        '         * - `none` - no authorization will be performed and all the authorization \n' +
-        '         *    tests will be skipped.\n' +
         '         */\n' +
         '        type: "none",\n' +
         '\n' +
@@ -169,7 +173,10 @@ program
         '\n' +
         '        /**\n' +
         '         * The full URL of the token endpoint. Required, unless authType is set\n' +
-        '         * to "none"\n' +
+        '         * to "none". If set to a falsy value BDT will try to auto-detect it\n' +
+        '         * from the CapabilityStatement. To disable such auto-detection\n'+
+        '         * attempts, set this to your token endpoint or to "none" if you don\'t\n' +
+        '         * have one.\n' +
         '         */\n' +
         '        tokenEndpoint: "",\n' +
         '\n' +
@@ -264,22 +271,30 @@ program
         '     * empty string.\n' +
         '     */\n' +
         '    patientExportEndpoint: "Patient/$export", // will be auto-detected if not defined\n' +
-       '\n' +
+        '\n' +
         '    /**\n' +
-        '     * By default BDT will fetch and parse the CapabilityStatement to try to\n' +
-        '     * detect if the server supports group-level export. If so, and if `groupId`\n' +
-        '     * is set group-level tests will be enabled.\n' +
-        '     * However, if the server does not have a CapabilityStatement or if it is\n' +
-        '     * not properly declaring the group export support, you can skip that\n' +
-        '     * check by declaring the `groupExportEndpoint` below. The value should be\n' +
-        '     * a path relative to the `baseURL` (typically "Group/{GroupID}/$export").\n' +
-        '     * Note that if you set this, then the `groupId` option will not be used\n' +
-        '     * since the `groupId` is already part of the `groupExportEndpoint` path.\n' +
+        '     * Set this to your group-level export endpoint to enable the group-level\n' +
+        '     * tests. The value should be a path relative to the `baseURL` - typically\n' +
+        '     * "Group/{GroupID}/$export", where {GroupID} is the ID of the group you\'d\n' +
+        '     * like to to test.\n' +
         '     */\n' +
-        '    groupExportEndpoint: "", // will be auto-detected if not defined\n' +
-       '\n' +
+        '    groupExportEndpoint: "",\n' +
+        '\n' +
+        '    /**\n' +
+        '     * The resource type that should be fast to export (for example because\n' +
+        '     * there are very fey resources of that type). Wherever applicable, BDT will\n' +
+        '     * restrict the exports it makes to that type only. Defaults to "Patient",\n' +
+        '     * just because that is the one resource that should be available on any\n' +
+        '     * FHIR server.\n' +
+        '     */\n' +
         '    fastestResource: "Patient",\n' +
         '\n' +
+        '    /**\n' +
+        '     * To function properly BDT will need at least two resource types listed\n' +
+        '     * here. Alternatively, you could remove (or comment out) this option, and\n' +
+        '     * then BDT will set it to all the resource types found in the capability\n' +
+        '     * statement.\n' +
+        '     */\n' +
         '    supportedResourceTypes: ["Patient"]\n' +
         '};\n'
 

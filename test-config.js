@@ -1,17 +1,22 @@
+/**
+ * @type { import("./src/lib/Config").ServerConfig }
+ */
 module.exports = {
+
     /**
      * FHIR server base URL.
      */
-    baseURL: "",
+    baseURL: "http://my-fhir-server.com/",
 
     authentication: {
+
         /**
          * Can be:
          * - `backend-services` (*default*) all tests will be executed.
-         * - `client-credentials` - uses client_id and client_secret. Most of the
+         * - `client-credentials` - uses client_id and client_secret. Most of
+         *    the authorization tests will be skipped.
+         * - `none` - no authorization will be performed and all the
          *    authorization tests will be skipped.
-         * - `none` - no authorization will be performed and all the authorization 
-         *    tests will be skipped.
          */
         type: "none",
 
@@ -38,7 +43,10 @@ module.exports = {
 
         /**
          * The full URL of the token endpoint. Required, unless authType is set
-         * to "none"
+         * to "none". If set to a falsy value BDT will try to auto-detect it
+         * from the CapabilityStatement. To disable such auto-detection
+         * attempts, set this to your token endpoint or to "none" if you don't
+         * have one.
          */
         tokenEndpoint: "",
 
@@ -135,19 +143,27 @@ module.exports = {
     patientExportEndpoint: "Patient/$export", // will be auto-detected if not defined
 
     /**
-     * By default BDT will fetch and parse the CapabilityStatement to try to
-     * detect if the server supports group-level export. If so, and if `groupId`
-     * is set group-level tests will be enabled.
-     * However, if the server does not have a CapabilityStatement or if it is
-     * not properly declaring the group export support, you can skip that
-     * check by declaring the `groupExportEndpoint` below. The value should be
-     * a path relative to the `baseURL` (typically "Group/{GroupID}/$export").
-     * Note that if you set this, then the `groupId` option will not be used
-     * since the `groupId` is already part of the `groupExportEndpoint` path.
+     * Set this to your group-level export endpoint to enable the group-level
+     * tests. The value should be a path relative to the `baseURL` - typically
+     * "Group/{GroupID}/$export", where {GroupID} is the ID of the group you'd
+     * like to to test.
      */
-    groupExportEndpoint: "", // will be auto-detected if not defined
+    groupExportEndpoint: "",
 
+    /**
+     * The resource type that should be fast to export (for example because
+     * there are very fey resources of that type). Wherever applicable, BDT will
+     * restrict the exports it makes to that type only. Defaults to "Patient",
+     * just because that is the one resource that should be available on any
+     * FHIR server.
+     */
     fastestResource: "Patient",
 
+    /**
+     * To function properly BDT will need at least two resource types listed
+     * here. Alternatively, you could remove (or comment out) this option, and
+     * then BDT will set it to all the resource types found in the capability
+     * statement.
+     */
     supportedResourceTypes: ["Patient"]
 };
