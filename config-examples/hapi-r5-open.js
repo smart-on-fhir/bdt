@@ -1,7 +1,5 @@
-/// <reference path="../index.d.ts" />
-
 /**
- * @type { BDT.ServerConfig }
+ * @type { import("../src/lib/Config").ServerConfig }
  */
 module.exports = {
     baseURL: "http://hapi.fhir.org/baseR5",
@@ -11,5 +9,8 @@ module.exports = {
     fastestResource: "Immunization",
     requests: {
         timeout: 15000
+    },
+    authentication: {
+        type: "none"
     }
 };

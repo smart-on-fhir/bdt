@@ -1,5 +1,3 @@
-/// <reference path="../index.d.ts" />
-
 /**
  * This file will configure BDT to test a a locally running instance of the
  * reference bulk data server (https://github.com/smart-on-fhir/bulk-data-server)
@@ -7,7 +5,7 @@
  */
 module.exports = {
     baseURL: "http://localhost:9443/eyJlcnIiOiIiLCJwYWdlIjoxMDAwMCwiZHVyIjoxMCwidGx0IjoxNSwibSI6MSwic3R1Ijo0fQ/fhir",
-    groupId: "ff7dc35f-79e9-47a0-af22-475cf301a085",
+    groupExportEndpoint: "Group/ff7dc35f-79e9-47a0-af22-475cf301a085/$export",
     fastestResource: "ImagingStudy",
     authentication: {
         type: "backend-services",

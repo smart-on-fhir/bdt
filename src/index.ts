@@ -12,6 +12,13 @@ async function getConfig(path: string): Promise<NormalizedConfig> {
     const configPath = Path.resolve(process.cwd(), path);
     try {
         const options = require(configPath)
+        try {
+            await Config.validate(options)
+        } catch (ex) {
+            console.log(`Found some errors in your configuration file. Please fix them first.`.bold)
+            console.log(ex.message.red)
+            process.exit(1)
+        }
         const config  = new Config(options)
         return await config.normalize() as ConfigType
     } catch (ex) {

@@ -11,6 +11,7 @@ import {
     AuthTokenClaims
 } from "./auth"
 import { FHIR } from "./BulkDataClient"
+import ms from "ms"
 
 export interface AuthenticationOptions {
 
@@ -100,8 +101,15 @@ export interface AuthenticationOptions {
 }
 
 export interface ServerConfig {
-    baseURL?: string
 
+    /**
+     * FHIR server base URL.
+     */
+    baseURL: string
+
+    /**
+     * Authentication options
+     */
     authentication: AuthenticationOptions
 
     requests: {
@@ -390,6 +398,8 @@ export default class Config
                 "Invalid authentication.tokenSignAlgorithm option"
             ).to.include(tokenSignAlgorithm)
             out.authentication.tokenSignAlgorithm = tokenSignAlgorithm
+        } else {
+            out.authentication.tokenSignAlgorithm = out.authentication.privateKey?.alg as SupportedJWKAlgorithm
         }
 
         // tokenExpiresIn
@@ -561,5 +571,175 @@ export default class Config
             return (capabilityStatement.rest[0].resource || []).map((x: any) => x.type);
         }
         return []
+    }
+
+    static async validate(cfg: Partial<ServerConfig>) {
+        
+        // baseURL -------------------------------------------------------------
+        expect(cfg, "The baseURL property is required").to.include("baseURL")
+        expect(cfg.baseURL, "The baseURL property must be a string").to.be.string()
+        expect(cfg.baseURL, "The baseURL property cannot be empty").to.not.be.empty()
+    
+        // systemExportEndpoint ------------------------------------------------
+        if ("systemExportEndpoint" in cfg) {
+            expect(!cfg.systemExportEndpoint || typeof cfg.systemExportEndpoint === "string", "The systemExportEndpoint property can either be falsy or non-empty string")
+        }
+
+        // patientExportEndpoint -----------------------------------------------
+        if ("patientExportEndpoint" in cfg) {
+            expect(!cfg.patientExportEndpoint || typeof cfg.patientExportEndpoint === "string", "The patientExportEndpoint property can either be falsy or non-empty string")
+        }
+
+        // groupExportEndpoint -------------------------------------------------
+        if ("groupExportEndpoint" in cfg) {
+            expect(!cfg.groupExportEndpoint || typeof cfg.groupExportEndpoint === "string", "The groupExportEndpoint property can either be falsy or non-empty string")
+        }
+
+        // Any export endpoint -------------------------------------------------
+        // expect(
+        //     !!(cfg.systemExportEndpoint || cfg.patientExportEndpoint || cfg.groupExportEndpoint),
+        //     "No export endpoints defined. You need to set at least one of 'systemExportEndpoint', " +
+        //     "'patientExportEndpoint' or 'groupExportEndpoint'."
+        // ).to.be.true()
+
+        // fastestResource -----------------------------------------------------
+        if ("fastestResource" in cfg) {
+            expect(cfg.fastestResource, "The fastestResource property must be a string").to.be.string()
+            expect(cfg.fastestResource, "The fastestResource property cannot be empty").to.not.be.empty()
+        }
+
+        // supportedResourceTypes ----------------------------------------------
+        if ("supportedResourceTypes" in cfg) {
+            expect(cfg.supportedResourceTypes, "The supportedResourceTypes property must be an array").to.be.an.array()
+            expect(cfg.supportedResourceTypes.length, "The supportedResourceTypes array must contain at least 2 resource types").to.be.greaterThan(1)
+        }
+
+        // requests ------------------------------------------------------------
+        if ("requests" in cfg) {
+            expect(cfg.requests, "If set, the requests property must be an object").to.be.an.object()
+        }
+
+        // authentication ------------------------------------------------------
+        expect(cfg.authentication, "The 'authentication' property must be an object").to.be.an.object()
+        expect(cfg.authentication, "The 'authentication' object cannot be empty").to.not.be.empty()
+
+        // authentication.type -------------------------------------------------
+        expect(cfg.authentication, "The 'authentication.type' option is required.").to.include("type")
+        expect(
+            ["backend-services", "client-credentials", "none"],
+            "The 'authentication.type' option can only be 'backend-services', " +
+            "'client-credentials' or 'none'."
+        ).to.include(cfg.authentication.type)
+
+        if (cfg.authentication.type !== "none") {
+            
+            // authentication.optional -----------------------------------------
+            if ("optional" in cfg.authentication) {
+                expect(cfg.authentication.optional, "The 'authentication.type' option must have a boolean value.").to.be.boolean()
+            }
+
+            // authentication.tokenEndpoint ------------------------------------
+            if ("tokenEndpoint" in cfg.authentication) {
+                expect(cfg.authentication.tokenEndpoint, "The authentication.tokenEndpoint property must be a string").to.be.string()
+                expect(cfg.authentication.tokenEndpoint, "The authentication.tokenEndpoint property cannot be empty").to.not.be.empty()
+            }
+
+            // authentication.clientId -----------------------------------------
+            expect(cfg.authentication, "The authentication.clientId property is required").to.include("clientId")
+            expect(cfg.authentication.clientId, "The authentication.clientId property must be a string").to.be.string()
+            expect(cfg.authentication.clientId, "The authentication.clientId property cannot be empty").to.not.be.empty()
+        }
+
+        if (cfg.authentication.type === "client-credentials") {
+
+            // authentication.clientSecret -------------------------------------
+            expect(cfg.authentication, "The authentication.clientSecret property is required").to.include("clientSecret")
+            expect(cfg.authentication.clientSecret, "The authentication.clientSecret property must be a string").to.be.string()
+            expect(cfg.authentication.clientSecret, "The authentication.clientSecret property cannot be empty").to.not.be.empty()
+        }
+
+        if (cfg.authentication.type === "backend-services") {
+            
+            // authentication.privateKey ---------------------------------------
+            expect(cfg.authentication, "The authentication.privateKey property is required").to.include("privateKey")
+            // expect(cfg.authentication.privateKey, "The authentication.privateKey property must be an object").to.be.an.object()
+            expect(cfg.authentication.privateKey, "The authentication.privateKey property cannot be empty").to.not.be.empty()
+
+            let privateKey;
+            try {
+                if (typeof cfg.authentication.privateKey === "string") {
+                    privateKey = await jose.JWK.asKey(cfg.authentication.privateKey, "pem")
+                }
+                else if (cfg.authentication.privateKey && typeof cfg.authentication.privateKey === "object") {
+                    privateKey = await jose.JWK.asKey(cfg.authentication.privateKey, "json")
+                }
+            } catch(ex) {
+                throw new Error("The authentication.privateKey property does not appear to be a valid key. " + ex.message)
+            }
+
+            // expect(privateKey, "The authentication.privateKey property does not appear to be a JWK").to.include("alg")
+            // expect(
+            //     ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'],
+            //     "Invalid authentication.privateKey.alg option"
+            // ).to.include(privateKey.alg)
+
+            // authentication.scope --------------------------------------------
+
+            // authentication.customTokenClaims --------------------------------
+            if ("customTokenClaims" in cfg.authentication) {
+                expect(cfg.authentication.customTokenClaims, "If used, the authentication.customTokenClaims property must be an object").to.be.an.object()
+                let keys = ["iss", "sub", "aud", "jti"];
+                let ignored = Object.keys(cfg.authentication.customTokenClaims).find(key => {
+                    return keys.indexOf(key) > -1
+                });
+                if (ignored) {
+                    console.warn(
+                        `The configuration property authentication.customTokenClaims.${
+                        ignored} is not configurable and will be ignored`.yellow
+                    )
+                }
+            }
+        
+            // authentication.customTokenHeaders -------------------------------
+            if ("customTokenHeaders" in cfg.authentication) {
+                expect(cfg.authentication.customTokenHeaders, "If used, the authentication.customTokenHeaders property must be an object").to.be.an.object()
+                let keys = ["typ", "alg", "kty", "jku"];
+                let ignored = Object.keys(cfg.authentication.customTokenHeaders).find(key => {
+                    return keys.indexOf(key) > -1
+                });
+                if (ignored) {
+                    console.warn(
+                        `The configuration property authentication.customTokenHeaders.${
+                        ignored} is not configurable and will be ignored`.yellow
+                    )
+                }
+            }
+
+            // authentication.tokenSignAlgorithm -------------------------------
+            if ("tokenSignAlgorithm" in cfg.authentication) {
+                expect(cfg.authentication.tokenSignAlgorithm, "authentication.tokenSignAlgorithm must be a string").to.be.string()
+                expect<string>(cfg.authentication.tokenSignAlgorithm, "authentication.tokenSignAlgorithm must not be \"none\"").to.not.equal("none")
+                expect(
+                    ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'],
+                    "Invalid authentication.tokenSignAlgorithm option"
+                ).to.include(cfg.authentication.tokenSignAlgorithm)
+            }
+
+            // authentication.tokenExpiresIn -----------------------------------
+            if (typeof cfg.authentication.tokenExpiresIn == "string") {
+                expect(cfg.authentication.tokenExpiresIn, "authentication.tokenExpiresIn cannot be empty.").to.not.be.empty()
+                expect(ms(cfg.authentication.tokenExpiresIn), "The authentication.tokenExpiresIn value is invalid").to.not.be.undefined()
+                expect(ms(cfg.authentication.tokenExpiresIn), "The authentication.tokenExpiresIn value is invalid").to.be.greaterThan(0)
+            }
+            else if (typeof cfg.authentication.tokenExpiresIn == "number") {
+                expect(cfg.authentication.tokenExpiresIn, "The authentication.tokenExpiresIn value is invalid").to.be.greaterThan(0)
+            }
+
+            // authentication.jwksUrl ------------------------------------------
+            if ("jwksUrl" in cfg.authentication) {
+                expect(cfg.authentication.jwksUrl, "If set, the authentication.jwksUrl property must be a string").to.be.string()
+                expect(cfg.authentication.jwksUrl, "If set, the authentication.jwksUrl property cannot be empty").to.not.be.empty()
+            }
+        }
     }
 }

@@ -1,13 +1,8 @@
-/// <reference path="../index.d.ts" />
 
 /**
- * @type { BDT.ServerConfig }
+ * @type { import("../src/lib/Config").ServerConfig }
  */
 module.exports = {
-    // public: true,
-    // name: "LEAP Bulk Data Server (deprecated)",
-    // description: "",
-
     baseURL: "https://34.73.85.246",
     fastestResource: "Practitioner",
     systemExportEndpoint: "$export",
@@ -22,6 +17,7 @@ module.exports = {
         type: "backend-services",
         tokenEndpoint: "https://34.73.85.246/auth/token",
         clientId: "leap-client-id",
+        optional: false,
         privateKey: {
             "kty": "EC",
             "crv": "P-384",

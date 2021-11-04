@@ -1,5 +1,3 @@
-/// <reference path="../index.d.ts" />
-
 /**
  * This file will configure BDT to test an R4 instance of the
  * reference bulk data server (https://bulk-data.smarthealthit.org)
@@ -7,7 +5,7 @@
  */
 module.exports = {
     baseURL: "https://bulk-data.smarthealthit.org/eyJlcnIiOiIiLCJwYWdlIjoxMDAwMCwiZHVyIjoxMCwidGx0IjoxNSwibSI6MSwic3R1Ijo0LCJkZWwiOjB9/fhir",
-    groupId: "ff7dc35f-79e9-47a0-af22-475cf301a085",
+    groupExportEndpoint: "Group/ff7dc35f-79e9-47a0-af22-475cf301a085/$export",
     fastestResource: "ImagingStudy",
     authentication: {
         type: "backend-services",

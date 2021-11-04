@@ -1,7 +1,5 @@
-/// <reference path="../index.d.ts" />
-
 /**
- * @type { BDT.ServerConfig }
+ * @type { import("../src/lib/Config").ServerConfig }
  */
 module.exports = {
     baseURL: "http://hapi.fhir.org/baseR4",
@@ -11,5 +9,8 @@ module.exports = {
     fastestResource: "Organization",
     requests: {
         timeout: 15000
+    },
+    authentication: {
+        type: "none"
     }
 };

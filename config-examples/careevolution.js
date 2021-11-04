@@ -1,5 +1,3 @@
-/// <reference path="../index.d.ts" />
-
 /**
  * Use this to template define new configurations
  * @type { import("../src/lib/Config").ServerConfig }
