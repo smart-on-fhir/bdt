@@ -588,7 +588,7 @@ export function expectSuccessfulExport(response: Response, prefix = "")
     // the host machine that executes the tests and the server. For that reason we also check if
     // the server returns a "date" header and if so, we verify that "expires" is after "date".
     const { expires, date } = response.headers
-    if (expires) {
+    if (expires && expires !== "0" && expires !== "-1") {
         expectHttpDateAfter(expires, date || null, concat(prefix, "Invalid 'expires' header"))
     }
 }

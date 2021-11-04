@@ -9,6 +9,7 @@ import {
     expectUnauthorized,
     isJsonResponse
 } from "../lib/assertions"
+import { expect } from "@hapi/code";
 
 interface TokenTestsContext {
     client: BulkDataClient
@@ -333,10 +334,8 @@ suite("Authorization", () => {
         });
 
         test<TokenTestsContext>({
-            name: "Handles wildcard action scopes correctly",
-            description: "Verifies that scopes like `system/Patient.*` or `system/*.*` are handled correctly. Examples:\n" +
-                "- If `system/*.*` is requested, the server should grant `system/*.read` or `system/*.*`\n" +
-                "- If `system/Patient.*` is requested, the server should grant `system/Patient.read`, `system/Patient.*`, `system/*.read` or `system/*.*`\n" + 
+            name: "Handles scopes correctly",
+            description: "Verifies that scopes like `system/Patient.*` or `system/*.*` are handled correctly.\n" +
                 "- Servers should avoid granting `.*` action scopes and prefer `.read` instead\n" +
                 "- Servers should NOT explicitly grant any `.write` scopes\n"
         }, async ({ config, context, api }) => {
@@ -361,6 +360,7 @@ suite("Authorization", () => {
                         response,
                         `If the server supports the "${scope}" scope, then it must reply with valid token response`
                     )
+                    expect(response.body.scope, "Servers should not grant any write scopes").not.to.match(/\.\*\b|\.write\b/);
                 } else {
                     expectOAuthErrorType(
                         response,
