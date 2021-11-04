@@ -153,7 +153,7 @@ class Audit extends EventEmitter
 
 
 async function report2(options: ConfigType) {
-    console.log("\n")
+    console.log("\nRunning audit for " + options.baseURL + "\n\n\n")
     const audit = new Audit(options)
     audit.load()
     audit.on("progress", (score, check) => {

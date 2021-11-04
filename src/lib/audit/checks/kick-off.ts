@@ -84,6 +84,7 @@ export const suite: suiteFunction = async function({ config, check }) {
 
     await check({
         name: `Supports system-level export using POST requests`,
+        minVersion: "2",
         weights: { reliability: 3, compliance: 5 }
     }, async () => {
         if (config.systemExportEndpoint) {
@@ -99,6 +100,7 @@ export const suite: suiteFunction = async function({ config, check }) {
 
     await check({
         name: `Supports patient-level export using POST requests`,
+        minVersion: "2",
         weights: { reliability: 3, compliance: 5 }
     }, async () => {
         if (config.patientExportEndpoint) {
@@ -114,6 +116,7 @@ export const suite: suiteFunction = async function({ config, check }) {
 
     await check({
         name: `Supports group-level export using POST requests`,
+        minVersion: "2",
         weights: { reliability: 3, compliance: 5 }
     }, async () => {
         if (config.groupExportEndpoint) {
@@ -136,6 +139,7 @@ export const suite: suiteFunction = async function({ config, check }) {
 
             await check({
                 name: `${type}-level ${method} kick-off requires "accept" header`,
+                description: "The 'accept' request header is required and servers should return an error if it is not sent",
                 weights: { security: 1, reliability: 4, compliance : 5 }
             }, async () => {
                 const { response } = await client.kickOff({ type, method, headers: { accept: undefined } })
@@ -145,6 +149,7 @@ export const suite: suiteFunction = async function({ config, check }) {
 
             await check({
                 name: `${type}-level ${method} kick-off requires the "prefer" header to contain respond-async`,
+                description: "The 'prefer' request header must contain 'respond-async' and servers should verify that",
                 weights: { security: 1, reliability: 4, compliance: 5 }
             }, async () => {
                 const { response } = await client.kickOff({ type, method, headers: { prefer: "test-header-value" }})
@@ -154,7 +159,9 @@ export const suite: suiteFunction = async function({ config, check }) {
 
             await check({
                 name: `${type}-level ${method} kick-off allows the "prefer" header to contain "respond-async,handling=lenient"`,
-                weights: { reliability: 4, compliance: 5 }
+                description: "Clients should be able to send 'handling=lenient' in the prefer header. That would increase the reliability and compliance score.",
+                weights: { reliability: 4, compliance: 5 },
+                minVersion: "2"
             }, async () => {
                 const { response } = await client.kickOff({ type, method, headers: { prefer: ["respond-async", "handling=lenient"] }})
                 await client.cancelIfStarted(response)
@@ -165,6 +172,7 @@ export const suite: suiteFunction = async function({ config, check }) {
 
             await check({
                 name: `${type}-level ${method} kick-off accepts "_outputFormat=application/fhir+ndjson"`,
+                description: "Even servers that use custom output formats must support the default format 'application/fhir+ndjson'.",
                 weights: { reliability: 4, compliance: 4 },
             }, async () => {
                 const { response } = await client.kickOff({ type, method, params: { _outputFormat: "application/fhir+ndjson" }})
@@ -174,6 +182,7 @@ export const suite: suiteFunction = async function({ config, check }) {
         
             await check({
                 name: `${type}-level ${method} kick-off accepts "_outputFormat=application/ndjson"`,
+                description: "Even servers that use custom output formats must support the default format 'application/ndjson'.",
                 weights: { reliability: 4, compliance: 4 }
             }, async () => {
                 const { response } = await client.kickOff({ type, method, params: { _outputFormat: "application/ndjson" }})
@@ -183,6 +192,7 @@ export const suite: suiteFunction = async function({ config, check }) {
         
             await check({
                 name: `${type}-level ${method} kick-off accepts "_outputFormat=ndjson"`,
+                description: "Even servers that use custom output formats must support the default format 'ndjson'.",
                 weights: { reliability: 4, compliance: 4 }
             }, async () => {
                 const { response } = await client.kickOff({ type, method, params: { _outputFormat: "ndjson" }})
@@ -192,6 +202,7 @@ export const suite: suiteFunction = async function({ config, check }) {
 
             await check({
                 name: `${type}-level ${method} kick-off rejects irrelevant output formats like _outputFormat=text/html"`,
+                description: "Servers should reject irrelevant output formats like _outputFormat=text/html instead of silently ignoring them.",
                 weights: { reliability: 3, compliance: 4 }
             }, async () => {
                 const { response } = await client.kickOff({ type, method, params: { _outputFormat: "text/html" }})
@@ -203,6 +214,7 @@ export const suite: suiteFunction = async function({ config, check }) {
 
             await check({
                 name: `${type}-level ${method} kick-off rejects the "_since" parameter if it contains invalid date`,
+                description: "Invalid '_since' should be rejected by the server, rather than being silently ignored.",
                 weights: { compliance: 3, reliability: 5, security: 3 }
             }, async () => {
                 const { response } = await client.kickOff({ type, method, params: { _since: "0000-60-01T30:70:80+05:00" }})
@@ -212,6 +224,7 @@ export const suite: suiteFunction = async function({ config, check }) {
 
             await check({
                 name: `${type}-level ${method} kick-off rejects the "_since" parameter if it contains a future date`,
+                description: "Invalid '_since' should be rejected by the server, rather than being silently ignored.",
                 weights: { compliance: 1, reliability: 5, security: 3 }
             }, async () => {
                 const { response } = await client.kickOff({ type, method, params: { _since: "2057-01-01T00:00:00+05:00" }})
