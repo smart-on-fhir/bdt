@@ -28,48 +28,80 @@ const bdt_1 = require("./lib/bdt");
 const Config_1 = __importDefault(require("./lib/Config"));
 const index_1 = __importDefault(require("./lib/audit/index"));
 require("colors");
+async function getConfig(path) {
+    const configPath = path_1.default.resolve(process.cwd(), path);
+    try {
+        const options = require(configPath);
+        try {
+            await Config_1.default.validate(options);
+        }
+        catch (ex) {
+            console.log(`Found some errors in your configuration file. Please fix them first.`.bold);
+            console.log(ex.message.red);
+            process.exit(1);
+        }
+        const config = new Config_1.default(options);
+        return await config.normalize();
+    }
+    catch (ex) {
+        throw new Error(`Failed to load settings from "${configPath}".\n${ex.message.red}`);
+    }
+}
 const program = new commander_1.Command();
 program.version("2.0.0");
 program.name("bdt");
-program.option('-c, --config <path>', 'set config path', '../config.js');
-program.addOption(new commander_1.default.Option("-v, --api-version [version]", "Bulk Data API version to test.")
-    .choices(["1.0", "2.0"])
-    .default("1.0"));
+// =============================================================================
+//                                    list
+// =============================================================================
+// List the test tree as JSON structure. Useful for clients that may want to use
+// this to build test list UI.
+// Examples
+//   node . list
+//   node . list --path '2.2'
+//   node . list --api-version '1.3'
+//   node . list --pattern './build/testSuite/authorization.test.js'
 program
     .command('list')
     .description('output loaded test tree structure as JSON')
-    .action(() => {
-    console.log('read config from %s', program.opts().config);
-});
+    .option("-p, --path [path]", "List the sub-tree at the given path", "")
+    .option("-v, --api-version [version]", "List only nodes matching the given version", "")
+    .option("-f, --pattern [glob]", "A glob pattern to load test files from (relative to cwd)", "./build/testSuite/**/*.test.js")
+    .action(async (options) => { bdt_1.bdt({ ...options, list: true }); });
+// =============================================================================
+//                                    audit
+// =============================================================================
+// Experimental feature! This will run a variety of checks against the given
+// server and generate an audit report for it, giving it a score for Security,
+// Compliance and Reliability.
 program
     .command("audit")
     .description('Generates audit report')
-    .action(async () => {
+    .option('-c, --config <path>', 'set config path', './config.js')
+    .action(async (commandOptions) => {
     const args = program.opts();
-    const options = {
+    const config = await getConfig(commandOptions.config);
+    const options = Object.assign(config, {
         cli: true,
-        apiVersion: args.apiVersion
-    };
-    const configPath = path_1.default.resolve(process.cwd(), args.config);
-    try {
-        const serverOptions = require(configPath);
-        const config = new Config_1.default(serverOptions);
-        const normalizedConfig = await config.normalize();
-        Object.assign(options, normalizedConfig);
-    }
-    catch (ex) {
-        console.error(`Failed to load settings from "${configPath}".\n`, ex.message.red);
-        process.exit(1);
-    }
+        apiVersion: args.apiVersion,
+        path: ""
+    });
     index_1.default(options);
 });
+// =============================================================================
+//                                    test
+// =============================================================================
 program
     .command('test') // { isDefault: true }
     .description('load tests and execute them')
+    .option('-c, --config <path>', 'set config path', './config.js')
+    .option("-V, --api-version [version]", "List only nodes matching the given version", "1.0")
     .option("-c, --no-colors", "show output without colors", true)
-    .option("-w, --wrap [column]", "wrap at column [n]", parseFloat, 100)
+    .option("-w, --wrap [column]", "wrap at column [n]", parseFloat, 160)
     .option("-b, --bail", "exit on first error", false)
-    .option("--showConfig", "Print BDT config and exit. Useful for debugging what options have been loaded")
+    .option("-s, --showConfig", "Print BDT config and exit. Useful for debugging what options have been loaded")
+    .option("-m, --match [RegExp]", "JS case-insensitive RegExp to run against the test name", "")
+    .option("-p, --path [path]", "Path to the test node to execute (e.g. '0.2' for the third child of the first child of the root node)", "")
+    .option("-P, --pattern [glob]", "A glob pattern to load test files from", "./build/testSuite/**/*.test.js")
     .addOption(new commander_1.default.Option("-v, --verbose [value]", 'When to show full details. "auto" means that full details will only be shown for failed tests')
     .choices(["always", "never", "auto"])
     .default("auto"))
@@ -77,61 +109,30 @@ program
     .choices(["console", "json", "stdout"])
     .default("console"))
     .action(async (commandOptions) => {
-    const args = program.opts();
-    const options = {
-        cli: true,
-        apiVersion: args.apiVersion,
+    let config = await getConfig(commandOptions.config);
+    Object.assign(config, {
+        apiVersion: commandOptions.apiVersion,
         bail: commandOptions.bail,
-        // match: "",
+        match: commandOptions.match,
         reporter: commandOptions.reporter,
-        pattern: "./build/testSuite/**/*.test.js",
+        pattern: commandOptions.pattern,
+        path: commandOptions.path,
         list: false,
-        // path: "",
+        cli: true,
         reporterOptions: {
-            // logHttpRequests: commandOptions.verbose,
-            // logHttpResponses: commandOptions.verbose,
-            // logErrorStacks: commandOptions.verbose,
             wrap: commandOptions.wrap,
             colors: commandOptions.colors,
             verbose: commandOptions.verbose
         }
-    };
-    // console.log(process.cwd())
-    // console.log(__dirname)
-    const configPath = path_1.default.resolve(process.cwd(), args.config);
-    try {
-        // Object.assign(options, require(configPath));
-        const serverOptions = require(configPath);
-        const config = new Config_1.default(serverOptions);
-        const normalizedConfig = await config.normalize();
-        // console.log(normalizedConfig)
-        Object.assign(options, normalizedConfig);
-    }
-    catch (ex) {
-        console.error(`Failed to load settings from "${configPath}".\n`, ex.message.red);
-        process.exit(1);
-    }
-    if (commandOptions.showConfig) {
-        console.log(options);
+    });
+    if (config.showConfig) {
+        console.log(config);
         return;
     }
-    // console.log(options)
-    // console.log(args)
-    // console.log(commandOptions)
-    bdt_1.bdt(options);
+    // console.log(config)
+    bdt_1.bdt(config);
 });
-//     // .option("-p, --pattern [glob]"       , "A glob pattern to load test files from", "../testSuite/**/*.test.js")
-// program.option("-r, --reporter [name]"      , "Specify a reporter to use (console | json)", "console")
-// program.option("-l, --list"                 , "List loaded structure instead of executing tests")
-//     // .option("-P, --path [path]"          , "Path to the test node to execute (e.g. '0.2' for the third child of the first child of the root node)", "")
-// program.option("-c, --config [path]"        , "Path to config file to load. Defaults to '../config.js'", "../config.js")
-// program.option("-v, --api-version [version]", "Bulk Data API version to test. Example \"1.0\", \"1.2\", \"2\"", "1.0")
-//     // .option("-b, --bail"                 , "Exit on first error")
-//     // .option("-m, --match [RegExp]"       , "JS case-insensitive RegExp to run against the test name", "")
-// program.option("-V, --verbose", "Pass options to the chosen reporter")    
-// program.option("--reporter-arg <name=value...>", "Pass options to the chosen reporter")
 async function main() {
-    // program.parse(process.argv);
     await program.parseAsync(process.argv);
 }
 main();

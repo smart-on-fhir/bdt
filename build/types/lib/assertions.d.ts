@@ -132,6 +132,11 @@ export interface ResponseAssertions {
 }
 export declare function concat(...messages: (string | Error)[]): string;
 /**
+ * Check if the response comes with a JSON(-like) content-type header
+ * @param response The response to check
+ */
+export declare function isJsonResponse(response: Response): Boolean;
+/**
  * Asserts that the `statusCode` of the given response is either:
  * 1. Equal to the given `code` argument, if that code is a number
  * 2. Listed in the given `code` argument, if that code is an array of numbers

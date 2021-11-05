@@ -7,6 +7,7 @@ const events_1 = __importDefault(require("events"));
 const errors_1 = require("./errors");
 const Test_1 = require("./Test");
 const TestAPI_1 = require("./TestAPI");
+const globalContext_1 = __importDefault(require("./globalContext"));
 class TestRunner extends events_1.default {
     constructor(settings, onlyMode = false) {
         super();
@@ -81,6 +82,12 @@ class TestRunner extends events_1.default {
     }
     async run(node, context = {}) {
         if (node instanceof Test_1.Test) {
+            // If run is called for a leaf node we don't know its parent so make
+            // sure we find it manually and set it as `currentGroup`
+            let path = node.path.split(".");
+            path.pop();
+            // @ts-ignore
+            this.currentGroup = globalContext_1.default.root.getNodeAt(path.join("."));
             return await this.runTest(node, context);
         }
         let parentGroup = this.currentGroup;

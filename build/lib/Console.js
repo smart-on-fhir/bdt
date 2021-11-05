@@ -78,7 +78,7 @@ class Console {
             method: req.method,
             url: req.url.href,
             headers: req.headers,
-            payload: req.body || req.form || null
+            payload: req.body || req.form || req.json || null
         });
     }
     /**

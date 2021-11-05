@@ -59,7 +59,7 @@ function getErrorMessageFromResponse(response) {
                 json = response.body;
             }
             if (json.resourceType === "OperationOutcome") {
-                msg = json.issue.map((i) => i.details?.text || i.diagnostics).join("; ");
+                msg = json.issue.map((i) => i.details?.text || i.diagnostics || "Unknown error").join("; ");
             }
             else if (typeof json.error === "string") {
                 msg = json.error;

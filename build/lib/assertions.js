@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.assert = exports.expectValidManifestEntry = exports.expectNDJSONElements = exports.expectExportNotEmpty = exports.expectSuccessfulDownload = exports.expectSuccessfulExport = exports.expectHttpDateBefore = exports.expectHttpDateAfter = exports.expectHttpDate = exports.expectSuccessfulKickOff = exports.expectFailedKickOff = exports.expectSuccessfulAuth = exports.expectOAuthErrorType = exports.expectOAuthError = exports.expectUnauthorized = exports.expectOperationOutcome = exports.expectFhirResourceType = exports.expectFhirResource = exports.expectNDJsonResponse = exports.expectJsonResponse = exports.expectClientError = exports.expectResponseText = exports.expectResponseCode = exports.concat = exports.HTTP_DATE_FORMATS = void 0;
+exports.assert = exports.expectValidManifestEntry = exports.expectNDJSONElements = exports.expectExportNotEmpty = exports.expectSuccessfulDownload = exports.expectSuccessfulExport = exports.expectHttpDateBefore = exports.expectHttpDateAfter = exports.expectHttpDate = exports.expectSuccessfulKickOff = exports.expectFailedKickOff = exports.expectSuccessfulAuth = exports.expectOAuthErrorType = exports.expectOAuthError = exports.expectUnauthorized = exports.expectOperationOutcome = exports.expectFhirResourceType = exports.expectFhirResource = exports.expectNDJsonResponse = exports.expectJsonResponse = exports.expectClientError = exports.expectResponseText = exports.expectResponseCode = exports.isJsonResponse = exports.concat = exports.HTTP_DATE_FORMATS = void 0;
 const code_1 = require("@hapi/code");
 const lib_1 = require("./lib");
 const moment_1 = __importDefault(require("moment"));
@@ -39,6 +39,21 @@ function concat(...messages) {
     return "\n✖ " + messages.map(x => String(x).replace(/\n✖\sAssertion$/, "").replace(/^\n✖\s*/, "").trim()).filter(Boolean).join("\n✖ ") + "\n✖ Assertion";
 }
 exports.concat = concat;
+// Checks ----------------------------------------------------------------------
+/**
+ * Check if the response comes with a JSON(-like) content-type header
+ * @param response The response to check
+ */
+function isJsonResponse(response) {
+    const ct = String(response.headers["content-type"] || "").toLowerCase().split(";").shift();
+    return [
+        "application/json",
+        "application/json+fhir",
+        "application/fhir+json"
+    ].includes(ct + "");
+}
+exports.isJsonResponse = isJsonResponse;
+// Assertions ------------------------------------------------------------------
 /**
  * Asserts that the `statusCode` of the given response is either:
  * 1. Equal to the given `code` argument, if that code is a number
@@ -109,7 +124,7 @@ exports.expectJsonResponse = expectJsonResponse;
  */
 function expectNDJsonResponse(response, prefix = "") {
     const contentType = String(response.headers["content-type"] || "");
-    code_1.expect(contentType, concat(prefix, `The server must reply with FHIR NDJSON content-type header. Got "${contentType}"`, lib_1.getErrorMessageFromResponse(response))).to.startWith("application/fhir+ndjson");
+    code_1.expect(contentType, concat(prefix, `The server must reply with FHIR NDJSON content-type header. Got "${contentType}"`, lib_1.getErrorMessageFromResponse(response))).to.match(/^application\/(x-|fhir\+)?ndjson/i);
     code_1.expect(response.body, concat(prefix, "The response body is not a string")).to.be.string();
     code_1.expect(response.body, concat(prefix, "The response body is empty")).to.not.be.empty();
     const lines = (response.body + "").split(/\n/);
@@ -330,7 +345,7 @@ function expectSuccessfulExport(response, prefix = "") {
     // the host machine that executes the tests and the server. For that reason we also check if
     // the server returns a "date" header and if so, we verify that "expires" is after "date".
     const { expires, date } = response.headers;
-    if (expires) {
+    if (expires && expires !== "0" && expires !== "-1") {
         expectHttpDateAfter(expires, date || null, concat(prefix, "Invalid 'expires' header"));
     }
 }

@@ -7,6 +7,7 @@ const bdt_1 = require("../lib/bdt");
 const BulkDataClient_1 = require("../lib/BulkDataClient");
 const node_jose_1 = __importDefault(require("node-jose"));
 const assertions_1 = require("../lib/assertions");
+const code_1 = require("@hapi/code");
 bdt_1.suite("Authorization", () => {
     // A few tests that are the same for each of the kick-off endpoints
     ["system", "patient", "group"].forEach((type) => {
@@ -26,7 +27,13 @@ bdt_1.suite("Authorization", () => {
                 const { response } = await client.kickOff({ type, skipAuth: true });
                 await client.cancelIfStarted(response);
                 assertions_1.expectUnauthorized(client.kickOffResponse, "The server must not accept kick-off requests without authorization header");
-                assertions_1.expectJsonResponse(client.kickOffResponse, "The response body SHALL be a FHIR OperationOutcome resource in JSON format.");
+                // The body SHALL be a FHIR OperationOutcome resource in JSON format
+                // but replying with an OperationOutcome is optional. This should
+                // mean that if the server replies with JSON, then the body must be
+                // an OperationOutcome.
+                if (assertions_1.isJsonResponse(client.kickOffResponse)) {
+                    assertions_1.expectOperationOutcome(client.kickOffResponse, "The body SHALL be a FHIR OperationOutcome resource in JSON format");
+                }
             });
             bdt_1.test({
                 name: `Rejects invalid token`,
@@ -227,10 +234,8 @@ bdt_1.suite("Authorization", () => {
             assertions_1.expectOAuthErrorType(response, "invalid_scope", "The authorization attempt must fail if a non-system scope is requested");
         });
         bdt_1.test({
-            name: "Handles wildcard action scopes correctly",
-            description: "Verifies that scopes like `system/Patient.*` or `system/*.*` are handled correctly. Examples:\n" +
-                "- If `system/*.*` is requested, the server should grant `system/*.read` or `system/*.*`\n" +
-                "- If `system/Patient.*` is requested, the server should grant `system/Patient.read`, `system/Patient.*`, `system/*.read` or `system/*.*`\n" +
+            name: "Handles scopes correctly",
+            description: "Verifies that scopes like `system/Patient.*` or `system/*.*` are handled correctly.\n" +
                 "- Servers should avoid granting `.*` action scopes and prefer `.read` instead\n" +
                 "- Servers should NOT explicitly grant any `.write` scopes\n"
         }, async ({ config, context, api }) => {
@@ -249,6 +254,7 @@ bdt_1.suite("Authorization", () => {
                 });
                 if (response.statusCode === 200) {
                     assertions_1.expectSuccessfulAuth(response, `If the server supports the "${scope}" scope, then it must reply with valid token response`);
+                    code_1.expect(response.body.scope, "Servers should not grant any write scopes").not.to.match(/\.\*\b|\.write\b/);
                 }
                 else {
                     assertions_1.expectOAuthErrorType(response, "invalid_scope", `It appears that the "${scope}" scope is not supported by the server.` +

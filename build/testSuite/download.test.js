@@ -58,7 +58,9 @@ bdt_1.suite("Download Endpoint", () => {
             throw ex;
         }
         finally {
-            await client.cancel(kickOffResponse);
+            if (kickOffResponse) {
+                await client.cancel(kickOffResponse);
+            }
         }
     });
     bdt_1.test({
@@ -100,7 +102,9 @@ bdt_1.suite("Download Endpoint", () => {
             throw ex;
         }
         finally {
-            await client.cancel(kickOffResponse);
+            if (kickOffResponse) {
+                await client.cancel(kickOffResponse);
+            }
         }
     });
     bdt_1.test({
@@ -172,6 +176,7 @@ bdt_1.suite("Download Endpoint", () => {
             // If we got here, it mans the kick-off was successful. We now have
             // to wait for the export to complete
             await client.waitForExport();
+            assertions_1.expectSuccessfulExport(client.statusResponse, "Export was not successful");
             // Inspect and validate the export response
             code_1.expect(client.statusResponse.body.output, "The output property of the status response must be an array").to.be.an.array();
             // If DocumentReference is supported but there is nothing to export
@@ -263,11 +268,16 @@ bdt_1.suite("Download Endpoint", () => {
     });
     bdt_1.test({
         name: "Requesting deleted files returns 404 responses",
-        description: "If the export has been completed, a server MAY send a DELETE request " +
-            "to the status endpoint as a signal that a client is done retrieving files and " +
-            "that it is safe for the sever to remove those from storage. Following the " +
-            "delete request, when subsequent requests are made to the download location, " +
-            "the server SHALL return a 404 error and an associated FHIR OperationOutcome in JSON format."
+        description: "After a bulk data request has been started, a client **MAY** " +
+            "send a **DELETE** request to the URL provided in the `Content-Location` " +
+            "header to cancel the request as described in the [FHIR Asynchronous " +
+            "Request Pattern](https://www.hl7.org/fhir/R4/async.html). If the " +
+            "request has been completed, a server **MAY** use the request as a signal " +
+            "that a client is done retrieving files and that it is safe for the " +
+            "sever to remove those from storage. Following the delete request, " +
+            "when subsequent requests are made to the polling location, the server " +
+            "**SHALL return a 404** error and an associated FHIR OperationOutcome " +
+            "in JSON format."
     }, async ({ config, api }) => {
         const client = new BulkDataClient_1.BulkDataClient(config, api);
         let kickOffResponse;
@@ -278,7 +288,9 @@ bdt_1.suite("Download Endpoint", () => {
             await client.cancel(kickOffResponse);
             let fileUrl = client.statusResponse.body.output[0].url;
             const resp2 = await client.downloadFile(fileUrl);
-            code_1.expect(resp2.statusCode, "Files remain accessible after the export is deleted! " + lib_1.getErrorMessageFromResponse(resp2)).to.equal(404);
+            assertions_1.expectResponseCode(resp2, 404, "Files remain accessible after the export is deleted. " +
+                "Requesting them should return a 404 status code but we got " +
+                resp2.statusCode + " " + resp2.statusMessage + ".");
         }
         catch (ex) {
             throw ex;

@@ -75,14 +75,19 @@ export interface AuthenticationOptions {
     jwksUrl?: string;
 }
 export interface ServerConfig {
-    baseURL?: string;
+    /**
+     * FHIR server base URL.
+     */
+    baseURL: string;
+    /**
+     * Authentication options
+     */
     authentication: AuthenticationOptions;
     requests: {
         strictSSL?: boolean;
         timeout?: number;
         customHeaders: Record<string, any>;
     };
-    groupId?: string;
     /**
      * By default BDT will fetch and parse the CapabilityStatement to try to
      * detect if the server supports system-level export and at what endpoint.
@@ -102,15 +107,10 @@ export interface ServerConfig {
      */
     patientExportEndpoint?: string;
     /**
-     * By default BDT will fetch and parse the CapabilityStatement to try to
-     * detect if the server supports group-level export. If so, and if `groupId`
-     * is set group-level tests will be enabled.
-     * However, if the server does not have a CapabilityStatement or if it is
-     * not properly declaring the group export support, you can skip that
-     * check by declaring the `groupExportEndpoint` below. The value should be
-     * a path relative to the `baseURL` (typically "Group/{GroupID}/$export").
-     * Note that if you set this, then the `groupId` option will not be used
-     * since the `groupId` is already part of the `groupExportEndpoint` path.
+     * Set this to your group-level export endpoint to enable the group-level
+     * tests. The value should be a path relative to the `baseURL` (typically
+     * "Group/{GroupID}/$export"), where {GroupID} is the ID of the group you'd
+     * like to to test.
      */
     groupExportEndpoint?: string;
     fastestResource?: string;
@@ -199,15 +199,10 @@ export interface NormalizedConfig {
      */
     patientExportEndpoint?: string;
     /**
-     * By default BDT will fetch and parse the CapabilityStatement to try to
-     * detect if the server supports group-level export. If so, and if `groupId`
-     * is set group-level tests will be enabled.
-     * However, if the server does not have a CapabilityStatement or if it is
-     * not properly declaring the group export support, you can skip that
-     * check by declaring the `groupExportEndpoint` below. The value should be
-     * a path relative to the `baseURL` (typically "Group/{GroupID}/$export").
-     * Note that if you set this, then the `groupId` option will not be used
-     * since the `groupId` is already part of the `groupExportEndpoint` path.
+     * Set this to your group-level export endpoint to enable the group-level
+     * tests. The value should be a path relative to the `baseURL` (typically
+     * "Group/{GroupID}/$export"), where {GroupID} is the ID of the group you'd
+     * like to to test.
      */
     groupExportEndpoint?: string;
     fastestResource: string;
@@ -222,7 +217,7 @@ export default class Config {
     private getCapabilityStatement;
     private getTokenEndpoint;
     private getSystemExportEndpoint;
-    private getGroupExportEndpoint;
     private getPatientExportEndpoint;
     private getSupportedResourceTypes;
+    static validate(cfg: Partial<ServerConfig>): Promise<void>;
 }

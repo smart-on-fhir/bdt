@@ -105,7 +105,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     assertions_1.expectFailedKickOff(response, api, "The prefer header is not validated");
                 });
                 bdt_1.test({
-                    name: 'Allows the Prefer header to contain "respond-async,handling=lenient"'
+                    name: 'Allows the Prefer header to contain "handling=lenient"'
                 }, async ({ config, api }) => {
                     const client = new BulkDataClient_1.BulkDataClient(config, api);
                     // By default the kickOff method will do a proper request to the
@@ -114,13 +114,13 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     const { response } = await client.kickOff({
                         type,
                         params: { _type: [config.fastestResource] },
-                        headers: { prefer: "respond-async,handling=lenient" }
+                        headers: { prefer: ["respond-async", "handling=lenient"] }
                     });
                     // If the server did not return an error as expected, an export
                     // might actually been started. Make sure we cancel that!
                     await client.cancelIfStarted(response);
                     // Finally check that we have got an error response
-                    assertions_1.expectSuccessfulKickOff(response, api, "The 'handling=lenient' portion of the prefer header is not supported");
+                    assertions_1.expectSuccessfulKickOff(response, api, "The 'handling=lenient' Prefer header is not supported");
                 });
             });
             bdt_1.suite("Request Parameters", () => {
@@ -281,7 +281,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     const { response: response2 } = await client.kickOff({
                         type,
                         headers: {
-                            prefer: "respond-async,handling=lenient"
+                            prefer: ["respond-async", "handling=lenient"]
                         },
                         params: {
                             includeAssociatedData: "LatestProvenanceResources"
@@ -400,7 +400,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     const { response: response2 } = await client.kickOff({
                         type,
                         headers: {
-                            prefer: "respond-async,handling=lenient"
+                            prefer: ["respond-async", "handling=lenient"]
                         },
                         params: {
                             _typeFilter: "Patient?status=active"
@@ -409,7 +409,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     });
                     await client.cancelIfStarted(response2);
                     try {
-                        assertions_1.expectSuccessfulKickOff(response2, api, "Parameter _typeFilter plus header \"prefer: respond-async,handling=lenient\" was rejected");
+                        assertions_1.expectSuccessfulKickOff(response2, api, "Parameter _typeFilter plus header \"prefer: respond-async, handling=lenient\" was rejected");
                     }
                     catch (ex) {
                         ex.message = "\n✖ The server was expected to ignore the _typeFilter parameter if handling=lenient is included in the Prefer header" + ex.message;
@@ -440,7 +440,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     const { response: response2 } = await client.kickOff({
                         type,
                         headers: {
-                            prefer: "respond-async,handling=lenient"
+                            prefer: ["respond-async", "handling=lenient"]
                         },
                         params: {
                             _typeFilter: ["Patient?status=active", "Patient?gender=male"]
@@ -489,7 +489,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                         method: "POST",
                         type,
                         headers: {
-                            prefer: "respond-async,handling=lenient"
+                            prefer: ["respond-async", "handling=lenient"]
                         },
                         json: {
                             resourceType: "Parameters",
@@ -544,7 +544,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                         }
                         await client.waitForExport();
                         assertions_1.expectSuccessfulExport(client.statusResponse, "Export failed");
-                        if (!client.statusResponse?.body.output.length) {
+                        if (!client.statusResponse?.body.output?.length) {
                             return api.setNotSupported("Unable to find enough data to export and complete this test");
                         }
                         const response = await client.downloadFileAt(0);
@@ -610,7 +610,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     }
                     await client.waitForExport();
                     assertions_1.expectSuccessfulExport(client.statusResponse, "Export failed");
-                    if (!client.statusResponse?.body.output.length) {
+                    if (!client.statusResponse?.body.output?.length) {
                         return api.setNotSupported("Unable to find enough data to export and complete this test");
                     }
                     const response = await client.downloadFileAt(0);

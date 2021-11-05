@@ -14,6 +14,7 @@ const console_1 = __importDefault(require("../reporters/console"));
 const globalContext_1 = __importDefault(require("./globalContext"));
 const Test_1 = require("./Test");
 const Suite_1 = require("./Suite");
+const Version_1 = require("./Version");
 const globalContext = globalContext_1.default;
 const reporters = {
     console: console_1.default,
@@ -31,15 +32,21 @@ async function bdt(options) {
     // }
     // load --------------------------------------------------------------------
     load(options.pattern);
-    // runner ------------------------------------------------------------------
-    const runner = new TestRunner_1.default(config, !!globalContext.onlyMode);
-    // reporter ----------------------------------------------------------------
-    reporters[options.reporter](runner, config.reporterOptions);
-    if (options.list) {
-        // console.log()
-    }
-    else {
-        await runner.run(globalContext.root);
+    let node = getPath(options.path || "");
+    if (node) {
+        if (options.list) {
+            if (options.apiVersion) {
+                node = filterByVersion(node.toJSON(), options.apiVersion);
+            }
+            console.log(JSON.stringify(node, null, 4));
+        }
+        else {
+            // runner ------------------------------------------------------------------
+            const runner = new TestRunner_1.default(config, !!globalContext.onlyMode);
+            // reporter ----------------------------------------------------------------
+            reporters[options.reporter](runner, config.reporterOptions);
+            await runner.run(node);
+        }
     }
     return globalContext.root;
 }
@@ -51,9 +58,7 @@ function load(pattern) {
     const paths = glob_1.sync(pattern);
     paths.forEach((file) => {
         const fullPath = path_1.default.resolve(file);
-        // console.log(fullPath)
         try {
-            // requireUncached(fullPath);
             require(fullPath);
         }
         catch (e) {
@@ -61,6 +66,30 @@ function load(pattern) {
         }
     });
     return globalContext.root;
+}
+/**
+ * Given a path (which is a dot-separated list of indexes), finds and returns
+ * the node at that path. For example getPath("2.1.5") will return the sixth
+ * child of the second child of the third child of the root node.
+ */
+function getPath(path = "") {
+    if (!path) {
+        return globalContext.root;
+    }
+    return path.split(".").reduce((out, i) => out && out.children ? out.children[+i] : undefined, globalContext.root);
+}
+function filterByVersion(node, version) {
+    if (node.minVersion && new Version_1.Version(node.minVersion).isAbove(version)) {
+        return undefined;
+    }
+    if (node.maxVersion && new Version_1.Version(node.maxVersion).isBelow(version)) {
+        return undefined;
+    }
+    const out = { ...node };
+    if (Array.isArray(out.children)) {
+        out.children = out.children.map((child) => filterByVersion(child, version)).filter(Boolean);
+    }
+    return out;
 }
 /**
  * Register a function to be executed before a test group execution starts.

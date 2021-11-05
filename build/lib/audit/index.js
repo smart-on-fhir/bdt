@@ -100,7 +100,7 @@ class Audit extends events_1.default {
     }
 }
 async function report2(options) {
-    console.log("\n");
+    console.log("\nRunning audit for " + options.baseURL + "\n\n\n");
     const audit = new Audit(options);
     audit.load();
     audit.on("progress", (score, check) => {

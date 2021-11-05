@@ -277,7 +277,7 @@ class BulkDataClient {
      *     method: "POST",
      *     type: "group",
      *     headers: {
-     *         prefer: "respond-async,handling=lenient"
+     *         prefer: ["respond-async", "handling=lenient"]
      *     },
      *     params: {
      *         includeAssociatedData: "LatestProvenanceResources",
@@ -403,6 +403,7 @@ class BulkDataClient {
             skipAuth,
             followRedirect: false,
             maxRedirects: 0,
+            // throwHttpErrors: true,
             headers: {
                 accept: "application/fhir+json",
                 prefer: "respond-async",
@@ -413,6 +414,7 @@ class BulkDataClient {
         // console.log(result.request.requestUrl, result.request.options.headers, result.response.statusCode, result.body)
         this.kickOffRequest = result.request;
         this.kickOffResponse = result.response;
+        // console.log(result)
         if (result.error) {
             if (result.response.statusCode === 401 && !skipAuth) {
                 const { optional, clientId, type, privateKey, clientSecret } = this.options.authentication;
@@ -493,7 +495,7 @@ class BulkDataClient {
         this.statusRequest = request;
         this.statusResponse = response;
         if (response.statusCode === 202) {
-            await lib_1.wait(Math.min(1000 + 1000 * suffix, 10000));
+            await lib_1.wait(Math.min(2000 + 1000 * suffix, 10000));
             return this.waitForExport(suffix + 1);
         }
     }
@@ -625,6 +627,7 @@ class BulkDataClient {
         return await this.request({
             url: kickOffResponse.headers["content-location"],
             method: "DELETE",
+            responseType: "json",
             requestLabel: labelPrefix + "Cancellation Request",
             responseLabel: labelPrefix + "Cancellation Response"
         });

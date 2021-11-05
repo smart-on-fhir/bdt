@@ -267,18 +267,23 @@ function StdoutReporter(runner, options) {
         colors_1.default.disable();
     }
     function text(node) {
+        let name = node.name;
+        let info = "path: " + node.path;
         if (node.status === "not-implemented") {
-            return node.name.grey + " (not implemented)".grey.dim;
+            name = name.grey;
+            info += ", not implemented".grey;
         }
-        if (node.status === "not-supported") {
-            return node.name.grey + " (not supported)".yellow.dim;
+        else if (node.status === "not-supported") {
+            name = name.grey;
+            info += ", not supported".yellow;
         }
-        if (node.status === "skipped") {
-            return node.name.grey + (isInOnlyMode && !node.only ?
-                " (skipped due to only mode)" :
-                " (skipped)").grey.dim.italic;
+        else if (node.status === "skipped") {
+            name = name.grey;
+            info += (isInOnlyMode && !node.only ?
+                ", skipped due to only mode" :
+                ", skipped").grey.italic;
         }
-        return node.name;
+        return name + (" (" + info + ")").dim;
     }
     function logConsoleEntry(entry, verbose) {
         if (entry.tags.indexOf("request") >= 0 && !verbose)
@@ -340,7 +345,7 @@ function StdoutReporter(runner, options) {
             let prefix = indent(depth++);
             log(`${prefix} ${icon(node)} ${wrap(
             // @ts-ignore
-            node.name.bold, prefix, options.wrap)}`);
+            node.name.bold + ` (path: ${node.path})`.dim, prefix, options.wrap)}`);
         }
     }
     function onGroupEnd(node) {
@@ -351,7 +356,7 @@ function StdoutReporter(runner, options) {
         if (node.status === "skipped" && options.verbose !== "always")
             return;
         // const chars = ["○", "◔", "◑", "◕", "●"];
-        const chars = "○○○○◓◑◒◐○○○○".split(""); // ◒◐◓
+        const chars = "○○◓◑◒◐○○".split(""); // ◒◐◓
         // const chars = "  ▏▎▍▌▋▊▋▌▍▎▏".split(""); //
         // const chars = " ▁▂▃▄▅▆▇█▇▆▅▄▃▂▁ ".split("");
         // const chars = "🌕🌔🌓🌒🌑🌘🌗🌖".split("");⦾⦿
