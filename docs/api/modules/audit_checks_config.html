@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>auth | BDT (Bulk Data Tester)</title>
+	<title>audit/checks/config | BDT (Bulk Data Tester)</title>
 	<meta name="description" content="Documentation for BDT (Bulk Data Tester)">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,10 +55,10 @@
 					<a href="../modules.html">BDT (Bulk Data Tester)</a>
 				</li>
 				<li>
-					<a href="auth.html">auth</a>
+					<a href="audit_checks_config.html">audit/checks/config</a>
 				</li>
 			</ul>
-			<h1>Module auth</h1>
+			<h1>Module audit/checks/config</h1>
 		</div>
 	</div>
 </header>
@@ -70,71 +70,77 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Interfaces</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/auth.authtokenclaims.html" class="tsd-kind-icon">Auth<wbr>Token<wbr>Claims</a></li>
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/auth.authtokenheader.html" class="tsd-kind-icon">Auth<wbr>Token<wbr>Header</a></li>
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/auth.createauthtokenoptions.html" class="tsd-kind-icon">create<wbr>Auth<wbr>Token<wbr>Options</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
-							<h3>Type aliases</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="auth.html#supportedjwkalgorithm" class="tsd-kind-icon">SupportedJWKAlgorithm</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="auth.html#createauthtoken" class="tsd-kind-icon">create<wbr>Auth<wbr>Token</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="audit_checks_config.html#suite" class="tsd-kind-icon">suite</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Type aliases</h2>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
-					<a name="supportedjwkalgorithm" class="tsd-anchor"></a>
-					<h3>SupportedJWKAlgorithm</h3>
-					<div class="tsd-signature tsd-kind-icon">SupportedJWKAlgorithm<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;RS256&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;RS384&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;RS512&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;ES256&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;ES384&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;ES512&quot;</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/auth.ts#L5">src/lib/auth.ts:5</a></li>
-						</ul>
-					</aside>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="createauthtoken" class="tsd-anchor"></a>
-					<h3>create<wbr>Auth<wbr>Token</h3>
+					<a name="suite" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> suite</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">create<wbr>Auth<wbr>Token<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/auth.createauthtokenoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">createAuthTokenOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">suite<span class="tsd-signature-symbol">(</span>ctx<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>check<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">checkOptions</span>, fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>config<span class="tsd-signature-symbol">: </span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/auth.ts#L138">src/lib/auth.ts:138</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/audit/checks/config.ts#L4">src/lib/audit/checks/config.ts:4</a></li>
 								</ul>
 							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Creates and signs an authentication token. Note that this is the low-level
-										method and everything is customizable. That is perfect for testing, but for
-										real life use it may be better to wrap this in another function that only
-									allows meaningful modifications.</p>
-								</div>
-							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>__namedParameters: <a href="../interfaces/auth.createauthtokenoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">createAuthTokenOptions</a></h5>
+									<h5>ctx: <span class="tsd-signature-symbol">{ </span>check<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">checkOptions</span>, fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>config<span class="tsd-signature-symbol">: </span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a><span class="tsd-signature-symbol"> }</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>check<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">checkOptions</span>, fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h5>
+											<ul class="tsd-parameters">
+												<li class="tsd-parameter-signature">
+													<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
+														<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">checkOptions</span>, fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+													</ul>
+													<ul class="tsd-descriptions">
+														<li class="tsd-description">
+															<h4 class="tsd-parameters-title">Parameters</h4>
+															<ul class="tsd-parameters">
+																<li>
+																	<h5>options: <span class="tsd-signature-type">checkOptions</span></h5>
+																</li>
+																<li>
+																	<h5>fn: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">any</span></h5>
+																	<ul class="tsd-parameters">
+																		<li class="tsd-parameter-signature">
+																			<ul class="tsd-signatures tsd-kind-type-literal">
+																				<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+																			</ul>
+																			<ul class="tsd-descriptions">
+																				<li class="tsd-description">
+																					<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
+																				</li>
+																			</ul>
+																		</li>
+																	</ul>
+																</li>
+															</ul>
+															<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+														</li>
+													</ul>
+												</li>
+											</ul>
+										</li>
+										<li class="tsd-parameter">
+											<h5>config<span class="tsd-signature-symbol">: </span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a></h5>
+										</li>
+									</ul>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -179,7 +185,7 @@
 					<li class=" tsd-kind-module">
 						<a href="audit.html">audit</a>
 					</li>
-					<li class=" tsd-kind-module">
+					<li class="current tsd-kind-module">
 						<a href="audit_checks_config.html">audit/checks/config</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -191,7 +197,7 @@
 					<li class=" tsd-kind-module">
 						<a href="audit_lib.html">audit/lib</a>
 					</li>
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
 						<a href="auth.html">auth</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -213,20 +219,8 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/auth.authtokenclaims.html" class="tsd-kind-icon">Auth<wbr>Token<wbr>Claims</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/auth.authtokenheader.html" class="tsd-kind-icon">Auth<wbr>Token<wbr>Header</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/auth.createauthtokenoptions.html" class="tsd-kind-icon">create<wbr>Auth<wbr>Token<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="auth.html#supportedjwkalgorithm" class="tsd-kind-icon">SupportedJWKAlgorithm</a>
-					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="auth.html#createauthtoken" class="tsd-kind-icon">create<wbr>Auth<wbr>Token</a>
+						<a href="audit_checks_config.html#suite" class="tsd-kind-icon">suite</a>
 					</li>
 				</ul>
 			</nav>

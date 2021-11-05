@@ -109,7 +109,7 @@
 					<div class="tsd-signature tsd-kind-icon">authentication<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>clientId<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>clientSecret<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>customTokenClaims<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>customTokenHeaders<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>jwksUrl<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>optional<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>privateKey<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Key</span><span class="tsd-signature-symbol">; </span>scope<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>tokenEndpoint<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>tokenExpiresIn<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>tokenSignAlgorithm<span class="tsd-signature-symbol">?: </span><a href="../modules/auth.html#supportedjwkalgorithm" class="tsd-signature-type" data-tsd-kind="Type alias">SupportedJWKAlgorithm</a><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">&quot;backend-services&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;client-credentials&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;none&quot;</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L156">src/lib/Config.ts:156</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L157">src/lib/Config.ts:157</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -224,7 +224,7 @@
 					<div class="tsd-signature tsd-kind-icon">baseURL<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L154">src/lib/Config.ts:154</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L155">src/lib/Config.ts:155</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -234,7 +234,7 @@
 					<div class="tsd-signature tsd-kind-icon">fastest<wbr>Resource<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L263">src/lib/Config.ts:263</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L258">src/lib/Config.ts:258</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -244,20 +244,15 @@
 					<div class="tsd-signature tsd-kind-icon">group<wbr>Export<wbr>Endpoint<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L261">src/lib/Config.ts:261</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L256">src/lib/Config.ts:256</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>By default BDT will fetch and parse the CapabilityStatement to try to
-								detect if the server supports group-level export. If so, and if <code>groupId</code>
-								is set group-level tests will be enabled.
-								However, if the server does not have a CapabilityStatement or if it is
-								not properly declaring the group export support, you can skip that
-								check by declaring the <code>groupExportEndpoint</code> below. The value should be
-								a path relative to the <code>baseURL</code> (typically &quot;Group/{GroupID}/$export&quot;).
-								Note that if you set this, then the <code>groupId</code> option will not be used
-							since the <code>groupId</code> is already part of the <code>groupExportEndpoint</code> path.</p>
+							<p>Set this to your group-level export endpoint to enable the group-level
+								tests. The value should be a path relative to the <code>baseURL</code> (typically
+								&quot;Group/{GroupID}/$export&quot;), where {GroupID} is the ID of the group you&#39;d
+							like to to test.</p>
 						</div>
 					</div>
 				</section>
@@ -267,7 +262,7 @@
 					<div class="tsd-signature tsd-kind-icon">patient<wbr>Export<wbr>Endpoint<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L248">src/lib/Config.ts:248</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L248">src/lib/Config.ts:248</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -287,7 +282,7 @@
 					<div class="tsd-signature tsd-kind-icon">requests<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>customHeaders<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>strictSSL<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>timeout<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L223">src/lib/Config.ts:223</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L224">src/lib/Config.ts:224</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -311,7 +306,7 @@
 					<div class="tsd-signature tsd-kind-icon">supported<wbr>Resource<wbr>Types<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L265">src/lib/Config.ts:265</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L260">src/lib/Config.ts:260</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -321,7 +316,7 @@
 					<div class="tsd-signature tsd-kind-icon">system<wbr>Export<wbr>Endpoint<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L238">src/lib/Config.ts:238</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L238">src/lib/Config.ts:238</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -374,6 +369,21 @@
 						<a href="../modules/assertions.html">assertions</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="../modules/audit.html">audit</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/audit_checks_config.html">audit/checks/config</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/audit_checks_kick_off.html">audit/checks/kick-<wbr>off</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/audit_checks_token_endpoint.html">audit/checks/token-<wbr>endpoint</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/audit_lib.html">audit/lib</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="../modules/auth.html">auth</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -381,6 +391,9 @@
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/errors.html">errors</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/evaluate.html">evaluate</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/globalcontext.html">global<wbr>Context</a>

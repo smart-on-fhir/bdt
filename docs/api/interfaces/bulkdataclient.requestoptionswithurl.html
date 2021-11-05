@@ -674,7 +674,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="bulkdataclient.requestoptions.html">requestOptions</a>.<a href="bulkdataclient.requestoptions.html#isstream">isStream</a></p>
 						<ul>
-							<li>Defined in node_modules/got/dist/source/types.d.ts:68</li>
+							<li>Defined in node_modules/got/dist/source/types.d.ts:78</li>
 						</ul>
 					</aside>
 				</section>
@@ -1419,7 +1419,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="bulkdataclient.requestoptions.html">requestOptions</a>.<a href="bulkdataclient.requestoptions.html#requestlabel">requestLabel</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/BulkDataClient.ts#L264">src/lib/BulkDataClient.ts:264</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/BulkDataClient.ts#L265">src/lib/BulkDataClient.ts:265</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -1430,7 +1430,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="bulkdataclient.requestoptions.html">requestOptions</a>.<a href="bulkdataclient.requestoptions.html#resolvebodyonly">resolveBodyOnly</a></p>
 						<ul>
-							<li>Defined in node_modules/got/dist/source/types.d.ts:69</li>
+							<li>Defined in node_modules/got/dist/source/types.d.ts:79</li>
 						</ul>
 					</aside>
 				</section>
@@ -1441,20 +1441,51 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="bulkdataclient.requestoptions.html">requestOptions</a>.<a href="bulkdataclient.requestoptions.html#responselabel">responseLabel</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/BulkDataClient.ts#L265">src/lib/BulkDataClient.ts:265</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/BulkDataClient.ts#L266">src/lib/BulkDataClient.ts:266</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external">
 					<a name="responsetype" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> response<wbr>Type</h3>
-					<div class="tsd-signature tsd-kind-icon">response<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;json&quot;</span></div>
+					<div class="tsd-signature tsd-kind-icon">response<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ResponseType</span></div>
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="bulkdataclient.requestoptions.html">requestOptions</a>.<a href="bulkdataclient.requestoptions.html#responsetype">responseType</a></p>
 						<ul>
-							<li>Defined in node_modules/got/dist/source/types.d.ts:70</li>
+							<li>Defined in node_modules/got/dist/source/as-promise/types.d.ts:194</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The parsing method.</p>
+						</div>
+						<p>The promise also has <code>.text()</code>, <code>.json()</code> and <code>.buffer()</code> methods which return another Got promise for the parsed body.</p>
+						<p>It&#39;s like setting the options to <code>{responseType: &#39;json&#39;, resolveBodyOnly: true}</code> but without affecting the main Got promise.</p>
+						<p><strong>Note</strong>: When using streams, this option is ignored.</p>
+						<dl class="tsd-comment-tags">
+							<dt>example</dt>
+							<dd><pre><code><span style="color: #24292EFF">(</span><span style="color: #D32F2F">async</span><span style="color: #24292EFF"> () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {</span>
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">responsePromise</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">got</span><span style="color: #24292EFF">(url);</span>
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bufferPromise</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">responsePromise</span><span style="color: #6F42C1">.buffer</span><span style="color: #24292EFF">();</span>
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">jsonPromise</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">responsePromise</span><span style="color: #6F42C1">.json</span><span style="color: #24292EFF">();</span>
+
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> [</span><span style="color: #1976D2">response</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">buffer</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">json</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Promise</span><span style="color: #6F42C1">.all</span><span style="color: #24292EFF">([responsePromise, bufferPromise, jsonPromise]);</span>
+<span style="color: #C2C3C5">// `response` is an instance of Got Response</span>
+<span style="color: #C2C3C5">// `buffer` is an instance of Buffer</span>
+<span style="color: #C2C3C5">// `json` is an object</span>
+<span style="color: #24292EFF">})();</span>
+</code></pre>
+							</dd>
+							<dt>example</dt>
+							<dd><pre><code><span style="color: #C2C3C5">// This</span>
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">body</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">await</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">got</span><span style="color: #24292EFF">(url)</span><span style="color: #6F42C1">.json</span><span style="color: #24292EFF">();</span>
+
+<span style="color: #C2C3C5">// is semantically the same as this</span>
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">body</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">await</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">got</span><span style="color: #24292EFF">(url, {responseType</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&#039;json&#039;</span><span style="color: #24292EFF">, resolveBodyOnly</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">true</span><span style="color: #24292EFF">});</span>
+</code></pre>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external">
 					<a name="retry" class="tsd-anchor"></a>
@@ -1537,7 +1568,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="bulkdataclient.requestoptions.html">requestOptions</a>.<a href="bulkdataclient.requestoptions.html#skipauth">skipAuth</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/BulkDataClient.ts#L263">src/lib/BulkDataClient.ts:263</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/BulkDataClient.ts#L264">src/lib/BulkDataClient.ts:264</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -1668,7 +1699,7 @@
 					<aside class="tsd-sources">
 						<p>Overrides <a href="bulkdataclient.requestoptions.html">requestOptions</a>.<a href="bulkdataclient.requestoptions.html#url">url</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/BulkDataClient.ts#L269">src/lib/BulkDataClient.ts:269</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/BulkDataClient.ts#L271">src/lib/BulkDataClient.ts:271</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -1741,6 +1772,21 @@
 						<a href="../modules/assertions.html">assertions</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="../modules/audit.html">audit</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/audit_checks_config.html">audit/checks/config</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/audit_checks_kick_off.html">audit/checks/kick-<wbr>off</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/audit_checks_token_endpoint.html">audit/checks/token-<wbr>endpoint</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/audit_lib.html">audit/lib</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="../modules/auth.html">auth</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -1748,6 +1794,9 @@
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/errors.html">errors</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/evaluate.html">evaluate</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/globalcontext.html">global<wbr>Context</a>

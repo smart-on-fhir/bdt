@@ -87,7 +87,6 @@
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="config.serverconfig.html#baseurl" class="tsd-kind-icon">baseURL</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="config.serverconfig.html#fastestresource" class="tsd-kind-icon">fastest<wbr>Resource</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="config.serverconfig.html#groupexportendpoint" class="tsd-kind-icon">group<wbr>Export<wbr>Endpoint</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="config.serverconfig.html#groupid" class="tsd-kind-icon">group<wbr>Id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="config.serverconfig.html#patientexportendpoint" class="tsd-kind-icon">patient<wbr>Export<wbr>Endpoint</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="config.serverconfig.html#requests" class="tsd-kind-icon">requests</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="config.serverconfig.html#supportedresourcetypes" class="tsd-kind-icon">supported<wbr>Resource<wbr>Types</a></li>
@@ -105,19 +104,29 @@
 					<div class="tsd-signature tsd-kind-icon">authentication<span class="tsd-signature-symbol">:</span> <a href="config.authenticationoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">AuthenticationOptions</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L105">src/lib/Config.ts:105</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L113">src/lib/Config.ts:113</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Authentication options</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="baseurl" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> baseURL</h3>
+					<h3>baseURL</h3>
 					<div class="tsd-signature tsd-kind-icon">baseURL<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L103">src/lib/Config.ts:103</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L108">src/lib/Config.ts:108</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>FHIR server base URL.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="fastestresource" class="tsd-anchor"></a>
@@ -125,7 +134,7 @@
 					<div class="tsd-signature tsd-kind-icon">fastest<wbr>Resource<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L148">src/lib/Config.ts:148</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L149">src/lib/Config.ts:149</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -135,32 +144,17 @@
 					<div class="tsd-signature tsd-kind-icon">group<wbr>Export<wbr>Endpoint<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L146">src/lib/Config.ts:146</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L147">src/lib/Config.ts:147</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>By default BDT will fetch and parse the CapabilityStatement to try to
-								detect if the server supports group-level export. If so, and if <code>groupId</code>
-								is set group-level tests will be enabled.
-								However, if the server does not have a CapabilityStatement or if it is
-								not properly declaring the group export support, you can skip that
-								check by declaring the <code>groupExportEndpoint</code> below. The value should be
-								a path relative to the <code>baseURL</code> (typically &quot;Group/{GroupID}/$export&quot;).
-								Note that if you set this, then the <code>groupId</code> option will not be used
-							since the <code>groupId</code> is already part of the <code>groupExportEndpoint</code> path.</p>
+							<p>Set this to your group-level export endpoint to enable the group-level
+								tests. The value should be a path relative to the <code>baseURL</code> (typically
+								&quot;Group/{GroupID}/$export&quot;), where {GroupID} is the ID of the group you&#39;d
+							like to to test.</p>
 						</div>
 					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="groupid" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> group<wbr>Id</h3>
-					<div class="tsd-signature tsd-kind-icon">group<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L113">src/lib/Config.ts:113</a></li>
-						</ul>
-					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="patientexportendpoint" class="tsd-anchor"></a>
@@ -168,7 +162,7 @@
 					<div class="tsd-signature tsd-kind-icon">patient<wbr>Export<wbr>Endpoint<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L133">src/lib/Config.ts:133</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L139">src/lib/Config.ts:139</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -188,7 +182,7 @@
 					<div class="tsd-signature tsd-kind-icon">requests<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>customHeaders<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>strictSSL<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>timeout<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L107">src/lib/Config.ts:107</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L115">src/lib/Config.ts:115</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -212,7 +206,7 @@
 					<div class="tsd-signature tsd-kind-icon">supported<wbr>Resource<wbr>Types<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L150">src/lib/Config.ts:150</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L151">src/lib/Config.ts:151</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -222,7 +216,7 @@
 					<div class="tsd-signature tsd-kind-icon">system<wbr>Export<wbr>Endpoint<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/49db2f7/src/lib/Config.ts#L123">src/lib/Config.ts:123</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/a09ec80/src/lib/Config.ts#L129">src/lib/Config.ts:129</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -275,6 +269,21 @@
 						<a href="../modules/assertions.html">assertions</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="../modules/audit.html">audit</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/audit_checks_config.html">audit/checks/config</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/audit_checks_kick_off.html">audit/checks/kick-<wbr>off</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/audit_checks_token_endpoint.html">audit/checks/token-<wbr>endpoint</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/audit_lib.html">audit/lib</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="../modules/auth.html">auth</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -282,6 +291,9 @@
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/errors.html">errors</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/evaluate.html">evaluate</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/globalcontext.html">global<wbr>Context</a>
@@ -318,9 +330,6 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="config.serverconfig.html#groupexportendpoint" class="tsd-kind-icon">group<wbr>Export<wbr>Endpoint</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="config.serverconfig.html#groupid" class="tsd-kind-icon">group<wbr>Id</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="config.serverconfig.html#patientexportendpoint" class="tsd-kind-icon">patient<wbr>Export<wbr>Endpoint</a>
