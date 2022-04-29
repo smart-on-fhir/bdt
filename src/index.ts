@@ -80,7 +80,7 @@ program
     .description('load tests and execute them')
     .option('-c, --config <path>'        , 'set config path', './config.js')
     .option("-V, --api-version [version]", "List only nodes matching the given version", "1.0")
-    .option("-c, --no-colors"            , "show output without colors", true)
+    .option("-C, --no-colors"            , "show output without colors", true)
     .option("-w, --wrap [column]"        , "wrap at column [n]", parseFloat, 160)
     .option("-b, --bail"                 , "exit on first error", false)
     .option("-s, --showConfig"           , "Print BDT config and exit. Useful for debugging what options have been loaded")
@@ -106,6 +106,7 @@ program
             reporter  : commandOptions.reporter,
             pattern   : commandOptions.pattern,
             path      : commandOptions.path,
+            showConfig: commandOptions.showConfig,
             list      : false,
             cli       : true,
             reporterOptions: {
