@@ -4,7 +4,9 @@ import { Config as ConfigType } from "../bdt"
 import EventEmitter from "events"
 import pug from "pug"
 import fs from "fs"
+import { resolve } from "path"
 import { NotSupportedError } from "../errors"
+import open from "open"
 
 
 type weight = 1 | 2 | 3 | 4 | 5
@@ -152,25 +154,19 @@ class Audit extends EventEmitter
 
 
 
-async function report2(options: ConfigType) {
+async function report(options: ConfigType, destination: string, openFile = false) {
     console.log("\nRunning audit for " + options.baseURL + "\n\n\n")
     const audit = new Audit(options)
     audit.load()
     audit.on("progress", (score, check) => {
-        // console.log(score)
         const line: string[] = []
-        const fails: string[] = []
+        
         for (const criteria in score) {
             const meta = score[criteria as keyof Score];
             if (meta.total > 0) {
                 const pct  = Math.round(meta.current / meta.total * 100)
-                line.push(criteria.blue.bold + ": " + String(pct + "%").bold + ` (${meta.current}/${meta.total})`.dim)
-                // const failed = meta.log.filter((x: LogEntry) => !x.pass)
-                // if (failed.length) {
-                //     failed.forEach((entry: LogEntry) => {
-                //         console.log("  " + "✘ ".red + entry.label)
-                //     })
-                // }
+                line.push(criteria.blue.bold + ": " + String(pct + "%").bold +
+                ` (${meta.current}/${meta.total})`.dim)
             }
         }
         process.stdout.write(
@@ -178,14 +174,6 @@ async function report2(options: ConfigType) {
             "Now running: " + 
             check.name.yellow +
             "\n" + line.join("   ") + "\n")
-
-        // const failed = meta.log.filter(x => !x.pass)
-        // if (failed.length) {
-        //     console.log("  Failed checks:")
-        //     failed.forEach(entry => {
-        //         console.log("  " + "✘ ".red + entry.label)
-        //     })
-        // }
     })
 
     audit.once("end", score => {
@@ -194,8 +182,15 @@ async function report2(options: ConfigType) {
         const html = pug.renderFile("./report-template.pug", {
             score,
             server: options.baseURL
-        })
-        fs.writeFileSync("./report.html", html)
+        });
+        fs.writeFileSync(destination, html)
+        console.log(`Report saved to "${resolve(destination)}"`)
+        if (openFile) {
+            open(resolve(destination)).catch(e => {
+                console.log(`Failed opening "${resolve(destination)}" in browser:`)
+                console.error(e)
+            });
+        }
     })
 
     await audit.run()
@@ -203,6 +198,4 @@ async function report2(options: ConfigType) {
 
 }
 
-// report(options)
-
-export default report2
+export default report

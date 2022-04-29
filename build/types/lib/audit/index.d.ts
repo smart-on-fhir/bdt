@@ -23,5 +23,5 @@ interface checkOptions {
     maxVersion?: string;
     description?: string;
 }
-declare function report2(options: ConfigType): Promise<void>;
-export default report2;
+declare function report(options: ConfigType, destination: string, openFile?: boolean): Promise<void>;
+export default report;

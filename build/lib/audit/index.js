@@ -7,7 +7,9 @@ require("colors");
 const events_1 = __importDefault(require("events"));
 const pug_1 = __importDefault(require("pug"));
 const fs_1 = __importDefault(require("fs"));
+const path_1 = require("path");
 const errors_1 = require("../errors");
+const open_1 = __importDefault(require("open"));
 class Audit extends events_1.default {
     constructor(options) {
         super();
@@ -99,38 +101,24 @@ class Audit extends events_1.default {
         this.emit("end", this.score);
     }
 }
-async function report2(options) {
+async function report(options, destination, openFile = false) {
     console.log("\nRunning audit for " + options.baseURL + "\n\n\n");
     const audit = new Audit(options);
     audit.load();
     audit.on("progress", (score, check) => {
-        // console.log(score)
         const line = [];
-        const fails = [];
         for (const criteria in score) {
             const meta = score[criteria];
             if (meta.total > 0) {
                 const pct = Math.round(meta.current / meta.total * 100);
-                line.push(criteria.blue.bold + ": " + String(pct + "%").bold + ` (${meta.current}/${meta.total})`.dim);
-                // const failed = meta.log.filter((x: LogEntry) => !x.pass)
-                // if (failed.length) {
-                //     failed.forEach((entry: LogEntry) => {
-                //         console.log("  " + "✘ ".red + entry.label)
-                //     })
-                // }
+                line.push(criteria.blue.bold + ": " + String(pct + "%").bold +
+                    ` (${meta.current}/${meta.total})`.dim);
             }
         }
         process.stdout.write("\u001b[2K\u001b[1A\u001b[2K\u001b[1A\u001b[2K\u001b[1A\u001b[2K\n" +
             "Now running: " +
             check.name.yellow +
             "\n" + line.join("   ") + "\n");
-        // const failed = meta.log.filter(x => !x.pass)
-        // if (failed.length) {
-        //     console.log("  Failed checks:")
-        //     failed.forEach(entry => {
-        //         console.log("  " + "✘ ".red + entry.label)
-        //     })
-        // }
     });
     audit.once("end", score => {
         process.stdout.write("\u001b[2A\u001b[2K" + "FINAL SCORE:".bold + "\u001b[2B\n");
@@ -138,10 +126,16 @@ async function report2(options) {
             score,
             server: options.baseURL
         });
-        fs_1.default.writeFileSync("./report.html", html);
+        fs_1.default.writeFileSync(destination, html);
+        console.log(`Report saved to "${path_1.resolve(destination)}"`);
+        if (openFile) {
+            open_1.default(path_1.resolve(destination)).catch(e => {
+                console.log(`Failed opening "${path_1.resolve(destination)}" in browser:`);
+                console.error(e);
+            });
+        }
     });
     await audit.run();
 }
-// report(options)
-exports.default = report2;
+exports.default = report;
 //# sourceMappingURL=index.js.map

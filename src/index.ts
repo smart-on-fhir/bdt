@@ -60,6 +60,8 @@ program
     .command("audit")
     .description('Generates audit report')
     .option('-c, --config <path>', 'set config path', './config.js')
+    .option('-o, --open', 'Open generated report in browser', false)
+    .option('-d, --destination <path>', 'Path to the HTML report file', './report.html')
     .action(async (commandOptions) => {
         const args    = program.opts()
         const config  = await getConfig(commandOptions.config)
@@ -68,7 +70,7 @@ program
             apiVersion: args.apiVersion,
             path      : ""
         }) as ServerConfig;
-        audit(options as ConfigType)
+        audit(options as ConfigType, commandOptions.destination, commandOptions.open)
     });
 
 
