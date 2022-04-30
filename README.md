@@ -5,38 +5,52 @@ BDT as Bulk Data testing app for CLI
 **Prerequisites:** Make sure you have `git` and `NodeJS` version >= 14 installed
 ```sh
 git clone https://github.com/smart-on-fhir/bdt
-cd ./bdt
+cd bdt
 npm i
 ```
 
-## [API Docs](https://docs.smarthealthit.org/bdt/api/index.html)
+## Contribution
+Contributions are welcome, just make sure you check out the [API Docs](https://docs.smarthealthit.org/bdt/api/index.html) first.
 
 ## CLI Usage
 
 **Quick start**
 ```sh
-# Her "my/config.js" is the path to the configuration file for your server
+# Here "my/config.js" is the path to your configuration file
 node . test --config my/config.js
 ```
 
-**list**
-Outputs a JSON tree structure with all the tests without executing them.
-- Run `bdt help list` for more info
+### Commands
+The bdt tool contains 3 subcommands:
+- `test` - Runst the test suite
+- `list` - List available tests (useful for third-party integration)
+- `audit` - Generates audit reports
 
-**help**
-Running `bdt` with no options (`node .`), or running `node . help` will print a message like this:
+The usage is
+```sh
+node . [options] [command]
+# or
+node . [command] [options]
 ```
-Usage: node . [options] [command]
+For more information run one of:
+- `node . --help` - common usage
+- `node . help test` - **test** command usage
+- `node . help list` - **list** command usage
+- `node . help audit` - **audit** command usage
 
-Options:
-  -V, --version                output the version number
-  -c, --config <path>          set config path (default: "../config.js")
-  -v, --api-version [version]  Bulk Data API version to test. (choices: "1.0", "2.0", default: "1.0")
-  -h, --help                   display help for command
+## Examples
 
-Commands:
-  list                         output loaded test tree structure as JSON
-  test [options]               load tests and execute them
-  help [command]               display help for command
+Tests a server
+```sh
+node . test -c config-examples/reference-server-r4.js
 ```
 
+Tests a server but only run authorization-related tests
+```sh
+node . test -c config-examples/reference-server-r4.js --pattern './build/testSuite/**/authorization.test.js'
+```
+
+Tests a server against Bulk Data v2
+```sh
+node . test -c config-examples/reference-server-r4.js --api-version 2
+```
