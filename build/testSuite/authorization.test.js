@@ -234,7 +234,7 @@ bdt_1.suite("Authorization", () => {
             assertions_1.expectOAuthErrorType(response, "invalid_scope", "The authorization attempt must fail if a non-system scope is requested");
         });
         bdt_1.test({
-            name: "Handles scopes correctly",
+            name: "Handles V1 scopes correctly",
             description: "Verifies that scopes like `system/Patient.*` or `system/*.*` are handled correctly.\n" +
                 "- Servers should avoid granting `.*` action scopes and prefer `.read` instead\n" +
                 "- Servers should NOT explicitly grant any `.write` scopes\n"
@@ -244,7 +244,7 @@ bdt_1.suite("Authorization", () => {
                 "system/*.read",
                 "system/Patient.*",
                 "system/Patient.read",
-                "system/Patient.write"
+                "system/Patient.write" // servers should NOT grant write scopes
             ];
             for (const scope of scopes) {
                 const { response } = await context.client.request({
@@ -254,7 +254,40 @@ bdt_1.suite("Authorization", () => {
                 });
                 if (response.statusCode === 200) {
                     assertions_1.expectSuccessfulAuth(response, `If the server supports the "${scope}" scope, then it must reply with valid token response`);
-                    code_1.expect(response.body.scope, "Servers should not grant any write scopes").not.to.match(/\.\*\b|\.write\b/);
+                    code_1.expect(response.body.scope, "Servers should not grant any write scopes").not.to.match(/\.\*\b|\.write\b|\.[cud]+\b/);
+                }
+                else {
+                    assertions_1.expectOAuthErrorType(response, "invalid_scope", `It appears that the "${scope}" scope is not supported by the server.` +
+                        `In this case we expect a proper OAuth error response from the token ` +
+                        `endpoint.`);
+                }
+            }
+        });
+        bdt_1.test({
+            name: "Handles V2 scopes correctly",
+            description: "Verifies that scopes like `system/Patient.*` or `system/*.*` are handled correctly.\n" +
+                "- Servers should avoid granting `.*` action scopes and prefer `.read` instead\n" +
+                "- Servers should NOT explicitly grant any `.write` scopes\n",
+            minVersion: "2"
+        }, async ({ config, context, api }) => {
+            // /^\s*(patient|user|system)\/(\*|[A-Z][A-Za-z0-9]+)\.([cruds]+)(\?.*)?$/
+            const scopes = [
+                "system/*.cruds",
+                "system/*.rs",
+                "system/Patient.cruds",
+                "system/Patient.rs",
+                "system/Patient.cruds",
+                "system/Patient.rs?a=b",
+            ];
+            for (const scope of scopes) {
+                const { response } = await context.client.request({
+                    method: "POST",
+                    url: config.authentication.tokenEndpoint,
+                    form: { ...context.form, scope }
+                });
+                if (response.statusCode === 200) {
+                    assertions_1.expectSuccessfulAuth(response, `If the server supports the "${scope}" scope, then it must reply with valid token response`);
+                    code_1.expect(response.body.scope, "Servers should not grant any write scopes").not.to.match(/\.[cud]+\b/);
                 }
                 else {
                     assertions_1.expectOAuthErrorType(response, "invalid_scope", `It appears that the "${scope}" scope is not supported by the server.` +
@@ -278,6 +311,21 @@ bdt_1.suite("Authorization", () => {
             assertions_1.expectSuccessfulAuth(response, 'The authorization attempt should be successful with a "system/*.read" scope');
         });
         bdt_1.test({
+            name: "Accepts wildcard resource V2 scopes",
+            description: "Verifies that scopes like `system/*.rs` are supported.",
+            minVersion: "2"
+        }, async ({ config, context }) => {
+            const { response } = await context.client.request({
+                method: "POST",
+                url: config.authentication.tokenEndpoint,
+                form: {
+                    ...context.form,
+                    scope: "system/*.rs"
+                }
+            });
+            assertions_1.expectSuccessfulAuth(response, 'The authorization attempt should be successful with a "system/*.rs" scope');
+        });
+        bdt_1.test({
             name: "Rejects unknown action scopes",
             description: "Verifies that scopes like `system/Patient.unknownAction` are rejected"
         }, async ({ config, context }) => {
@@ -290,6 +338,21 @@ bdt_1.suite("Authorization", () => {
                 }
             });
             assertions_1.expectOAuthErrorType(response, "invalid_scope", "The authorization attempt must fail if a scope is requesting an unknown action (other than read, write or *)");
+        });
+        bdt_1.test({
+            name: "Rejects unknown action in V2 scopes",
+            description: "Verifies that scopes like `system/Patient.xyz` are rejected",
+            minVersion: "2"
+        }, async ({ config, context }) => {
+            const { response } = await context.client.request({
+                method: "POST",
+                url: config.authentication.tokenEndpoint,
+                form: {
+                    ...context.form,
+                    scope: "system/Patient.xyz"
+                }
+            });
+            assertions_1.expectOAuthErrorType(response, "invalid_scope", "The authorization attempt must fail if a scope is requesting an unknown action (other than c, r, u, d or s)");
         });
         bdt_1.test({
             name: "Rejects unknown resource scopes",
@@ -305,6 +368,86 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectOAuthErrorType(response, "invalid_scope", "The authorization attempt must fail if requested scopes are pointing to unknown FHIR resources");
         });
+        bdt_1.test({
+            name: "Rejects unknown resource in V2 scopes",
+            description: "Verifies that scopes like `system/UnknownResource.r` are rejected",
+            minVersion: "2"
+        }, async ({ config, context }) => {
+            const { response } = await context.client.request({
+                method: "POST",
+                url: config.authentication.tokenEndpoint,
+                form: {
+                    ...context.form,
+                    scope: "system/UnknownResource.r"
+                }
+            });
+            assertions_1.expectOAuthErrorType(response, "invalid_scope", "The authorization attempt must fail if requested scopes are pointing to unknown FHIR resources");
+        });
+        bdt_1.test({
+            name: "Rejects explicit mutation scopes",
+            description: "Verifies that scopes like `system/Patient.write` are rejected. In this case this is " +
+                "the only scope requested and it requires write access. The server should not grant it and if " +
+                "there isn't at least one other read-access scope requested, the entire negotiation should fail.",
+        }, async ({ config, context }) => {
+            const { response } = await context.client.request({
+                method: "POST",
+                url: config.authentication.tokenEndpoint,
+                form: {
+                    ...context.form,
+                    scope: "system/Patient.write"
+                }
+            });
+            assertions_1.expectOAuthErrorType(response, "invalid_scope", "The authorization attempt must fail for explicit mutation scopes");
+        });
+        bdt_1.test({
+            name: "Supports mixed v1 and v2 scopes",
+            description: "Tests the server behavior if a mixture of (otherwise valid) V1 and V2 scopes is requested." +
+                "The expectation is that all scopes should be granted either as they have been requested, or converted " +
+                "to V2. Converting V2 scope to V1 is not lossless, thus it is considered an error.",
+        }, async ({ config, context }) => {
+            const { response } = await context.client.request({
+                method: "POST",
+                url: config.authentication.tokenEndpoint,
+                form: {
+                    ...context.form,
+                    scope: "system/Patient.read system/Observation.rs"
+                }
+            });
+            assertions_1.expectSuccessfulAuth(response, `If the server supports scopes with mixed versions like "system/Patient.read system/Observation.rs", ` +
+                `then it must reply with valid token response`);
+            const granted = response.body.scope.trim().split(/\s+/);
+            code_1.expect(granted, "Both scopes should be granted").to.have.length(2);
+            code_1.expect(granted).to.contain("system/Observation.rs");
+            if (!granted.includes("system/Patient.read")) {
+                code_1.expect(granted).to.contain("system/Patient.rs");
+            }
+        });
+        bdt_1.test({
+            name: "Rejects explicit mutation V2 scopes",
+            description: "Verifies that scopes like `system/Patient.u` are rejected. In this case this is " +
+                "the only scope requested and it requires write access. The server should not grant it and if " +
+                "there isn't at least one other read-access scope requested, the entire negotiation should fail.",
+            minVersion: "2"
+        }, async ({ config, context }) => {
+            const scopes = [
+                "system/Patient.c",
+                "system/Patient.cu",
+                "system/Patient.cd",
+                "system/Patient.cud",
+                "system/Patient.ud",
+                "system/Patient.d",
+                "system/Patient.u"
+            ];
+            for (const scope of scopes) {
+                const { response } = await context.client.request({
+                    method: "POST",
+                    url: config.authentication.tokenEndpoint,
+                    form: { ...context.form, scope }
+                });
+                assertions_1.expectOAuthErrorType(response, "invalid_scope", "The authorization attempt must fail for explicit mutation scopes like '" + scope + "'");
+            }
+        });
+        // End Scopes ---------------------------------------------------------
         bdt_1.test({
             name: "validates the jku token header",
             description: "When present, the `jku` authentication JWT header should match a value " +
