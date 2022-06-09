@@ -159,7 +159,7 @@ suite("Download Endpoint", () => {
 
         const resp2 = await client.downloadFile(resp.body.output[0].url, {
             headers: {
-                authorization: `bearer ${newToken}`
+                authorization: `Bearer ${newToken}`
             }
         });
         await client.cancelIfStarted(response);
