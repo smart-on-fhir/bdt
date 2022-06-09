@@ -1,0 +1,270 @@
+mixin chart(title, data)
+    - function getCoordinatesForPercent(pct) { const x = Math.cos(2 * Math.PI * pct); const y = Math.sin(2 * Math.PI * pct); return [x * 100, y * 100]; }
+    - const percent = Math.max(Math.min(data.current / data.total * 100, 100), 0);
+    - const largeArcFlag = percent >= 50 ? 1 : 0;
+    
+    - const [x1, y1] = getCoordinatesForPercent(0.001);
+    - const [x2, y2] = getCoordinatesForPercent((percent - 0.1) / 100);
+    - const [x3, y3] = getCoordinatesForPercent((percent + 0.1) / 100);
+    - const [x4, y4] = getCoordinatesForPercent(0.999);
+
+    .chart
+        h2= title
+        svg(viewBox="-120 -120 240 240")
+            text.chart-big-text(y=0)= Math.round(percent) + "%"
+            text.chart-small-text-1(y="35")= Math.round(data.current) + " of " + Math.round(data.total) + " points"
+            text.chart-small-text-2(y="55")= data.log.length + " checks"
+
+            if percent === 0
+                circle.chart-arc-bg(cx=0 cy=0 r=100)
+            else if percent === 100
+                circle.chart-arc-main(cx=0 cy=0 r=100)
+            else 
+                g(style="transform: rotate(-0.25turn)")
+                    path.chart-arc-main(d=`M ${x1} ${y1} A 100 100 0 ${largeArcFlag} 1 ${x2} ${y2}`)
+                    path.chart-arc-bg(d=`M ${x3} ${y3} A 100 100 0 ${largeArcFlag ? 0 : 1 } 1 ${x4} ${y4}`)
+        a(href=`#log-${title}`) Details
+
+doctype html
+html(lang="en")
+  head
+    title SMART Bulk Data Audit Report
+    style.
+        * {
+            box-sizing: border-box;
+        }
+        /*html, body {
+            scroll-behavior: smooth;
+        }*/
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size  : 17px;
+            color      : #444;
+        }
+        h1 {
+            font-size: 28px;
+        }
+        h2 {
+            font-size: 22px;
+        }
+        h3 {
+            font-size: 20px;
+        }
+        a {
+            color: #02F;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        hr {
+            border: 0;
+            height: 4px;
+            background: #EEE;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .container {
+            margin: auto;
+            padding: 1rem;
+            max-width: 1200px;
+        }
+        .clear {
+            clear: both;
+        }
+        .charts {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: stretch;
+            align-content: center;
+            flex-wrap: wrap;
+            border: 3px solid #EEE;
+            background: linear-gradient(#FFF, #F7F7F7);
+            border-radius: 0 0 10px 10px;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem 0;
+        }
+        .chart {
+            display: flex;
+            flex: 0 1 33.33%;
+            padding: 2rem;
+            text-align: center;
+            flex-direction: column;
+            min-width: 250px;
+        }
+        .chart h2 {
+            text-transform: uppercase;
+        }
+        .chart-big-text {
+            font-size  : 46px;
+            font-weight: 500;
+            fill       : #000;
+            text-anchor: middle;
+        }
+        .chart-small-text-1 {
+            font-size  : 16px;
+            fill       : #999;
+            text-anchor: middle;
+        }
+        .chart-small-text-2 {
+            font-size  : 14px;
+            fill       : #999;
+            text-anchor: middle;
+        }
+        .chart-smaller-text {
+            font-size  : 14px;
+            fill       : #999;
+            text-anchor: middle;
+        }
+
+        .chart-arc-main {
+            fill: none;
+            stroke: #094;
+            stroke-width: 20px;
+        }
+        .chart-arc-bg {
+            fill: none;
+            stroke: #E63;
+            stroke-width: 20px;
+        }
+        .text-success { color: #094 }
+        .text-error { color: #E63 }
+        .text-muted { color: #777 }
+        .bg-muted {
+            background: #EEE;
+            border-radius: 10px 10px 0 0;
+            padding: 0.5rem 1rem;
+            line-height:1.6;
+            word-break: break-all;
+        }
+        .log {
+            display: none
+        }
+        .log .icon {
+            margin: 0 7px 0 -15px;
+        }
+        .log:target {
+            display: block
+        }
+
+        .log dl {
+            margin   : 0;
+            padding  : 0;
+            font-size: 14px;
+        }
+        .log dd {
+            margin : 0 0 0 35px;
+            padding: 0 10px 0 0;
+        }
+        .log dt {
+            padding: 5px 10px 5px 20px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0px 1.5px 0 -1px rgba(0, 0, 0, 0.1) inset;
+            text-shadow: 0 0 0.2px rgba(0, 0, 0, 0.5);
+            font-weight: 600;
+        }
+        .log dt:hover, .log dl.open {
+            background: linear-gradient(90deg, #FFF, #F6F6F6 40px);
+        }
+        .log dd {
+            display: none;
+            font-size: 14px;
+        }
+        .log dl.open {
+            padding-bottom: 0.5em;
+        }
+        .log dl.open dd {
+            display: list-item
+        }
+    body
+        .container
+            header
+                h1
+                    svg(xmlns="http://www.w3.org/2000/svg" viewBox="60 0 90 73" style="width: 40px; vertical-align: middle")
+                        defs
+                            style.
+                                .cls-3{fill:#722772;}
+                                .cls-4{fill:#e24a31;}
+                                .cls-5{fill:#89bf44;}
+                                .cls-6{fill:#e77d26;}
+                                .cls-7{fill:#f1b42a;}
+                        polygon.cls-3(points="83.91 0 93.42 0 104.56 18.47 116.03 0 125.28 0 104.58 33.96 83.91 0")
+                        polygon.cls-4(points="60.61 35.72 65.37 28.16 87.76 28.16 76.67 9.49 81.3 1.87 101.89 35.72 60.61 35.72")
+                        polygon.cls-5(points="148.72 38.78 143.97 46.33 121.57 46.33 132.66 65.16 128.03 72.78 107.44 38.78 148.72 38.78")
+                        polygon.cls-6(points="128 1.73 132.76 9.55 121.5 28.16 144.06 28.16 148.69 35.72 107.4 35.72 128 1.73")
+                        polygon.cls-7(points="81.28 72.77 76.53 64.94 87.78 46.33 65.23 46.33 60.6 38.78 101.89 38.78 81.28 72.77")
+                    |  SMART Bulk Data Audit Report
+                .bg-muted
+                    div
+                        b Server:
+                        a(href=server, target="_blank")= " " + server
+                    div
+                        b Tested:
+                        |  #{new Date().toLocaleString()}
+            .charts
+                +chart("security"   , score.security)
+                +chart("compliance" , score.compliance)
+                +chart("reliability", score.reliability)
+            br.clear
+
+            #log-security.log
+                h3.text-success Security Checks
+                p
+                    | Listed below are all the security-related checks that we ran against this server. Each check has 
+                    | a specific "weight" to reflect how relevant it is to the security of this Bulk Data implementation.
+                hr
+                each entry in score.security.log
+                    dl
+                        dt(onclick="this.parentNode.classList.toggle('open')")
+                            span.icon(class=entry.pass ? "text-success" : "text-error")= (entry.pass ? "✔" : "✘")
+                            | #{entry.label}
+                        if (entry.description)
+                            dd.text-muted= entry.description
+                        if (entry.weight.description)
+                            dd.text-muted= entry.weight.description
+                        dd.text-muted= `Passing this check gives ${entry.weight.weight} points for security`
+                hr
+
+            #log-compliance.log
+                h3.text-success Compliance Checks
+                p
+                    | Listed below are all the compliance-related checks that we ran against this server. Each check has 
+                    | a specific "weight" to reflect how relevant it is to the compliance of this Bulk Data implementation.
+                hr
+                each entry in score.compliance.log
+                    dl
+                        dt(onclick="this.parentNode.classList.toggle('open')")
+                            span.icon(class=entry.pass ? "text-success" : "text-error")= (entry.pass ? "✔" : "✘")
+                            | #{entry.label}
+                        if (entry.description)
+                            dd.text-muted= entry.description
+                        if (entry.weight.description)
+                            dd.text-muted= entry.weight.description
+                        dd.text-muted= `Passing this check gives ${entry.weight.weight} points for compliance`
+                hr
+
+            #log-reliability.log
+                h3.text-success Reliability Checks
+                p
+                    | Listed below are all the reliability-related checks that we ran against this server. Each check has 
+                    | a specific "weight" to reflect how relevant it is to the reliability of this Bulk Data implementation.
+                hr
+                each entry in score.reliability.log
+                    dl
+                        dt(onclick="this.parentNode.classList.toggle('open')")
+                            span.icon(class=entry.pass ? "text-success" : "text-error")= (entry.pass ? "✔" : "✘")
+                            | #{entry.label}
+                        if (entry.description)
+                            dd.text-muted= entry.description
+                        if (entry.weight.description)
+                            dd.text-muted= entry.weight.description
+                        dd.text-muted= `Passing this check gives ${entry.weight.weight} points for reliability`
+                hr
+
+            footer.text-muted
+                | Generated with "BDT audit" -
+                |  
+                a(href="https://github.com/smart-on-fhir/bdt", target="_blank") https://github.com/smart-on-fhir/bdt

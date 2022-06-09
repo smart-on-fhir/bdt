@@ -1,0 +1,289 @@
+const Lab  = require("@hapi/lab");
+const Code = require("@hapi/code");
+
+const { load, loadCode } = require("../build/index.js")
+const Group      = require("../build/Group").default
+const Test       = require("../build/Test").default
+const Runner     = require("../build/TestRunner").default
+const JSReporter = require("../build/reporters/js").default
+
+const { expect } = Code;
+const { it, describe, } = exports.lab = Lab.script();
+
+describe("Loader", () => {
+    it('Returns correct tree structure', async () => {
+        const tree = await load("./**/fixtures/testSuite/a.test.js")
+        console.log(tree)
+        expect(tree instanceof Group, "load should return a Group").to.be.true()
+        expect(tree.children).to.be.array()
+        expect(tree.children[0] instanceof Group, "tree first child should be Group").to.be.true()
+        if (tree.children[0] instanceof Group) { // type guard
+            expect(tree.children[0].children).to.be.array()
+            expect(tree.children[0].children[0] instanceof Test).to.be.true()
+            expect(tree.children[0].children[1] instanceof Test).to.be.true()
+        }
+    });
+
+    it("Can load multiple files", { timeout: 5000 }, async () => {
+        const tree = (await load("./**/fixtures/testSuite/*.test.js")).toJSON();
+        
+        expect(tree.children.length).to.equal(2)
+        expect(tree.children[0].children.length).to.equal(2)
+        expect(tree.children[1].children.length).to.equal(2)
+        
+        expect(tree.children[0]).to.contain({
+            name: "suite 1",
+            path: "0"
+        })
+        expect(tree.children[0].children[0]).to.contain({
+            path: "0.0",
+            name: "test 1"
+        })
+        expect(tree.children[0].children[1]).to.contain({
+            path: "0.1",
+            name: "test-2"
+        })
+        
+        expect(tree.children[1]).to.contain({
+            name: "suite 2",
+            path: "1"
+        })
+        expect(tree.children[1].children[0]).to.contain({
+            path: "1.0",
+            name: "test 1"
+        })
+        expect(tree.children[1].children[1]).to.contain({
+            path: "1.1",
+            name: "test-2"
+        })
+    });
+
+    it('The test tree can be converted to proper JSON', async () => {
+        const tree = await load("./**/fixtures/testSuite/a.test.js")
+        expect(tree.toJSON()).to.equal({
+            name: '__ROOT__',
+            path: '',
+            children: [
+                {
+                    name: "suite 1",
+                    path: "0",
+                    children: [
+                        {
+                            path: "0.0",
+                            name: "test 1",
+                            id: "id-1",
+                            description: "description 1",
+                            maxVersion: "3.2.1",
+                            minVersion: "1.2.3"
+                        },
+                        {
+                            path: "0.1",
+                            name: "test-2",
+                            id: "01-test-2"
+                        }
+                    ]
+                }
+            ]
+        });
+    });
+    
+});
+
+describe("Runner", () => {
+    it ("Has shared context and proper lifecycle", async () => {
+        const root = loadCode(`
+            suite("suite 1", () => {
+                before(({ context }) => context.log.push("suite 1 - before"));
+                after(({ context }) => context.log.push("suite 1 - after"));
+                beforeEach(({ context }) => context.log.push("suite 1 - beforeEach"));
+                afterEach(({ context }) => context.log?.push("suite 1 - afterEach"));
+                test("test 1", ({ context }) => context.log.push("suite 1 / test 1"));
+                test("test 2", ({ context }) => context.log.push("suite 1 / test 2"));
+            })
+        `);
+        const log = [];
+        await new Runner({ version: "2.0" }).run(root, { log });
+        expect(log).to.equal([
+            "suite 1 - before",
+            "suite 1 - beforeEach",
+            "suite 1 / test 1",
+            "suite 1 - afterEach",
+            "suite 1 - beforeEach",
+            "suite 1 / test 2",
+            "suite 1 - afterEach",
+            "suite 1 - after"
+        ]);
+    });
+
+    // it ("Lifecycle cannot be called inside tests", async () => {
+    //     const root = new Group({ name: "__ROOT__" })
+    //     root.children.push(new Test({
+    //         name: "failed test",
+    //         fn: () => { before(() => {}) }
+    //     }));
+    //     expect(async () => {
+    //         await new Runner({ version: "2.0" }).run(root)
+    //     }).to.throw()
+    // });
+});
+
+describe("Events", () => {
+    it ("fires events correctly", async () => {
+        const log = []
+        const reporter = JSReporter(log);
+        const root = loadCode(`
+            suite("suite 1", () => {
+                test("test 1", () => {});
+                test("test 2", () => {});
+            })
+        `);
+        const runner = new Runner({ version: "2.0" });
+        reporter.attach(runner);
+        await runner.run(root);
+
+        expect(log.map(e => e.type)).to.equal([
+            "start",
+            "groupStart", // root
+            "groupStart", //    suite1
+            "testStart",  //       test1
+            "testEnd",    //       test1
+            "testStart",  //       test2
+            "testEnd",    //       test2
+            "groupEnd",   //    suite1
+            "groupEnd",   // root
+            "end"
+        ])
+
+        expect(log.map(e => e.data)).to.equal([
+            undefined, // run start has no data
+            root,                         // root
+            root.children[0],             //    suite1
+            root.children[0].children[0], //       test1
+            root.children[0].children[0], //       test1
+            root.children[0].children[1], //       test2
+            root.children[0].children[1], //       test2
+            root.children[0],             //    suite1
+            root,                         // root
+            undefined  // run end has no data
+        ])
+    });
+
+    it ("fires after events after throwing tests", async () => {
+        const log = []
+        const reporter = JSReporter(log);
+        const root = loadCode(`test("x", () => {throw new Error("Test Error")});`);
+        const runner = new Runner({ version: "2.0" });
+        reporter.attach(runner);
+        await runner.run(root);
+
+        expect(log.map(e => e.type)).to.equal([
+            "start",
+            "groupStart",
+            "testStart",
+            "testEnd",
+            "groupEnd",
+            "end"
+        ])
+    });
+
+    it ("fires after events after rejecting tests", async () => {
+        const log = []
+        const reporter = JSReporter(log);
+        const root = loadCode(`test("x", () => Promise.reject("Test Error"));`);
+        const runner = new Runner({ version: "2.0" });
+        reporter.attach(runner);
+        await runner.run(root);
+
+        expect(log.map(e => e.type)).to.equal([
+            "start",
+            "groupStart",
+            "testStart",
+            "testEnd",
+            "groupEnd",
+            "end"
+        ])
+    })
+
+    it ("skips not implemented tests", async () => {
+        const log = []
+        const reporter = JSReporter(log);
+        const root = loadCode(`test("x");`);
+        const runner = new Runner({ version: "2.0" });
+        reporter.attach(runner);
+        await runner.run(root);
+
+        expect(log.map(e => e.type)).to.equal([
+            "start",
+            "groupStart",
+            "groupEnd",
+            "end"
+        ])
+    })
+
+    it ("skips tests too low maxVersion", async () => {
+        const log = []
+        const reporter = JSReporter(log);
+        const root = loadCode(`test({
+            name: "x",
+            maxVersion: "1"
+        }, () => {});`);
+        const runner = new Runner({ version: "2.0" });
+        reporter.attach(runner);
+        await runner.run(root);
+
+        expect(log.map(e => e.type)).to.equal([
+            "start",
+            "groupStart",
+            "groupEnd",
+            "end"
+        ])
+    })
+
+    it ("skips tests too high minVersion", async () => {
+        const log = []
+        const reporter = JSReporter(log);
+        const root = loadCode(`test({
+            name: "x",
+            minVersion: "3"
+        }, () => {});`);
+        const runner = new Runner({ version: "2.0" });
+        reporter.attach(runner);
+        await runner.run(root);
+
+        expect(log.map(e => e.type)).to.equal([
+            "start",
+            "groupStart",
+            "groupEnd",
+            "end"
+        ])
+    })
+
+    it ("supports test.only", async () => {
+        const log = []
+        const reporter = JSReporter(log);
+        const root = loadCode(`
+            suite("suite 1", () => {
+                test("test 1", () => {});
+                test.only("test 2", () => {});
+                test({ name: "test 3", only: true }, () => {});
+                test("test 4", () => {});
+            })
+        `);
+        const runner = new Runner({ version: "2.0" });
+        reporter.attach(runner);
+        await runner.run(root);
+
+        expect(log.map(e => e.type + (e.data ? ":" + e.data.name : ""))).to.equal([
+            "start",
+            "groupStart:__ROOT__",
+            "groupStart:suite 1",
+            "testStart:test 2",
+            "testEnd:test 2",
+            "testStart:test 3",
+            "testEnd:test 3",
+            "groupEnd:suite 1",
+            "groupEnd:__ROOT__",
+            "end"
+        ])
+    })
+});

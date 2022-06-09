@@ -1,0 +1,7 @@
+theme: jekyll-theme-cayman
+title: "BDT (Bulk Data Tester)"
+
+include:
+    - "_*_.html"
+    - "_*_.*.html"
+    - "_lib_.html"

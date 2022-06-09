@@ -1,16 +1,12 @@
-// Use this to template define new configurations
+
+/**
+ * Use this to template define new configurations
+ * @type { import("../src/lib/Config").ServerConfig }
+ */
 module.exports = {
 
     // REQUIRED: The full URL of the server to which we can append "/$export".
     baseURL: "https://...",
-
-    // REQUIRED. Can be "backend-services", "client-credentials" or "none".
-    // - If "none" no authorization will be performed and all the authorization
-    //   tests will be skipped.
-    // - If "client-credentials" most of the authorization tests will be skipped.
-    // - If "backend-services" (default) all tests will be executed. `jwks` or
-    //   `jwks-url` auth must be supported in this case.
-    authType: "backend-services",
 
     /**
      * By default BDT will fetch and parse the CapabilityStatement to try to
@@ -18,99 +14,167 @@ module.exports = {
      * However, if the server does not have a CapabilityStatement or if it is
      * not properly declaring the system export support, you can skip that check
      * by declaring the `systemExportEndpoint` below. The value should be a path
-     * relative to the `baseURL` (typically just "$export").
-     * @type {string}
+     * relative to the `baseURL` (typically just "$export"). Living this empty
+     * (falsy) or omitting it tells BDT to try to auto-detect it.
      */
-    systemExportEndpoint: undefined, // will be auto-detected if not defined
-
+    systemExportEndpoint: "",
+    
     /**
      * By default BDT will fetch and parse the CapabilityStatement to try to
      * detect if the server supports patient-level export and at what endpoint.
      * However, if the server does not have a CapabilityStatement or if it is
      * not properly declaring the patient export support, you can skip that
      * check by declaring the `patientExportEndpoint` below. The value should be
-     * a path relative to the `baseURL` (typically "Patient/$export").
-     * @type {string}
+     * a path relative to the `baseURL` (typically "Patient/$export"). Living
+     * this empty (falsy) or omitting it tells BDT to try to auto-detect it.
      */
-    patientExportEndpoint: undefined, // will be auto-detected if not defined
+    patientExportEndpoint: "",
+    
+    /**
+     * The value should be a path relative to the `baseURL` (typically
+     * "Group/{GroupID}/$export"). Leaving this empty (falsy) or omitting it
+     * tells BDT to skip group-level export tests.
+     */
+    groupExportEndpoint: "",
 
     /**
-     * By default BDT will fetch and parse the CapabilityStatement to try to
-     * detect if the server supports group-level export. If so, and if `groupId`
-     * is set group-level tests will be enabled.
-     * However, if the server does not have a CapabilityStatement or if it is
-     * not properly declaring the group export support, you can skip that
-     * check by declaring the `groupExportEndpoint` below. The value should be
-     * a path relative to the `baseURL` (typically "Group/{GroupID}/$export").
-     * Note that if you set this, then the `groupId` option will not be used
-     * since the `groupId` is already part of the `groupExportEndpoint` path.
-     * @type {string}
+     * While testing we need to attempt downloading at least one resource type.
+     * Please enter the resource type that would be fast to export (because
+     * there are not many records of that type). If the server does not support
+     * system-level export, please make sure this resource type is accessible
+     * through the patient-level or the group-level export endpoint. We use
+     * "Patient" by default, just because we presume that it is present on every
+     * server.
      */
-    groupExportEndpoint: undefined, // will be auto-detected if not defined
-
-    /**
-     * Set this to false if your server does not require authentication. This
-     * is only applicable for servers that support authentication but do not
-     * require it (in other words auth is optional).
-     * @type {boolean}
-     */
-    requiresAuth: true,
-
-    // Set this to false to allow tests to accept self-signed certificates.
-    strictSSL: true,
-
-    // The full URL of the token endpoint. Required, unless authType is set to "none"
-    tokenEndpoint: "https://...",
-
-    // The Client ID is required unless authType is set to "none"
-    clientId: "...",
-
-    // Required if authType is set to "client-credentials" and ignored otherwise
-    clientSecret: "...",
-
-    // While testing we need to attempt downloading at least one resource type.
-    // Please enter the resource type that would be fast to export (because
-    // there are not many records of that type). If the server does not support
-    // system-level export, please make sure this resource type is accessible
-    // through the patient-level or the group-level export endpoint. We use
-    // "Patient" by default, just because we presume that it is present on every
-    // server.
     fastestResource: "Patient",
+    
+    /**
+     * Authentication options
+     */
+    authentication: {
 
-    // Enter the ID of the Group used for testing. Keep this empty if the server
-    // does not support group-level export.
-    groupId: "",
+        /**
+         * REQUIRED. Can be "backend-services", "client-credentials" or "none".
+         * - If "none" no authorization will be performed and all the
+         *   authorization tests will be skipped.
+         * - If "client-credentials" most of the authorization tests will be
+         *   skipped.
+         * - If "backend-services" (default) all tests will be executed. `jwks`
+         *   or `jwks-url` auth must be supported in this case.
+         */
+        type: "backend-services",
 
-    // Set this to true if the server supports JWKS URL authorization.
-    // NOTE: These tests ate not available in CLI environment.
-    jwksUrlAuth: false,
+        /**
+         * Set this to false if your server does not require authentication.
+         * This is only applicable for servers that support authentication but
+         * do not require it (in other words auth is optional).
+         */
+        optional: false,
 
-    // ------------------------------------------------------------------------
-    // KEYS
-    // ------------------------------------------------------------------------
-    // We typically only need a private key. Public keys are only used in
-    // JWKS-URL authentication tests which are not available in CLI because the
-    // tester is not online and cannot publicly host keys.
-    // The keys can be specified explicitly as "privateKey" and "publicKey"
-    // settings, or in a "jwks" object.
-    // ------------------------------------------------------------------------
+        /**
+         * The full URL of the token endpoint. Required, unless authType is set
+         * to "none". If not set (or falsy), BDT will try to auto-detect it but
+         * that will only work if the token endpoint has been declared in the
+         * CapabilityStatement.
+         */
+        tokenEndpoint: "https://...",
+        
+        /**
+         * The Client ID is required unless authType is set to "none"
+         */
+        clientId: "...",
+    
+        /**
+         * Required if authType is set to "client-credentials" and ignored
+         * otherwise
+         */
+        clientSecret: "...",
 
-    // The Private Key as JWK. Required if authType is set to "backend-services"
-    // and ignored otherwise. NOTE that if "jwks" is used and a public/private
-    // key pair is found in it, that will take precedence and this "privateKey"
-    // option will be ignored.
-    privateKey: {},
+        /**
+         * The Private Key as JWK. Required if authType is set to
+         * "backend-services" and ignored otherwise. Can be a JWK object or
+         * a PEM string.
+         */
+        privateKey: {/* JWK */},
 
-    // The Public Key as JWK. Required if authType is set to "backend-services"
-    // and "jwksUrlAuth" is set true (and if tests are not running in CLI),
-    // and ignored otherwise. NOTE that if "jwks" is used and a public/private
-    // key pair is found in it, that will take precedence and this "publicKey"
-    // option will be ignored.
-    publicKey: {},
+        /**
+         * BDT is a CLI tool and as such, it is not capable of hosting its
+         * public keys on location that will also be accessible by the tested
+         * bulk data server. However, you could host those keys yourself. In
+         * this case specify the public URL of those keys here. This will
+         * enable some additional authentication tests.
+         */
+        jwksUrl: "",
 
-    // If set, this should be an object having a "keys" array of JSON Web Keys
-    // containing a valid public/private key pair. NOTE that if "jwks" is used
-    // and a public/private key pair is found in it, those keys will be used
-    // and the "publicKey" and privateKey options (if set) will be ignored.
-    jwks: { keys: [] }
+        /**
+         * What scope(s) to request from the server by default. Not used if
+         * authentication.type is set to "none". Defaults to "system/*.read".
+         */
+        scope: "system/*.read",
+
+        /**
+         * The specifications states that:
+         * > *The authentication JWT SHALL include the following claims, and
+         *   SHALL be signed with the client’s private key (which **SHOULD
+         *   be an RS384 or ES384 signature**).
+         * 
+         * We sign with RS384 by default, but allow more!
+         * Acceptable values are: RS256, RS384, RS512, ES256, ES384 and ES512
+         */
+        tokenSignAlgorithm: "ES384", // Change if needed!
+
+        /**
+         * Expressed in seconds or a string describing a time span (Eg: `60`,
+         * `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as
+         * a seconds count. If you use a string be sure you provide the time
+         * units (days, hours, etc), otherwise milliseconds unit is used by
+         * default ("120" is equal to "120ms").
+         * If not provided, we will use "5m" as default.
+         * @see https://github.com/zeit/ms
+         */
+        tokenExpiresIn: "5m",
+
+        /**
+         * Custom values to be merged with the authentication token claims.
+         * NOTE that the following cannot be overridden:
+         * - `iss` (equals the clientId)
+         * - `sub` (equals the clientId)
+         * - `aud` (equals the tokenUrl)
+         * - `jti` random value generated at runtime
+         */
+        customTokenClaims: {},
+
+        /**
+         * Custom properties to be merged with the authentication token
+         * header before signing it.
+         * NOTE that the following cannot be overridden:
+         * - `typ` (equals "JWT")
+         * - `alg` (@see `tokenSignAlgorithm` below)
+         * - `kty` (equals the private key `kty`)
+         * - `jku` (equals the current `jwks_url` if any)
+         */
+        customTokenHeaders: {}
+    },
+
+    /**
+     * Requests customization
+     */
+    requests: {
+
+        /**
+         * If this is set to false, self-signed certificates will be accepted
+         */
+        strictSSL: true,
+
+        /**
+         * Set custom timeout (in milliseconds) for every request if needed
+         */
+        timeout: 30000,
+
+        /**
+         * HTTP headers to be added to every request if needed
+         */
+        customHeaders: {}
+    }
+
 };
