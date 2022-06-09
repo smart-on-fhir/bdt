@@ -22,7 +22,7 @@ node . test --config my/config.js
 
 ### Commands
 The bdt tool contains 3 subcommands:
-- `test` - Runst the test suite
+- `test` - Runs the test suite
 - `list` - List available tests (useful for third-party integration)
 - `audit` - Generates audit reports
 
