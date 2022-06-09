@@ -270,7 +270,6 @@ bdt_1.suite("Authorization", () => {
                 "- Servers should NOT explicitly grant any `.write` scopes\n",
             minVersion: "2"
         }, async ({ config, context, api }) => {
-            // /^\s*(patient|user|system)\/(\*|[A-Z][A-Za-z0-9]+)\.([cruds]+)(\?.*)?$/
             const scopes = [
                 "system/*.cruds",
                 "system/*.rs",
