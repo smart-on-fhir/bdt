@@ -4,12 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BulkDataClient = void 0;
+const moment_1 = __importDefault(require("moment"));
 const got_1 = __importDefault(require("got"));
 const errors_1 = require("./errors");
 const lib_1 = require("./lib");
 const assertions_1 = require("./assertions");
 const auth_1 = require("./auth");
-const moment_1 = __importDefault(require("moment"));
+// @ts-ignore
+const package_json_1 = __importDefault(require("../../package.json"));
 /**
  * Implements all the interactions with a bulk-data server that tests may need
  * to use. Helps keeping the tests clean and readable.
@@ -120,7 +122,7 @@ class BulkDataClient {
             },
             ...gotOptions,
             headers: {
-                'user-agent': 'BDT (https://github.com/smart-on-fhir/bdt)',
+                'user-agent': `BDT / ${package_json_1.default.version}`,
                 ...this.options.requests.customHeaders,
                 ...gotOptions.headers,
             },

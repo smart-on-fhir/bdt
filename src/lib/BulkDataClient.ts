@@ -1,16 +1,14 @@
+import moment from "moment";
 import Request, { NormalizedOptions } from "got/dist/source/core"
-import got, { HTTPError, OptionsOfJSONResponseBody, OptionsOfUnknownResponseBody, RequestError, Response } from "got"
+import got, { HTTPError, OptionsOfUnknownResponseBody, RequestError, Response } from "got"
 import { NotSupportedError } from "./errors"
-import {
-    formatHttpError,
-    getErrorMessageFromResponse,
-    wait
-} from "./lib";
+import { formatHttpError, getErrorMessageFromResponse, wait } from "./lib";
 import { TestAPI } from "./TestAPI"
 import { expectSuccessfulKickOff, HTTP_DATE_FORMATS } from "./assertions"
 import { createAuthToken, createAuthTokenOptions, SupportedJWKAlgorithm } from "./auth"
 import { NormalizedConfig } from "./Config"
-import moment from "moment";
+// @ts-ignore
+import pkg from "../../package.json"
 
 export namespace FHIR {
     
@@ -264,7 +262,6 @@ export interface requestOptions extends OptionsOfUnknownResponseBody {
     skipAuth?: boolean
     requestLabel?: string
     responseLabel?: string
-    
 }
 
 export interface requestOptionsWithUrl extends requestOptions {
@@ -441,7 +438,7 @@ export class BulkDataClient
             },
             ...gotOptions,
             headers: {
-                'user-agent': 'BDT (https://github.com/smart-on-fhir/bdt)',
+                'user-agent': `BDT / ${pkg.version}`,
                 ...this.options.requests.customHeaders,
                 ...gotOptions.headers,
             },

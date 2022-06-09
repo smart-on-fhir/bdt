@@ -5,7 +5,8 @@
     ],
     "compilerOptions": {
         "allowJs"                     : true,
-        "outDir"                      : "build",
+        "rootDir"                     : "./src",
+        "outDir"                      : "./build",
         "target"                      : "ES2020",
         "module"                      : "CommonJS",
         "moduleResolution"            : "Node",
@@ -20,7 +21,7 @@
         "noImplicitAny"               : true,
         "declaration"                 : true,
         "strict"                      : false,
-        "declarationDir"              : "build/types",
+        "declarationDir"              : "./build/types",
         // "mapRoot": "./build/maps",
         "sourceMap": true,
         // "inlineSourceMap": true
