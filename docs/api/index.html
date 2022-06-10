@@ -67,38 +67,52 @@
 				</a>
 				<p><strong>Prerequisites:</strong> Make sure you have <code>git</code> and <code>NodeJS</code> version &gt;= 14 installed</p>
 				<pre><code class="language-sh"><span style="color: #24292EFF">git clone https://github.com/smart-on-fhir/bdt</span>
-<span style="color: #6F42C1">cd</span><span style="color: #24292EFF"> ./bdt</span>
+<span style="color: #6F42C1">cd</span><span style="color: #24292EFF"> bdt</span>
 <span style="color: #24292EFF">npm i</span>
 </code></pre>
-				<a href="#api-docs" id="api-docs" style="color: inherit; text-decoration: none;">
-					<h2><a href="https://docs.smarthealthit.org/bdt/api/index.html">API Docs</a></h2>
+				<a href="#contribution" id="contribution" style="color: inherit; text-decoration: none;">
+					<h2>Contribution</h2>
 				</a>
+				<p>Contributions are welcome, just make sure you check out the <a href="https://docs.smarthealthit.org/bdt/api/index.html">API Docs</a> first.</p>
 				<a href="#cli-usage" id="cli-usage" style="color: inherit; text-decoration: none;">
 					<h2>CLI Usage</h2>
 				</a>
 				<p><strong>Quick start</strong></p>
-				<pre><code class="language-sh"><span style="color: #C2C3C5"># Her &quot;my/config.js&quot; is the path to the configuration file for your server</span>
+				<pre><code class="language-sh"><span style="color: #C2C3C5"># Here &quot;my/config.js&quot; is the path to your configuration file</span>
 <span style="color: #24292EFF">node </span><span style="color: #6F42C1">.</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">test</span><span style="color: #24292EFF"> --config my/config.js</span>
 </code></pre>
-				<p><strong>list</strong>
-				Outputs a JSON tree structure with all the tests without executing them.</p>
+				<a href="#commands" id="commands" style="color: inherit; text-decoration: none;">
+					<h3>Commands</h3>
+				</a>
+				<p>The bdt tool contains 3 subcommands:</p>
 				<ul>
-					<li>Run <code>bdt help list</code> for more info</li>
+					<li><code>test</code> - Runs the test suite</li>
+					<li><code>list</code> - List available tests (useful for third-party integration)</li>
+					<li><code>audit</code> - Generates audit reports</li>
 				</ul>
-				<p><strong>help</strong>
-				Running <code>bdt</code> with no options (<code>node .</code>), or running <code>node . help</code> will print a message like this:</p>
-				<pre><code><span style="color: #24292EFF">Usage: node . [options] [command]</span>
-
-<span style="color: #24292EFF">Options:</span>
-<span style="color: #24292EFF">  </span><span style="color: #D32F2F">-</span><span style="color: #1976D2">V</span><span style="color: #24292EFF">, </span><span style="color: #D32F2F">--</span><span style="color: #24292EFF">version                output the version number</span>
-<span style="color: #24292EFF">  </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF">c, </span><span style="color: #D32F2F">--</span><span style="color: #24292EFF">config </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">path</span><span style="color: #D32F2F">&gt;</span><span style="color: #24292EFF">          set config </span><span style="color: #6F42C1">path</span><span style="color: #24292EFF"> (default: </span><span style="color: #22863A">&quot;../config.js&quot;</span><span style="color: #24292EFF">)</span>
-<span style="color: #24292EFF">  </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF">v, </span><span style="color: #D32F2F">--</span><span style="color: #24292EFF">api</span><span style="color: #D32F2F">-</span><span style="color: #24292EFF">version [version]  Bulk Data </span><span style="color: #1976D2">API</span><span style="color: #24292EFF"> version to test. (choices</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;1.0&quot;</span><span style="color: #24292EFF">, </span><span style="color: #22863A">&quot;2.0&quot;</span><span style="color: #24292EFF">, default</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;1.0&quot;</span><span style="color: #24292EFF">)</span>
-<span style="color: #24292EFF">  -h, --help                   display help for command</span>
-
-<span style="color: #24292EFF">Commands:</span>
-<span style="color: #24292EFF">  list                         output loaded test tree structure as JSON</span>
-<span style="color: #24292EFF">  test [options]               load tests and execute them</span>
-<span style="color: #24292EFF">  help [command]               display help for command</span>
+				<p>The usage is</p>
+				<pre><code class="language-sh"><span style="color: #24292EFF">node </span><span style="color: #6F42C1">.</span><span style="color: #24292EFF"> [options] [command]</span>
+<span style="color: #C2C3C5"># or</span>
+<span style="color: #24292EFF">node </span><span style="color: #6F42C1">.</span><span style="color: #24292EFF"> [command] [options]</span>
+</code></pre>
+				<p>For more information run one of:</p>
+				<ul>
+					<li><code>node . --help</code> - common usage</li>
+					<li><code>node . help test</code> - <strong>test</strong> command usage</li>
+					<li><code>node . help list</code> - <strong>list</strong> command usage</li>
+					<li><code>node . help audit</code> - <strong>audit</strong> command usage</li>
+				</ul>
+				<a href="#examples" id="examples" style="color: inherit; text-decoration: none;">
+					<h2>Examples</h2>
+				</a>
+				<p>Tests a server</p>
+				<pre><code class="language-sh"><span style="color: #24292EFF">node </span><span style="color: #6F42C1">.</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">test</span><span style="color: #24292EFF"> -c config-examples/reference-server-r4.js</span>
+</code></pre>
+				<p>Tests a server but only run authorization-related tests</p>
+				<pre><code class="language-sh"><span style="color: #24292EFF">node </span><span style="color: #6F42C1">.</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">test</span><span style="color: #24292EFF"> -c config-examples/reference-server-r4.js --pattern </span><span style="color: #22863A">&#039;./build/testSuite/**/authorization.test.js&#039;</span>
+</code></pre>
+				<p>Tests a server against Bulk Data v2</p>
+				<pre><code class="language-sh"><span style="color: #24292EFF">node </span><span style="color: #6F42C1">.</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">test</span><span style="color: #24292EFF"> -c config-examples/reference-server-r4.js --api-version 2</span>
 </code></pre>
 			</div>
 		</div>

@@ -70,3 +70,4 @@ build/tsconfig.tsbuildinfo
 report.html
 audit-report-template.pug
 tsconfig.tsbuildinfo
+.DS_Store
