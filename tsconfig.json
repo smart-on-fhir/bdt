@@ -1,7 +1,6 @@
 {
     "include": [
         "src",
-        "index.d.ts"
     ],
     "compilerOptions": {
         "allowJs"                     : true,
@@ -22,14 +21,6 @@
         "declaration"                 : true,
         "strict"                      : false,
         "declarationDir"              : "./build/types",
-        // "mapRoot": "./build/maps",
-        "sourceMap": true,
-        // "inlineSourceMap": true
-        // "strict": true
-        // "typeRoots": [
-        //     "./node_modules/@types",
-        // //     "./src"
-        // ]
+        "sourceMap"                   : true,
     }
-
 }

@@ -122,7 +122,7 @@ async function report(options, destination, openFile = false) {
     });
     audit.once("end", score => {
         process.stdout.write("\u001b[2A\u001b[2K" + "FINAL SCORE:".bold + "\u001b[2B\n");
-        const html = pug_1.default.renderFile("./report-template.pug", {
+        const html = pug_1.default.renderFile("./audit-report-template.pug", {
             score,
             server: options.baseURL
         });

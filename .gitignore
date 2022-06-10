@@ -59,6 +59,8 @@ typings/
 
 # next.js build output
 .next
+
+# custom
 .vscode/launch.json
 config-examples/hl7-r3.js
 config-examples/DPC.js
@@ -67,4 +69,5 @@ config-examples/epic.js
 build/tsconfig.tsbuildinfo
 package.json
 report.html
+audit-report-template.pug
 tsconfig.tsbuildinfo

@@ -179,7 +179,7 @@ async function report(options: ConfigType, destination: string, openFile = false
     audit.once("end", score => {
         process.stdout.write("\u001b[2A\u001b[2K" + "FINAL SCORE:".bold + "\u001b[2B\n")
 
-        const html = pug.renderFile("./report-template.pug", {
+        const html = pug.renderFile("./audit-report-template.pug", {
             score,
             server: options.baseURL
         });

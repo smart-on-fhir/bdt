@@ -1,8 +1,9 @@
 {
   "name": "bdt",
   "version": "2.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Test Suite and Test Runner for Bulk Data FHIR servers",
+  "main": "build/index.js",
+  "types": "build/types/index.d.ts",
   "engines": {
     "node": ">=14"
   },
@@ -12,8 +13,8 @@
     "build:watch": "tsc --build tsconfig.json --incremental --watch",
     "doc": "typedoc --watch && touch docs/api/.nojekyll"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["test", "Bulk Data", "FHIR"],
+  "author": "Vladimir Ignatov <vlad.ignatov@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "@hapi/code": "^8.0.3",
