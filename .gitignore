@@ -67,7 +67,6 @@ config-examples/DPC.js
 config-examples/onc.js
 config-examples/epic.js
 build/tsconfig.tsbuildinfo
-package.json
 report.html
 audit-report-template.pug
 tsconfig.tsbuildinfo
