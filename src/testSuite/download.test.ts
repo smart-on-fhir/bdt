@@ -128,7 +128,7 @@ suite("Download Endpoint", () => {
 
         // Do an export using the full access scopes
         const { response } = await client.kickOff({ params: { _type: [config.fastestResource] }});
-        expectSuccessfulKickOff(response, api, "Export failed");
+        expectSuccessfulKickOff(response, "Export failed");
 
         const resp = await client.getExportResponse();
 

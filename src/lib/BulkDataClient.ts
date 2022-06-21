@@ -1045,7 +1045,7 @@ export class BulkDataClient
      */
     async cancel(kickOffResponse: Response, labelPrefix = "Unlabeled "): Promise<RequestResult>
     {
-        expectSuccessfulKickOff(kickOffResponse, this.testApi, "Failed to cancel export")
+        expectSuccessfulKickOff(kickOffResponse, "Failed to cancel export")
         return await this.request({
             url   : kickOffResponse.headers["content-location"],
             method: "DELETE",

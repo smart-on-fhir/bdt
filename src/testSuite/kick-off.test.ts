@@ -42,7 +42,7 @@ suite("Kick-off Endpoint", () => {
                     await client.cancelIfStarted(response)
 
                     // Finally check that we have got an error response
-                    expectFailedKickOff(response, api, "The accept header is not required")
+                    expectFailedKickOff(response, "The accept header is not required")
                 });
 
                 test({
@@ -72,7 +72,7 @@ suite("Kick-off Endpoint", () => {
                     await client.cancelIfStarted(response);
 
                     // Finally check that we have got an error response
-                    expectFailedKickOff(response, api, "The accept header is not required")
+                    expectFailedKickOff(response, "The accept header is not required")
                 });
 
                 // Prefer ------------------------------------------------------
@@ -100,7 +100,7 @@ suite("Kick-off Endpoint", () => {
                     await client.cancelIfStarted(response);
     
                     // Finally check that we have got an error response
-                    expectFailedKickOff(response, api, "The prefer header is not validated")
+                    expectFailedKickOff(response, "The prefer header is not validated")
                 });
 
                 test({
@@ -129,7 +129,7 @@ suite("Kick-off Endpoint", () => {
                     await client.cancelIfStarted(response);
     
                     // Finally check that we have got an error response
-                    expectFailedKickOff(response, api, "The prefer header is not validated")
+                    expectFailedKickOff(response, "The prefer header is not validated")
                 });
 
                 test({
@@ -152,7 +152,7 @@ suite("Kick-off Endpoint", () => {
                     await client.cancelIfStarted(response);
     
                     // Finally check that we have got an error response
-                    expectSuccessfulKickOff(response, api, "The 'handling=lenient' Prefer header is not supported");
+                    expectSuccessfulKickOff(response, "The 'handling=lenient' portion of the Prefer header is not supported");
                 });
             })
 
@@ -171,7 +171,7 @@ suite("Kick-off Endpoint", () => {
                         const client = new BulkDataClient(config, api);
                         const { response } = await client.kickOff({ type, params: { _outputFormat }});
                         await client.cancelIfStarted(response);
-                        expectSuccessfulKickOff(response, api, `The _outputFormat parameter does not support "${_outputFormat}" value`);
+                        expectSuccessfulKickOff(response, `The _outputFormat parameter does not support "${_outputFormat}" value`);
                     });
     
                     test({
@@ -182,7 +182,7 @@ suite("Kick-off Endpoint", () => {
                         const client = new BulkDataClient(config, api);
                         const { response } = await client.kickOff({ method: "POST", type, params: { _outputFormat }});
                         await client.cancelIfStarted(response);
-                        expectSuccessfulKickOff(response, api, `The _outputFormat parameter does not support "${_outputFormat}" value`);
+                        expectSuccessfulKickOff(response, `The _outputFormat parameter does not support "${_outputFormat}" value`);
                     });
                 }));
 
@@ -199,7 +199,7 @@ suite("Kick-off Endpoint", () => {
                         const client = new BulkDataClient(config, api);
                         const { response } = await client.kickOff({ type, params: { _outputFormat }});
                         await client.cancelIfStarted(response);
-                        expectFailedKickOff(response, api, `Parameter "_outputFormat=${_outputFormat}" was not rejected`);
+                        expectFailedKickOff(response, `Parameter "_outputFormat=${_outputFormat}" was not rejected`);
                     });
     
                     test({
@@ -211,7 +211,7 @@ suite("Kick-off Endpoint", () => {
                         const client = new BulkDataClient(config, api);
                         const { response } = await client.kickOff({ method: "POST", type, params: { _outputFormat }});
                         await client.cancelIfStarted(response);
-                        expectFailedKickOff(response, api, `Parameter "_outputFormat=${_outputFormat}" was not rejected`);
+                        expectFailedKickOff(response, `Parameter "_outputFormat=${_outputFormat}" was not rejected`);
                     });
                 }));
 
@@ -223,7 +223,7 @@ suite("Kick-off Endpoint", () => {
                     const client = new BulkDataClient(config, api);
                     const { response } = await client.kickOff({ type, params: { _since: "0000-60-01T30:70:80+05:00" }});
                     await client.cancelIfStarted(response);
-                    expectFailedKickOff(response, api, `Parameter "_since=0000-60-01T30:70:80+05:00" was not rejected`);
+                    expectFailedKickOff(response, `Parameter "_since=0000-60-01T30:70:80+05:00" was not rejected`);
                 });
     
                 test({
@@ -234,7 +234,7 @@ suite("Kick-off Endpoint", () => {
                     const client = new BulkDataClient(config, api);
                     const { response } = await client.kickOff({ method: "POST", type, params: { _since: "0000-60-01T30:70:80+05:00" }});
                     await client.cancelIfStarted(response);
-                    expectFailedKickOff(response, api, `Parameter "_since=0000-60-01T30:70:80+05:00" was not rejected`);
+                    expectFailedKickOff(response, `Parameter "_since=0000-60-01T30:70:80+05:00" was not rejected`);
                 });
 
                 test({
@@ -244,7 +244,7 @@ suite("Kick-off Endpoint", () => {
                     const client = new BulkDataClient(config, api);
                     const { response } = await client.kickOff({ type, params: { _since: "2057-01-01T00:00:00+05:00" }});
                     await client.cancelIfStarted(response);
-                    expectFailedKickOff(response, api, `Parameter "_since=2057-01-01T00:00:00+05:00" was not rejected`);
+                    expectFailedKickOff(response, `Parameter "_since=2057-01-01T00:00:00+05:00" was not rejected`);
                 });
     
                 test({
@@ -255,7 +255,7 @@ suite("Kick-off Endpoint", () => {
                     const client = new BulkDataClient(config, api);
                     const { response } = await client.kickOff({ method: "POST", type, params: { _since: "2057-01-01T00:00:00+05:00" }});
                     await client.cancelIfStarted(response);
-                    expectFailedKickOff(response, api, `Parameter "_since=2057-01-01T00:00:00+05:00" was not rejected`);
+                    expectFailedKickOff(response, `Parameter "_since=2057-01-01T00:00:00+05:00" was not rejected`);
                 });
 
                 // _type -------------------------------------------------------
@@ -266,7 +266,7 @@ suite("Kick-off Endpoint", () => {
                     const client = new BulkDataClient(config, api);
                     const { response } = await client.kickOff({ type, params: { _type: ["MissingType"] }});
                     await client.cancelIfStarted(response);
-                    expectFailedKickOff(response, api, `Parameter "_type=MissingType" was not rejected`);
+                    expectFailedKickOff(response, `Parameter "_type=MissingType" was not rejected`);
                 });
     
                 test({
@@ -285,7 +285,7 @@ suite("Kick-off Endpoint", () => {
                     const client = new BulkDataClient(config, api);
                     const { response } = await client.kickOff({ type, params: { _type: types.slice(0, 2) }});
                     await client.cancelIfStarted(response);
-                    expectSuccessfulKickOff(response, api, "Kick-off with multiple _type parameters failed");
+                    expectSuccessfulKickOff(response, "Kick-off with multiple _type parameters failed");
                 });
     
                 test({
@@ -296,7 +296,7 @@ suite("Kick-off Endpoint", () => {
                     const client = new BulkDataClient(config, api);
                     const { response } = await client.kickOff({ method: "POST", type, params: { _type: "MissingType" }});
                     await client.cancelIfStarted(response);
-                    expectFailedKickOff(response, api, "Parameter _type=MissingType was not rejected");
+                    expectFailedKickOff(response, "Parameter _type=MissingType was not rejected");
                 });
 
                 test({
@@ -323,7 +323,7 @@ suite("Kick-off Endpoint", () => {
                     // values SHOULD return an error and OperationOutcome resource
                     // so clients can re-submit a request that omits those values
                     // (for example, if a server does not retain provenance data). 
-                    expectFailedKickOff(response1, api, "Kick-off failed");
+                    expectFailedKickOff(response1, "Kick-off failed");
                     
                     // Now try standard export with
                     // includeAssociatedData=LatestProvenanceResources, plus a
@@ -349,7 +349,7 @@ suite("Kick-off Endpoint", () => {
                     //     "(or the handling=lenient value in the prefer header) is not supported by this server");
                     // }
     
-                    expectSuccessfulKickOff(response2, api, "It appears that the includeAssociatedData parameter " +
+                    expectSuccessfulKickOff(response2, "It appears that the includeAssociatedData parameter " +
                     "(or the handling=lenient value in the prefer header) is not supported by this server");
                 
                     // TODO: We should also verify that Provenance resources are
@@ -377,7 +377,7 @@ suite("Kick-off Endpoint", () => {
                         labelPrefix: "multiple comma-separated includeAssociatedData params - "
                     });
                     await client.cancelIfStarted(response, "Request with multiple comma-separated includeAssociatedData params - ");
-                    expectSuccessfulKickOff(response, api, "Failed to start an export using multiple includeAssociatedData values as comma separated list");
+                    expectSuccessfulKickOff(response, "Failed to start an export using multiple includeAssociatedData values as comma separated list");
                 });
     
                 test({
@@ -402,7 +402,7 @@ suite("Kick-off Endpoint", () => {
                         labelPrefix: "multiple includeAssociatedData params - "
                     });
                     await client.cancelIfStarted(response, "Request with multiple includeAssociatedData params - ");
-                    expectSuccessfulKickOff(response, api, "Failed to start an export using multiple includeAssociatedData parameters");
+                    expectSuccessfulKickOff(response, "Failed to start an export using multiple includeAssociatedData parameters");
                 });
 
                 // _typeFilter -------------------------------------------------
@@ -433,10 +433,9 @@ suite("Kick-off Endpoint", () => {
                     // verify that the presence of the _typeFilter did not result in
                     // a server error
                     if (response.statusCode === 202) {
-                        return expectSuccessfulKickOff(response, api);
-                    } else {
-                        expectClientError(response)
+                        expectSuccessfulKickOff(response);
                     }
+                    expectClientError(response)
                 });
     
                 test({
@@ -461,7 +460,7 @@ suite("Kick-off Endpoint", () => {
                     // If the export was successful assume that _typeFilter is
                     // supported. We have nothing else to do here.
                     if (response1.statusCode === 202) {
-                        return expectSuccessfulKickOff(response1, api, "Parameter _typeFilter was rejected")
+                        expectSuccessfulKickOff(response1, "Parameter _typeFilter was rejected")
                     }
     
                     // Second attempt
@@ -479,7 +478,7 @@ suite("Kick-off Endpoint", () => {
                     await client.cancelIfStarted(response2);
     
                     try {
-                        expectSuccessfulKickOff(response2, api, "Parameter _typeFilter plus header \"prefer: respond-async, handling=lenient\" was rejected");
+                        expectSuccessfulKickOff(response2, "Parameter _typeFilter plus header \"prefer: respond-async, handling=lenient\" was rejected");
                     } catch (ex) {
                         ex.message = "\n✖ The server was expected to ignore the _typeFilter parameter if handling=lenient is included in the Prefer header" + ex.message
                         throw ex
@@ -508,7 +507,7 @@ suite("Kick-off Endpoint", () => {
                     // If the export was successful assume that _typeFilter is
                     // supported. We have nothing else to do here.
                     if (response1.statusCode === 202) {
-                        return expectSuccessfulKickOff(response1, api, "Request with multiple _typeFilter parameters failed")
+                        expectSuccessfulKickOff(response1, "Request with multiple _typeFilter parameters failed")
                     }
     
                     // Second attempt
@@ -526,7 +525,7 @@ suite("Kick-off Endpoint", () => {
                     await client.cancelIfStarted(response2);
     
                     try {
-                        expectSuccessfulKickOff(response2, api, "Request with multiple _typeFilter parameters and handling=lenient failed");
+                        expectSuccessfulKickOff(response2, "Request with multiple _typeFilter parameters and handling=lenient failed");
                     } catch (ex) {
                         ex.message = "\n✖ The server was expected to ignore multiple _typeFilter parameter errors if handling=lenient is included in the Prefer header" + ex.message
                         throw ex
@@ -563,7 +562,7 @@ suite("Kick-off Endpoint", () => {
                     // If the export was successful assume that _typeFilter is
                     // supported. We have nothing else to do here.
                     if (response1.statusCode === 202) {
-                        return expectSuccessfulKickOff(response1, api, "Request with _typeFilter parameter was rejected");
+                        expectSuccessfulKickOff(response1, "Request with _typeFilter parameter was rejected");
                     }
     
                     // Second attempt
@@ -588,7 +587,7 @@ suite("Kick-off Endpoint", () => {
                     await client.cancelIfStarted(response2);
     
                     try {
-                        expectSuccessfulKickOff(response2, api, "Request with _typeFilter parameter and handling=lenient was rejected");
+                        expectSuccessfulKickOff(response2, "Request with _typeFilter parameter and handling=lenient was rejected");
                     } catch (ex) {
                         ex.message = "\n✖ The server was expected to ignore _typeFilter parameter errors if handling=lenient is included in the Prefer header" + ex.message
                         throw ex
@@ -629,7 +628,7 @@ suite("Kick-off Endpoint", () => {
                         // OperationOutcome resource so clients can re-submit a request omitting
                         // the _elements parameter.
                         if (response1.statusCode != 202) {
-                            return expectFailedKickOff(response1, api, "Kick-off with _elements parameter failed");
+                            expectFailedKickOff(response1, "Kick-off with _elements parameter failed");
                         }
         
                         await client.waitForExport();
@@ -708,7 +707,7 @@ suite("Kick-off Endpoint", () => {
                     // OperationOutcome resource so clients can re-submit a request omitting
                     // the _elements parameter.
                     if (response1.statusCode != 202) {
-                        return expectFailedKickOff(response1, api, "Kick-off with multiple _elements parameters failed");
+                        expectFailedKickOff(response1, "Kick-off with multiple _elements parameters failed");
                     }
     
                     await client.waitForExport();
@@ -868,7 +867,7 @@ suite("Kick-off Endpoint", () => {
                             return api.setNotSupported();
                         }
             
-                        expectFailedKickOff(response, api, "This kick-off request should have failed");
+                        expectFailedKickOff(response, "This kick-off request should have failed");
                     });
                 }
             });
@@ -882,7 +881,7 @@ suite("Kick-off Endpoint", () => {
                 const client = new BulkDataClient(config, api);
                 const { response } = await client.kickOff({ type });
                 await client.cancelIfStarted(response);
-                expectSuccessfulKickOff(response, api);
+                expectSuccessfulKickOff(response);
             });
 
             test({
@@ -906,7 +905,7 @@ suite("Kick-off Endpoint", () => {
                 });
 
                 await client.cancelIfStarted(response);
-                expectSuccessfulKickOff(response, api, "Failed to make an export via POST");
+                expectSuccessfulKickOff(response, "Failed to make an export via POST");
             });
 
             if (type === "system") {
@@ -940,7 +939,7 @@ suite("Kick-off Endpoint", () => {
         
                     await client.cancelIfStarted(response);
         
-                    expectFailedKickOff(response, api, "Export with patient parameter was not rejected");
+                    expectFailedKickOff(response, "Export with patient parameter was not rejected");
                 });
             }
             else {
@@ -962,7 +961,7 @@ suite("Kick-off Endpoint", () => {
         
                     await client.cancelIfStarted(response);
         
-                    expectSuccessfulKickOff(response, api, "Kick-off with patient parameter failed");
+                    expectSuccessfulKickOff(response, "Kick-off with patient parameter failed");
                 });
             }
         })

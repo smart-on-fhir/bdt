@@ -1,9 +1,9 @@
 import { Response } from "got/dist/source"
 import { expect } from "@hapi/code";
 import { getErrorMessageFromResponse, getUnfulfilledScopes, roundToPrecision, scopeSet } from "./lib";
-import { TestAPI } from "./TestAPI";
 import { OAuth, BulkData, FHIR } from "./BulkDataClient";
 import moment from "moment";
+import { NotSupportedError } from "./errors";
 
 const REGEXP_INSTANT = new RegExp(
     "([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-" +
@@ -53,8 +53,8 @@ export interface BulkDataAssertion {
         withElements: (body: string, elements: string[], prefix?: string) => void
     };
     kickOff: {
-        OK: (response: Response, testApi: TestAPI, prefix?: string) => string | void;
-        notOK: (response: Response, testApi: TestAPI, prefix?: string) => void
+        OK: (response: Response, prefix?: string) => string | void;
+        notOK: (response: Response, prefix?: string) => void
     };
 
     /**
@@ -483,19 +483,19 @@ export function expectSuccessfulAuth(response: Response, prefix = "")
 /**
  * @category Response Assertion
  */
-export function expectFailedKickOff(response: Response, testApi: TestAPI, prefix = "")
+export function expectFailedKickOff(response: Response, prefix = "")
 {
     const { statusCode } = response
     const { options } = response.request
 
     if (statusCode === 404 || statusCode === 405 /* Method Not Allowed */) {
-        return testApi.setNotSupported(
+        throw new NotSupportedError(
             `${options.method} ${options.url.pathname} is not supported by this server`
         );
     }
 
     if (statusCode >= 500) {
-        return testApi.setNotSupported(
+        throw new NotSupportedError(
             `${options.method} ${options.url.pathname} is not supported by this server. Received a server error.`
         );
     }
@@ -511,19 +511,21 @@ export function expectFailedKickOff(response: Response, testApi: TestAPI, prefix
 /**
  * @category Response Assertion
  */
-export function expectSuccessfulKickOff(response: Response, testApi: TestAPI, prefix = "")
+export function expectSuccessfulKickOff(response: Response, prefix = "")
 {
     const { statusCode } = response
     const { options } = response.request
 
     if (statusCode === 404 || statusCode === 405 /* Method Not Allowed */) {
-        return testApi.setNotSupported(
+        throw new NotSupportedError(
             `${options.method} ${options.url.pathname} is not supported by this server`
         )
     }
 
     if (statusCode >= 500) {
-        return `${options.method} ${options.url.pathname} is not supported by this server. Received a server error.`
+        throw new NotSupportedError(
+            `${options.method} ${options.url.pathname} is not supported by this server. Received a server error.`
+        )
     }
     
     const error = "Got: " + getErrorMessageFromResponse(response)

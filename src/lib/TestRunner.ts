@@ -15,6 +15,8 @@ export default class TestRunner extends EventEmitter
 
     currentGroup: Suite;
 
+    currentTestApi: TestAPI;
+
     onlyMode: boolean = false;
 
     constructor(settings: Config, onlyMode = false)
@@ -35,7 +37,7 @@ export default class TestRunner extends EventEmitter
             // Not supported
             if (error instanceof NotSupportedError) {
                 test.status = "not-supported"
-                // test.console.info(error.message)
+                test.console.info(String(error))
             }
 
             // Other errors
@@ -201,18 +203,29 @@ export default class TestRunner extends EventEmitter
         // execute
         try {
             this.emit("testStart", test);
-            await test.fn({ config: this.settings, api: new TestAPI(test), context })
+            this.currentTestApi = new TestAPI(test)
+            await test.fn({ config: this.settings, api: this.currentTestApi, context })
             await this.endTest(test, context)
         } catch (error) {
-            const thrownRe = /\: Expected \[Function\] to not throw an error but got \[/g
-            const match = error.message.match(thrownRe)
-            if (match) {
-                error.message = error.message
-                    .replace(/Error\: /g, "")
-                    .replace(thrownRe, `\n✖ `)// 🛈❌
-                    .replace(/\]*$/, "")
+            if (error instanceof NotSupportedError) {
+                test.status = "not-supported"
+                this.currentTestApi.setNotSupported(error.message)
+                await this.endTest(test, context)
             }
-            await this.endTest(test, context, error)
+            else {
+                const thrownRe = /\: Expected \[Function\] to not throw an error but got \[/g
+                const match = error.message.match(thrownRe)
+                if (match) {
+                    error.message = error.message
+                        .replace(/Error\: /g, "")
+                        .replace(thrownRe, `\n✖ `)// ❌
+                        .replace(/\]*$/, "")
+                }
+                await this.endTest(test, context, error)
+            }
+        } finally {
+            this.currentTestApi = null
         }
+    }
     }
 }

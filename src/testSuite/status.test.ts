@@ -95,11 +95,11 @@ suite("Status Endpoint", () => {
         // Start an export
         const { response: kickOffResponse } = await client.kickOff();
 
+        // Make sure the kick-off was successful
+        assert.bulkData.kickOff.OK(kickOffResponse, "Kick-off failed")
+
         // Cancel the export immediately
         const { response: cancelResponse1 } = await client.cancel(kickOffResponse);
-
-        // Verify that we didn't get an error
-        assert.bulkData.kickOff.OK(kickOffResponse, api)
 
         if (cancelResponse1.statusCode < 200 || cancelResponse1.statusCode >= 300) {
             return api.setNotSupported(`DELETE requests to the status endpoint are not supported by this server`);
@@ -183,7 +183,7 @@ suite("Status Endpoint", () => {
 
         // console.log(client.kickOffResponse.body)
 
-        assert.bulkData.kickOff.OK(response, api, "Kick-off failed");
+        assert.bulkData.kickOff.OK(response, "Kick-off failed");
 
         await client.waitForExport();
         await client.cancel(response);

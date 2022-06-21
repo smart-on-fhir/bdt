@@ -77,7 +77,7 @@ export class Console
      * @param error The error to add
      */
     error(error: Error) {
-        this.add("error", "error", [], error)
+        this.add("error", "error", [], error + "")
     }
 
     /**
