@@ -122,11 +122,19 @@ suite("Status Endpoint", () => {
 
     test({
         name: "Includes lenient errors in the payload errors array",
-        minVersion: "1.2",
+        minVersion: "2",
         description: "If the request contained invalid or unsupported parameters " +
             "along with a `Prefer: handling=lenient` header and the server " +
             "processed the request, the server SHOULD include an OperationOutcome " +
-            "resource for each of these parameters."
+            "resource for each of these parameters.\n\nTo properly execute this " +
+            "test we need to find at least one optional parameter that is not " + 
+            "supported by this server, which is why we start by making a few test " +
+            "kick-off requests using different parameters until we find one that fails. " +
+            "If all of these request are successful the test cannot continue. Otherwise " +
+            "we repeat the request with the unsupported parameter, but this time we " +
+            "send a `prefer` header of `respond-async, handling=lenient`, and we expect " +
+            "a manifest with an OperationOutcome(s) in the `error` array mentioning the " +
+            "unsupported parameter."
     }, async ({ config, api }) => {
 
         const client = new BulkDataClient(config, api)
@@ -148,6 +156,7 @@ suite("Status Endpoint", () => {
 
         for (const param of Object.keys(optionalParams)) {
             const { response } = await client.kickOff({
+                labelPrefix: `Trying kick-off with \`${param}\` parameter - `,
                 method: param === "patient" ? "POST" : "GET",
                 type  : param === "patient" ? "patient" : null,
                 params: {
@@ -157,7 +166,7 @@ suite("Status Endpoint", () => {
             });
 
             await client.cancelIfStarted(response);
-            if (client.kickOffResponse.statusCode >= 400 && client.kickOffResponse.statusCode < 500) {
+            if (client.kickOffResponse.statusCode >= 400/* && client.kickOffResponse.statusCode < 500*/) {
                 unsupportedParam = param;
                 break;
             }
@@ -165,6 +174,11 @@ suite("Status Endpoint", () => {
 
         // If all the optional params are supported there is nothing more we can do!
         if (!unsupportedParam) {
+            api.setNotSupported(
+                "All the kick-off parameters used by this test seem to be " + 
+                "supported by this server. We cannot continue since we can't " +
+                "find an unsupported parameter to test with."
+            )
             return;
         }
         
@@ -188,10 +202,18 @@ suite("Status Endpoint", () => {
         await client.waitForExport();
         await client.cancel(response);
 
-        const outcomes = (client.statusResponse.body.error || []).filter((x:any) => x.resourceType === "OperationOutcome");
+        const outcomes = (client.statusResponse.body.error || [])
+            .filter((x:any) => x.resourceType === "OperationOutcome");
 
-        expect(outcomes.length, "No OperationOutcome errors found in the errors array").to.be.greaterThan(0);
-        expect(JSON.stringify(outcomes), `"${unsupportedParam}" should be mentioned in at least one of the OperationOutcome errors`).to.contain(unsupportedParam);
+        expect(
+            outcomes.length,
+            "No OperationOutcome errors found in the errors array"
+        ).to.be.greaterThan(0);
+
+        expect(
+            JSON.stringify(outcomes),
+            `"${unsupportedParam}" should be mentioned in at least one of the OperationOutcome errors`
+        ).to.contain(unsupportedParam);
     });
 
 })

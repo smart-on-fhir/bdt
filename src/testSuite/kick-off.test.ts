@@ -47,7 +47,7 @@ suite("Kick-off Endpoint", () => {
 
                 test({
                     name: "Requires Accept header in POST requests",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: 'The Accept header specifies the format of the optional ' +
                     'OperationOutcome response to the kick-off request. Currently, ' +
                     'only `application/fhir+json` is supported. This test makes an ' +
@@ -105,7 +105,7 @@ suite("Kick-off Endpoint", () => {
 
                 test({
                     name: "Requires the Prefer header to contain respond-async in POST requests",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: 'The **Prefer** request header is required and specifies ' +
                                 'whether the response is immediate or asynchronous. ' +
                                 'The header MUST be set to **respond-async**. ' +
@@ -133,7 +133,8 @@ suite("Kick-off Endpoint", () => {
                 });
 
                 test({
-                    name: 'Allows the Prefer header to contain "handling=lenient"'
+                    name: 'Allows the Prefer header to contain "handling=lenient"',
+                    minVersion: "2"
                 }, async ({ config, api }) => {
     
                     const client = new BulkDataClient(config, api);
@@ -176,7 +177,7 @@ suite("Kick-off Endpoint", () => {
     
                     test({
                         name: `Accepts _outputFormat=${_outputFormat} in POST requests`,
-                        minVersion: "1.2",
+                        minVersion: "2",
                         description: `Verifies that the server accepts \`${_outputFormat}\` as **_outputFormat** parameter`
                     }, async ({ config, api }) => {
                         const client = new BulkDataClient(config, api);
@@ -203,7 +204,7 @@ suite("Kick-off Endpoint", () => {
                     });
     
                     test({
-                        minVersion: "1.2",
+                        minVersion: "2",
                         name: `Rejects unsupported format "_outputFormat=${_outputFormat}" in POST requests`,
                         description: `This tests if the server rejects \`_outputFormat=${_outputFormat}\` ` +
                             `parameter, even though \`${_outputFormat}\` is valid mime type.`
@@ -227,7 +228,7 @@ suite("Kick-off Endpoint", () => {
                 });
     
                 test({
-                    minVersion: "1.2",
+                    minVersion: "2",
                     name: "Rejects _since={invalid date} parameter in POST requests",
                     description: "The server should reject exports if the `_since` parameter is not a valid date"
                 }, async ({ config, api }) => {
@@ -248,7 +249,7 @@ suite("Kick-off Endpoint", () => {
                 });
     
                 test({
-                    minVersion: "1.2",
+                    minVersion: "2",
                     name: "Rejects _since={future date} parameter in POST requests",
                     description: "The server should reject exports if the `_since` parameter is a date in the future"
                 }, async ({ config, api }) => {
@@ -270,7 +271,7 @@ suite("Kick-off Endpoint", () => {
                 });
     
                 test({
-                    minVersion: "1.2",
+                    minVersion: "2",
                     name: "Accepts multiple _type parameters",
                     description: "Clients can use multiple `_type` parameters instead of single comma-separated lists"
                 }, async ({ config, api }) => {
@@ -289,7 +290,7 @@ suite("Kick-off Endpoint", () => {
                 });
     
                 test({
-                    minVersion: "1.2",
+                    minVersion: "2",
                     name: "Validates the _type parameter in POST requests",
                     description: "Verifies that the request is rejected if the `_type` contains invalid resource type"
                 }, async ({ config, api }) => {
@@ -301,7 +302,7 @@ suite("Kick-off Endpoint", () => {
 
                 test({
                     name: "Accepts the includeAssociatedData parameter",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: "When provided, servers with support for the parameter and " +
                         "requested values SHALL return or omit a pre-defined set of FHIR " +
                         "resources associated with the request. The `includeAssociatedData` " +
@@ -360,7 +361,7 @@ suite("Kick-off Endpoint", () => {
     
                 test({
                     name: "Accepts multiple includeAssociatedData values as comma separated list",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: "When provided, servers with support for the parameter and " +
                         "requested values SHALL return or omit a pre-defined set of FHIR " +
                         "resources associated with the request. The `includeAssociatedData` " +
@@ -382,7 +383,7 @@ suite("Kick-off Endpoint", () => {
     
                 test({
                     name: "Accepts multiple includeAssociatedData parameters",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: "When provided, servers with support for the parameter and " +
                         "requested values SHALL return or omit a pre-defined set of FHIR " +
                         "resources associated with the request. The `includeAssociatedData` " +
@@ -440,7 +441,7 @@ suite("Kick-off Endpoint", () => {
     
                 test({
                     name: "Handles the _typeFilter parameter",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: "The `_typeFilter` parameter is optional. Servers that do not support it " +
                         "should reject it, unless `handling=lenient` is included in the `Prefer` header"
                 }, async ({ config, api }) => {
@@ -487,7 +488,7 @@ suite("Kick-off Endpoint", () => {
     
                 test({
                     name: "Handles multiple _typeFilter parameters",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: "The `_typeFilter` parameter is optional. Servers that do not support it " +
                         "should reject it, unless `handling=lenient` is included in the `Prefer` header"
                 }, async ({ config, api }) => {
@@ -533,7 +534,7 @@ suite("Kick-off Endpoint", () => {
                 });
     
                 test({
-                    minVersion: "1.2",
+                    minVersion: "2",
                     name: "Accepts the _typeFilter parameter in POST requests",
                     description: "The `_typeFilter` parameter is optional so the servers " +
                         "should not reject it, even if they don't support it"
@@ -701,6 +702,7 @@ suite("Kick-off Endpoint", () => {
                             _type: [resourceType]
                         }
                     });
+
                     context.kickOffResponse = response1
 
                     // Servers unable to support _elements SHOULD return an error and
@@ -885,7 +887,7 @@ suite("Kick-off Endpoint", () => {
             });
 
             test({
-                minVersion: "1.2",
+                minVersion: "2",
                 name: "Can start an export from POST requests",
                 description: "Verifies that the server starts an export if called with valid parameters. " +
                     "The status code must be `202 Accepted` and a `Content-Location` header must be " +
@@ -911,7 +913,7 @@ suite("Kick-off Endpoint", () => {
             if (type === "system") {
 
                 test({
-                    minVersion: "1.2",
+                    minVersion: "2",
                     name: "Rejects system-level export with patient parameter",
                     description: "The patient parameter is not applicable to system level export requests. " +
                         "This test verifies that such invalid export attempts are being rejected."
@@ -945,7 +947,7 @@ suite("Kick-off Endpoint", () => {
             else {
                 test({
                     name: "Can start an export with patient parameter",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: "This test verifies that export attempts including patient are not being rejected."
                 }, async ({ config, api }) => {
                     

@@ -245,7 +245,7 @@ export const suite: suiteFunction = async function({ config, check }) {
             });
 
             await check({
-                minVersion: "1.2",
+                minVersion: "2",
                 name: `${type}-level ${method} kick-off accepts multiple "_type" parameters`,
                 description: "Clients can use multiple `_type` parameters instead of single comma-separated lists",
                 weights: { reliability: 5, compliance: 5 }
@@ -261,7 +261,7 @@ export const suite: suiteFunction = async function({ config, check }) {
 
             await check({
                 name: `${type}-level ${method} kick-off accepts the includeAssociatedData parameter`,
-                minVersion: "1.2",
+                minVersion: "2",
                 description: "When provided, servers with support for the parameter and " +
                     "requested values SHALL return or omit a pre-defined set of FHIR " +
                     "resources associated with the request. The `includeAssociatedData` " +
@@ -275,7 +275,7 @@ export const suite: suiteFunction = async function({ config, check }) {
 
             await check({
                 name: `${type}-level ${method} kick-off accepts multiple includeAssociatedData values as comma separated list`,
-                minVersion: "1.2",
+                minVersion: "2",
                 description: "When provided, servers with support for the parameter and " +
                     "requested values SHALL return or omit a pre-defined set of FHIR " +
                     "resources associated with the request. The `includeAssociatedData` " +
@@ -294,7 +294,7 @@ export const suite: suiteFunction = async function({ config, check }) {
 
             await check({
                 name: `${type}-level ${method} kick-off accepts multiple includeAssociatedData parameters`,
-                minVersion: "1.2",
+                minVersion: "2",
                 description: "When provided, servers with support for the parameter and " +
                     "requested values SHALL return or omit a pre-defined set of FHIR " +
                     "resources associated with the request. The `includeAssociatedData` " +

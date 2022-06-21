@@ -369,8 +369,8 @@ export function expectUnauthorized(response: Response, prefix = "")
  */
 export function expectOAuthError(response: Response, prefix = ""): void
 {
-    expectJsonResponse(response, prefix)
-    expectClientError(response, prefix)
+    expectJsonResponse(response, prefix + "Invalid OAuth error response! ")
+    expectClientError(response, prefix + "Invalid OAuth error response! ")
 
     const body = response.body as OAuth.ErrorResponse;
 
@@ -388,19 +388,19 @@ export function expectOAuthError(response: Response, prefix = ""): void
     const err = "Got " + getErrorMessageFromResponse(response)
 
     // body.error
-    expect(error, concat(prefix, err, "The 'error' property of OAuth error responses is required")).to.exist()
-    expect(error, concat(prefix, err, "The 'error' property of OAuth error responses must be a string")).to.be.string()
-    expect(validErrorTypes, concat(prefix, err, "Invalid OAuth error 'error' property")).to.include(error)
+    expect(error, concat(prefix, err, "Invalid OAuth error response! The 'error' property of OAuth error responses is required")).to.exist()
+    expect(error, concat(prefix, err, "Invalid OAuth error response! The 'error' property of OAuth error responses must be a string")).to.be.string()
+    expect(validErrorTypes, concat(prefix, err, "Invalid OAuth error response! Invalid OAuth error 'error' property")).to.include(error)
 
     // body.error_description
     if (error_description) {
-        expect(error_description, concat(prefix, err, `The 'error_description' property of OAuth error responses must be a string if present`)).to.be.string()
+        expect(error_description, concat(prefix, err, `Invalid OAuth error response! The 'error_description' property of OAuth error responses must be a string if present`)).to.be.string()
     }
 
     // body.error_uri
     if (error_uri) {
-        expect(error_uri, concat(prefix, err, `If present, the 'error_uri' property of OAuth error responses must be a string`)).to.be.string()
-        expect(error_uri, concat(prefix, err, `If present, the 'error_uri' property of OAuth error responses must be an url`)).to.match(/^https?:\/\/.+/)
+        expect(error_uri, concat(prefix, err, `Invalid OAuth error response! If present, the 'error_uri' property of OAuth error responses must be a string`)).to.be.string()
+        expect(error_uri, concat(prefix, err, `Invalid OAuth error response! If present, the 'error_uri' property of OAuth error responses must be an url`)).to.match(/^https?:\/\/.+/)
     }
 }
 

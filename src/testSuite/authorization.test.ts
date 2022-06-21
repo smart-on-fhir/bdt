@@ -358,7 +358,7 @@ suite("Authorization", () => {
                 if (response.statusCode === 200) {
                     expectSuccessfulAuth(
                         response,
-                        `If the server supports the "${scope}" scope, then it must reply with valid token response`
+                        `If the server supports the \`${scope}\` scope, then it must reply with valid token response`
                     )
                     expect(
                         response.body.scope,
@@ -368,7 +368,7 @@ suite("Authorization", () => {
                     expectOAuthErrorType(
                         response,
                         "invalid_scope",
-                        `It appears that the "${scope}" scope is not supported by the server.` +
+                        `It appears that the \`${scope}\` scope is not supported by the server. ` +
                         `In this case we expect a proper OAuth error response from the token ` +
                         `endpoint.`
                     )
@@ -378,9 +378,8 @@ suite("Authorization", () => {
 
         test<TokenTestsContext>({
             name: "Handles V2 scopes correctly",
-            description: "Verifies that scopes like `system/Patient.*` or `system/*.*` are handled correctly.\n" +
-                "- Servers should avoid granting `.*` action scopes and prefer `.read` instead\n" +
-                "- Servers should NOT explicitly grant any `.write` scopes\n",
+            description: "Verifies that scopes like `system/Patient.rs` or `system/*.cruds` are handled correctly.\n" +
+                "- Bulk Data Servers should NOT explicitly grant any write-level scopes like `c`, `u` or `d`.\n",
             minVersion: "2"
         }, async ({ config, context, api }) => {
 
@@ -403,7 +402,7 @@ suite("Authorization", () => {
                 if (response.statusCode === 200) {
                     expectSuccessfulAuth(
                         response,
-                        `If the server supports the "${scope}" scope, then it must reply with valid token response`
+                        `If the server supports the \`${scope}\` scope, then it must reply with valid token response`
                     )
                     expect(
                         response.body.scope,
@@ -413,7 +412,7 @@ suite("Authorization", () => {
                     expectOAuthErrorType(
                         response,
                         "invalid_scope",
-                        `It appears that the "${scope}" scope is not supported by the server.` +
+                        `It appears that the \`${scope}\` scope is not supported by the server. ` +
                         `In this case we expect a proper OAuth error response from the token ` +
                         `endpoint.`
                     )
