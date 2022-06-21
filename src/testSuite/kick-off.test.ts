@@ -145,7 +145,7 @@ suite("Kick-off Endpoint", () => {
                     const { response } = await client.kickOff({
                         type,
                         params: { _type: [config.fastestResource] },
-                        headers: { prefer: ["respond-async", "handling=lenient"] }
+                        headers: { prefer: "respond-async, handling=lenient" }
                     });
     
                     // If the server did not return an error as expected, an export
@@ -334,7 +334,7 @@ suite("Kick-off Endpoint", () => {
                     const { response: response2 } = await client.kickOff({
                         type,
                         headers: {
-                            prefer: ["respond-async", "handling=lenient"]
+                            prefer: "respond-async, handling=lenient"
                         },
                         params: {
                             includeAssociatedData: "LatestProvenanceResources"
@@ -468,7 +468,7 @@ suite("Kick-off Endpoint", () => {
                     const { response: response2 } = await client.kickOff({
                         type,
                         headers: {
-                            prefer: ["respond-async", "handling=lenient"]
+                            prefer: "respond-async, handling=lenient"
                         },
                         params: {
                             _typeFilter: "Patient?status=active"
@@ -515,7 +515,7 @@ suite("Kick-off Endpoint", () => {
                     const { response: response2 } = await client.kickOff({
                         type,
                         headers: {
-                            prefer: ["respond-async", "handling=lenient"]
+                            prefer: "respond-async, handling=lenient"
                         },
                         params: {
                             _typeFilter: ["Patient?status=active", "Patient?gender=male"]
@@ -571,7 +571,7 @@ suite("Kick-off Endpoint", () => {
                         method: "POST",
                         type,
                         headers: {
-                            prefer: ["respond-async", "handling=lenient"]
+                            prefer: "respond-async, handling=lenient"
                         },
                         json: {
                             resourceType: "Parameters",

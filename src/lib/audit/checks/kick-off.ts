@@ -163,7 +163,7 @@ export const suite: suiteFunction = async function({ config, check }) {
                 weights: { reliability: 4, compliance: 5 },
                 minVersion: "2"
             }, async () => {
-                const { response } = await client.kickOff({ type, method, headers: { prefer: ["respond-async", "handling=lenient"] }})
+                const { response } = await client.kickOff({ type, method, headers: { prefer: "respond-async, handling=lenient" }})
                 await client.cancelIfStarted(response)
                 return response.statusCode === 202
             })
