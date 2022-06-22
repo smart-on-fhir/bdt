@@ -19,15 +19,18 @@ export default class TestRunner extends EventEmitter
 
     onlyMode: boolean = false;
 
+    context: typeof ctx
 
     startPath: string | null = null
 
+    constructor(settings: Config, onlyMode = false, context = ctx)
     {
         super()
 
         this.canceled = false
         this.onlyMode = onlyMode
         this.settings = settings
+        this.context  = context
     }
 
     async endTest(test: Test, context: Record<string, any>, error?: Error)
@@ -127,7 +130,7 @@ export default class TestRunner extends EventEmitter
             let path = node.path.split(".");
             path.pop();
             // @ts-ignore
-            this.currentGroup = ctx.root.getNodeAt(path.join(".")) as Suite;
+            this.currentGroup = this.context.root.getNodeAt(path.join(".")) as Suite;
             return await this.runTest(node, context)
         }
         
