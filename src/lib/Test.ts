@@ -60,6 +60,15 @@ export class Test extends TestNode
         this.console = new Console()
     }
 
+    public reset()
+    {
+        this._status   = undefined
+        this.startedAt = undefined
+        this.endedAt   = undefined
+        this.error     = undefined
+        this.console.clear()
+    }
+
     toJSON()
     {
         const json = super.toJSON()

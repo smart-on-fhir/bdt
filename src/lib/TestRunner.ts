@@ -160,6 +160,8 @@ export default class TestRunner extends EventEmitter
 
     async runTest(test: Test, context: Record<string, any> = {})
     {
+        test.reset()
+        
         test.startedAt = Date.now()
 
         // Exit if onlyMode is being used elsewhere

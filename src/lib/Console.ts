@@ -207,5 +207,9 @@ export class Console
     forEach(callback: (entry: ConsoleEntry, index?: number, all?: ConsoleEntry[]) => void): void {
         this.entries.forEach(callback)
     }
+
+    clear() {
+        this.entries = []
+    }
 }
 
