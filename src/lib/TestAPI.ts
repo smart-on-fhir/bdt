@@ -23,9 +23,12 @@ export class TestAPI
 {
     console: Console;
 
+    readonly abortController: AbortController;
+
     constructor(protected test: Test)
     {
         this.console = test.console
+        this.abortController = new AbortController()
     }
 
     /**

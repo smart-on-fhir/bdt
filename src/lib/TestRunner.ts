@@ -212,6 +212,11 @@ export default class TestRunner extends EventEmitter
                 this.currentTestApi.setNotSupported(error.message)
                 await this.endTest(test, context)
             }
+            else if (error.name === "AbortError" || error.name === "CancelError") {
+                test.status = "aborted"
+                this.currentTestApi.console.warn("Test aborted")
+                await this.endTest(test, context)
+            }
             else {
                 const thrownRe = /\: Expected \[Function\] to not throw an error but got \[/g
                 const match = error.message.match(thrownRe)
@@ -227,5 +232,12 @@ export default class TestRunner extends EventEmitter
             this.currentTestApi = null
         }
     }
+
+    abort(aportAll = false) {
+        if (aportAll) {
+            this.canceled = true
+        }
+
+        this.currentTestApi && this.currentTestApi.abortController.abort()
     }
 }

@@ -8,7 +8,16 @@ export interface TestOptions extends TestNodeOptions {
     fn?: TestCallbackFn
 }
 
-export type TestStatus = "succeeded" | "failed" | "not-supported" | "not-implemented" | "skipped"
+export type TestStatus = "succeeded"
+                       | "failed"
+                       | "not-supported"
+                       | "not-implemented"
+                       | "skipped"
+                       | "aborted"
+                       | "warned"
+                       | "running"
+                       | "unknown";
+
 
 export class Test extends TestNode
 {

@@ -473,7 +473,12 @@ export default function StdoutReporter(runner: TestRunner, options: StdOutReport
         
         // counters
         counts.total += 1;
-        counts[node.status] += 1;
+        if (node.status !== "warned" &&
+            node.status !== "running" && 
+            node.status !== "unknown" &&
+            node.status !== "aborted") {
+            counts[node.status] += 1;
+        }
 
         depth++
 

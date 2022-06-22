@@ -445,7 +445,7 @@ export class BulkDataClient
             hooks: {
                 beforeRequest: [
                     (options) => {
-                        this.testApi.console.request(options, "log", requestLabel);               
+                        this.testApi.console.request(options, "log", requestLabel);
                     }
                 ],
                 afterResponse: [
@@ -492,7 +492,16 @@ export class BulkDataClient
         //     console.log(requestOptions)
         // console.log(requestOptions.url.toString(), requestOptions)
 
-        const result = await got(requestOptions)
+        const result = await (async () => {
+            let job = got(requestOptions);
+            
+            const abort = () => job.cancel("Test(s) canceled");
+            this.testApi.abortController.signal.addEventListener("abort", abort);
+            
+            return job.finally(
+                () => this.testApi.abortController.signal.removeEventListener("abort", abort)
+            );
+        })()
 
         if (result.statusCode === 401 && requestOptions.headers.authorization && !options.context?.retried) {
             this.accessToken = null
@@ -904,7 +913,7 @@ export class BulkDataClient
         this.statusResponse = response
 
         if (response.statusCode === 202) {
-            await wait(Math.min(2000 + 1000 * suffix, 10000));
+            await wait(Math.min(2000 + 1000 * suffix, 10000), this.testApi.abortController.signal);
             return this.waitForExport(suffix + 1);
         }
     }
@@ -938,7 +947,7 @@ export class BulkDataClient
                 retryAfterSeconds = Math.min(1 + suffix, 10);
              }
 
-             await wait(retryAfterSeconds * 1000);
+             await wait(retryAfterSeconds * 1000, this.testApi.abortController.signal);
              return this.getExportManifest(res, suffix + 1);
          }
 

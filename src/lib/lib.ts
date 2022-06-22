@@ -1,5 +1,8 @@
 import { HTTPError, Response } from "got"
 import { expect } from "@hapi/code"
+import {
+    setTimeout as timeoutPromise
+  } from "timers/promises";
 
 
 /**
@@ -138,9 +141,9 @@ export function expectStatusText(response: Response, text: string, message = "")
  * Simple utility for waiting. Returns a promise that will resolve after @ms
  * milliseconds.
  */
-export function wait(ms: number)
+export function wait(ms: number, signal?: AbortSignal)
 {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return timeoutPromise(ms, `Waited for ${ms} ms`, { ref: false, signal })
 }
 
 

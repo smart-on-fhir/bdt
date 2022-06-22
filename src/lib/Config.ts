@@ -273,7 +273,7 @@ export default class Config
         this.originalConfig = originalConfig
     }
 
-    async normalize(): Promise<NormalizedConfig>
+    async normalize(signal?: AbortSignal): Promise<NormalizedConfig>
     {
         const out: Partial<NormalizedConfig> = {
             systemExportEndpoint: "",
@@ -365,7 +365,7 @@ export default class Config
                 expect(tokenEndpoint, "authentication.tokenEndpoint must be an url").to.match(/^https?:\/\/.+/)
                 out.authentication.tokenEndpoint = tokenEndpoint.trim()
             } else {
-                out.authentication.tokenEndpoint = await this.getTokenEndpoint(out)
+                out.authentication.tokenEndpoint = await this.getTokenEndpoint(out, signal)
                 expect(out.authentication.tokenEndpoint, "authentication.tokenEndpoint was not set and could not be auto-detected").to.be.string()
                 expect(out.authentication.tokenEndpoint, "authentication.tokenEndpoint was not set and could not be auto-detected properly").to.match(/^https?:\/\/.+/)
             }
@@ -449,7 +449,7 @@ export default class Config
             expect(options.systemExportEndpoint, "options.systemExportEndpoint must be a string").to.be.string()
             out.systemExportEndpoint = options.systemExportEndpoint
         } else {
-            out.systemExportEndpoint = await this.getSystemExportEndpoint(out)
+            out.systemExportEndpoint = await this.getSystemExportEndpoint(out, signal)
         }
 
         // patientExportEndpoint
@@ -457,7 +457,7 @@ export default class Config
             expect(options.patientExportEndpoint, "options.patientExportEndpoint must be a string").to.be.string()
             out.patientExportEndpoint = options.patientExportEndpoint
         } else {
-            out.patientExportEndpoint = await this.getPatientExportEndpoint(out)
+            out.patientExportEndpoint = await this.getPatientExportEndpoint(out, signal)
         }
 
         // groupExportEndpoint
@@ -473,7 +473,7 @@ export default class Config
                 .to.satisfy(types => types.every(x => typeof x === "string"))
             out.supportedResourceTypes = options.supportedResourceTypes
         } else {
-            out.supportedResourceTypes = await this.getSupportedResourceTypes(out)
+            out.supportedResourceTypes = await this.getSupportedResourceTypes(out, signal)
         }
 
         // fastestResource
@@ -494,32 +494,33 @@ export default class Config
         return out as NormalizedConfig
     }
 
-    private async getCapabilityStatement(options: Partial<NormalizedConfig>)
+    private async getCapabilityStatement(options: Partial<NormalizedConfig>, signal?: AbortSignal)
     {
         if (this._capabilityStatement === undefined) {
+            this._capabilityStatement = null
+
+            const url = `${options.baseURL}/metadata?_format=json`
             try {
-                this._capabilityStatement = await got({
-                    url: `${options.baseURL}/metadata?_format=json`,
-                    https: {
-                        rejectUnauthorized: false
-                    },
+
+                const response = await fetch(url, {
+                    signal,
                     headers: {
                         accept: "application/fhir+json,application/json+fhir,application/json"
                     }
-                }).json();
-            } catch(ex) {
-                this._capabilityStatement = null
-                console.error(`Could not fetch the CapabilityStatement from ${options.baseURL}/metadata?_format=json. ${ex.message}`)
-                // ex.message = `Could not fetch the CapabilityStatement from ${options.baseURL}/metadata?_format=json. ${ex.message}`
-                // throw ex
+                });
+
+                const json = await response.json()
+                this._capabilityStatement = json as FHIR.CapabilityStatement
+            } catch (ex) {
+                console.error(`Could not fetch the CapabilityStatement from ${url}: ${ex.message}`)
             }
         }
         return this._capabilityStatement
     }
 
-    private async getTokenEndpoint(options: Partial<NormalizedConfig>)
+    private async getTokenEndpoint(options: Partial<NormalizedConfig>, signal?: AbortSignal)
     {
-        const capabilityStatement = await this.getCapabilityStatement(options);
+        const capabilityStatement = await this.getCapabilityStatement(options, signal);
         if (capabilityStatement) {
             const securityExtensions = getPath(capabilityStatement, "rest.0.security.extension") || [];
             const oauthUrisUrl = "http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris";
@@ -529,9 +530,9 @@ export default class Config
         return ""
     }
 
-    private async getSystemExportEndpoint(options: Partial<NormalizedConfig>)
+    private async getSystemExportEndpoint(options: Partial<NormalizedConfig>, signal?: AbortSignal)
     {
-        const capabilityStatement = await this.getCapabilityStatement(options);
+        const capabilityStatement = await this.getCapabilityStatement(options, signal);
         if (capabilityStatement) {
             const operations = getPath(capabilityStatement, "rest.0.operation") || [];
 
@@ -544,9 +545,9 @@ export default class Config
         return ""
     }
 
-    private async getPatientExportEndpoint(options: Partial<NormalizedConfig>)
+    private async getPatientExportEndpoint(options: Partial<NormalizedConfig>, signal?: AbortSignal)
     {
-        const capabilityStatement = await this.getCapabilityStatement(options);
+        const capabilityStatement = await this.getCapabilityStatement(options, signal);
         if (capabilityStatement) {
             let supported;
             try {
@@ -564,9 +565,9 @@ export default class Config
         return ""
     }
 
-    private async getSupportedResourceTypes(options: Partial<NormalizedConfig>)
+    private async getSupportedResourceTypes(options: Partial<NormalizedConfig>, signal?: AbortSignal)
     {
-        const capabilityStatement = await this.getCapabilityStatement(options);
+        const capabilityStatement = await this.getCapabilityStatement(options, signal);
         if (capabilityStatement) {
             return (capabilityStatement.rest[0].resource || []).map((x: any) => x.type);
         }
