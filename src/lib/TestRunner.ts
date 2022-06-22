@@ -19,7 +19,9 @@ export default class TestRunner extends EventEmitter
 
     onlyMode: boolean = false;
 
-    constructor(settings: Config, onlyMode = false)
+
+    startPath: string | null = null
+
     {
         super()
 
@@ -82,6 +84,11 @@ export default class TestRunner extends EventEmitter
         // }
 
         this.emit("testEnd", test);
+
+        if (test.path === this.startPath) {
+            this.emit("end");
+            this.startPath = null
+        }
     }
 
     async endGroup(node: Suite, parent: Suite, context: Record<string, any>, error?: Error)
@@ -99,12 +106,19 @@ export default class TestRunner extends EventEmitter
 
         this.emit("groupEnd", node);
 
-        if (node.name === "__ROOT__") {
+        if (node.path === this.startPath) {
             this.emit("end");
+            this.startPath = null
         }
     }
 
-    async run(node: Test | Suite, context: Record<string, any> = {})
+    async run(node: Test | Suite, context: Record<string, any> = {}) {
+        this.startPath = node.path
+        this.emit("start", { onlyMode: this.onlyMode });
+        return this._run(node, context)
+    }
+
+    async _run(node: Test | Suite, context: Record<string, any> = {})
     {
         if (node instanceof Test) {
             
@@ -120,10 +134,6 @@ export default class TestRunner extends EventEmitter
         let parentGroup = this.currentGroup
         this.currentGroup = node;
 
-        if (node.name === "__ROOT__") {
-            this.emit("start", { onlyMode: this.onlyMode });
-        }
-
         this.emit("groupStart", node);
 
         if (node.before) {
@@ -136,7 +146,7 @@ export default class TestRunner extends EventEmitter
         }
 
         for (const child of node.children) {
-            await this.run(child, context);
+            await this._run(child, context);
             if (this.canceled) {
                 break;
             }
