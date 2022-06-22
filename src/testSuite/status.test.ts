@@ -75,8 +75,7 @@ suite("Status Endpoint", () => {
             "    - Every item may a `count` number property\n"
     }, async ({ config, api }) => {
         const client = new BulkDataClient(config, api)
-        const resourceType = config.fastestResource;
-        const { response: kickOffResponse } =await client.kickOff({ params: { _type: resourceType } });
+        const { response: kickOffResponse } = await client.kickOff({ params: { _type: "Patient" } });
         await client.waitForExport();
         await client.cancel(kickOffResponse);
         assert.bulkData.status.OK(client.statusResponse, "Status response is invalid")
@@ -99,7 +98,7 @@ suite("Status Endpoint", () => {
         assert.bulkData.kickOff.OK(kickOffResponse, "Kick-off failed")
 
         // Cancel the export immediately
-        const { response: cancelResponse1 } = await client.cancel(kickOffResponse);
+        const { response: cancelResponse1 } = await client.cancel(kickOffResponse, "First ");
 
         if (cancelResponse1.statusCode < 200 || cancelResponse1.statusCode >= 300) {
             return api.setNotSupported(`DELETE requests to the status endpoint are not supported by this server`);
@@ -109,7 +108,12 @@ suite("Status Endpoint", () => {
 
         const { response: cancelResponse2 } = await client.request({
             url: client.kickOffResponse.headers["content-location"],
-            method: "DELETE"
+            requestLabel: "Second Cancellation Request",
+            responseLabel: "Second Cancellation Response",
+            method: "DELETE",
+            headers: {
+                accept: "application/json"
+            }
         });
 
         assert.bulkData.cancellation.notOK(
