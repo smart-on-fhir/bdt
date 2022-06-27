@@ -182,7 +182,8 @@ suite("Metadata", () => {
                 url: ".well-known/smart-configuration",
                 responseType: "json",
                 requestLabel: ".well-known/smart-configuration request",
-                responseLabel: ".well-known/smart-configuration response"
+                responseLabel: ".well-known/smart-configuration response",
+                skipAuth: true
             })
 
             // Having a WellKnown JSON is optional but we show a warning if
