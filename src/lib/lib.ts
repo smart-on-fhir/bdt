@@ -143,7 +143,7 @@ export function expectStatusText(response: Response, text: string, message = "")
  */
 export function wait(ms: number, signal?: AbortSignal)
 {
-    return timeoutPromise(ms, `Waited for ${ms} ms`, { ref: false, signal })
+    return timeoutPromise(ms, `Waited for ${ms} ms`, { signal })
 }
 
 

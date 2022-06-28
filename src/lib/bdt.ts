@@ -57,7 +57,7 @@ export interface Config extends NormalizedConfig {
     /**
      * JS case-insensitive RegExp (as string) to run against the test name
      */
-    match?: ""
+    match?: string
 
     cli?: boolean
 

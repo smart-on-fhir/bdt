@@ -328,26 +328,26 @@ export default function StdoutReporter(runner: TestRunner, options: StdOutReport
 
     function text(node: TestNode) {
         let name = node.name;
-        let info = "path: " + node.path;
+        let info = "";
 
         if (node.status === "not-implemented") {
             name = name.grey
-            info += ", not implemented".grey;
+            info = (" (not implemented)").grey.dim;
         }
         else if (node.status === "not-supported") {
             name = name.grey
-            info += ", not supported".yellow;
+            info = (" (not supported)").yellow.dim;
         }
         else if (node.status === "skipped") {
             name = name.grey
-            info += (
+            info = (
                 isInOnlyMode && !node.only ?
                 ", skipped due to only mode" :
                 ", skipped"
-            ).grey.italic;
+            ).grey.italic.dim;
         }
 
-        return name + (" (" + info + ")").dim;
+        return name + info;
     }
 
     function logConsoleEntry(entry: ConsoleEntry, verbose?: boolean)
@@ -421,7 +421,7 @@ export default function StdoutReporter(runner: TestRunner, options: StdOutReport
             let prefix = indent(depth++)
             log(`${prefix} ${icon(node)} ${wrap(
                 // @ts-ignore
-                node.name.bold + ` (path: ${node.path})`.dim,
+                node.name.bold,
                 prefix,
                 options.wrap
             )}`);
