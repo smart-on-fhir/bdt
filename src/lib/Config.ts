@@ -522,6 +522,16 @@ export default class Config
         return this._capabilityStatement
     }
 
+
+    private getOperationDefinition(operations: any[], name: string, ref: string) {
+        return operations.find((e: any) => {
+            return e.name === name && (
+                e.definition === ref ||
+                e.definition?.reference === ref // Incorrect but needed for some servers
+            );
+        });
+    }
+
     private async getTokenEndpoint(options: Partial<NormalizedConfig>, signal?: AbortSignal)
     {
         const capabilityStatement = await this.getCapabilityStatement(options, signal);
@@ -539,12 +549,7 @@ export default class Config
         const capabilityStatement = await this.getCapabilityStatement(options, signal);
         if (capabilityStatement) {
             const operations = getPath(capabilityStatement, "rest.0.operation") || [];
-
-            const definition = operations.find((e: any) => (
-                e.name === "export" &&
-                e.definition === "http://hl7.org/fhir/uv/bulkdata/OperationDefinition/export"    
-            ));
-            return definition ? "$export" : ""
+            return this.getOperationDefinition(operations, "export", "http://hl7.org/fhir/uv/bulkdata/OperationDefinition/export") ? "$export" : "";
         }
         return ""
     }
@@ -555,12 +560,8 @@ export default class Config
         if (capabilityStatement) {
             let supported;
             try {
-                supported = !!capabilityStatement.rest[0].resource.find(
-                    (x: any) => x.type === "Patient"
-                ).operation.find((x: any) => (
-                    x.name === "patient-export" &&
-                    x.definition === "http://hl7.org/fhir/uv/bulkdata/OperationDefinition/patient-export"
-                ));
+                const patient = capabilityStatement.rest[0].resource.find((x: any) => x.type === "Patient");
+                supported = !!this.getOperationDefinition(patient.operation, "patient-export", "http://hl7.org/fhir/uv/bulkdata/OperationDefinition/patient-export");
             } catch {
                 supported = false;
             }
