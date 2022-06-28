@@ -291,7 +291,7 @@ export default class Config
             },
             requests: {
                 strictSSL: true,
-                timeout: 5000,
+                timeout: 10000,
                 customHeaders: {}
             }
         };
