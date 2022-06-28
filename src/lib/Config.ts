@@ -416,7 +416,11 @@ export default class Config
         // jwksUrl
         if (jwksUrl) {
             expect(jwksUrl, "authentication.jwksUrl must be a string").to.be.string()
-            expect(jwksUrl, "authentication.jwksUrl must be an https url").to.match(/^https:\/\/.+/)
+
+            // jwksUrl must be on https but we allow http on localhost for dev
+            if (!jwksUrl.match(/\/\/(localhost|127.0.0.1)(:\d+)?\//)) {
+                expect(jwksUrl, "authentication.jwksUrl must be an https url").to.match(/^https:\/\/.+/)
+            }
             out.authentication.jwksUrl = jwksUrl.trim()
         }
 
