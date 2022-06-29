@@ -1,12 +1,10 @@
 import got, { OptionsOfUnknownResponseBody, Response } from "got/dist/source"
 import { merge } from "../lib"
-import validator from "validator"
 import { suiteFunction } from ".."
-import { BulkData, BulkDataClient, exportType, KickOfOptions } from "../../BulkDataClient"
+import { BulkDataClient, exportType } from "../../BulkDataClient"
 import { TestAPI } from "../../TestAPI"
 import { Test } from "../../Test"
-import { NotSupportedError } from "../../errors"
-import { wait } from "../../lib"
+
 
 const baseOptions: OptionsOfUnknownResponseBody = {}
 
@@ -376,7 +374,7 @@ export const suite: suiteFunction = async function({ config, check }) {
                             await client.cancel(kickOffResponse1);
                             const line1 = file.body.split(/\r?\n/).map(l => l.trim()).filter(Boolean)[0];
                             let patient = JSON.parse(line1);
-        
+
                             kickOffResponse2 = (await client.kickOff({
                                 method: "POST",
                                 type,
@@ -386,27 +384,24 @@ export const suite: suiteFunction = async function({ config, check }) {
                                 }
                             })).response;
 
-                            {
-                                const manifest = await client.getExportManifest(kickOffResponse2)
-                                const fileUrl = manifest.output[0].url
-                                const file = await client.downloadFile(fileUrl)
-                                await client.cancel(kickOffResponse2);
-                                const lines = file.body.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-                            
-                                if (lines.length !== 1) {
-                                    return false
-                                }
-
-                                return JSON.parse(lines[0]).id === patient.id
+                            const manifest2 = await client.getExportManifest(kickOffResponse2)
+                            const fileUrl2 = manifest2.output[0].url
+                            const file2 = await client.downloadFile(fileUrl2)
+                            await client.cancel(kickOffResponse2);
+                            const lines2 = file2.body.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                        
+                            if (lines2.length !== 1) {
+                                return false
                             }
-                        } catch (error) {
+
+                            return JSON.parse(lines2[0]).id === patient.id
+                        } finally {
                             if (kickOffResponse2) {
                                 await client.cancel(kickOffResponse2);
                             }
                             if (kickOffResponse1) {
                                 await client.cancel(kickOffResponse1);
                             }
-                            throw error 
                         }
                     });
                 } else {

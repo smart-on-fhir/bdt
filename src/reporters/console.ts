@@ -6,9 +6,9 @@ import { Suite } from "../lib/Suite";
 import { Test } from "../lib/Test";
 import TestRunner from "../lib/TestRunner"
 import { ConsoleEntry, LogType } from "../lib/Console";
-import { StdOutReporterOptions } from "../lib/bdt";
 import { count as assertionsCount } from "@hapi/code"
 import { roundToPrecision } from "../lib/lib";
+import { bdt } from "../../types";
 
 const md = markdownIt();
 
@@ -295,7 +295,7 @@ function getColorForLogType(type: LogType) {
     }
 }
 
-export default function StdoutReporter(runner: TestRunner, options: StdOutReporterOptions)
+export default function StdoutReporter(runner: TestRunner, options: bdt.StdOutReporterOptions)
 {
     let depth     = 0;
     let startTime = 0;

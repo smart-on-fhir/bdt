@@ -1,76 +1,16 @@
-import slug                  from "slug"
+import Path                  from "path"
 import { sync }              from "glob"
-import path                  from "path"
+import slug                  from "slug"
+import { readFileSync }      from "fs"
+import Config                from "./Config"
+import { Suite }             from "./Suite"
+import { Test, TestOptions } from "./Test"
 import TestRunner            from "./TestRunner"
+import { Version }           from "./Version"
 import stdoutReporter        from "../reporters/stdout"
 import jsonReporter          from "../reporters/json-stream"
 import consoleReporter       from "../reporters/console"
-import ctx                   from "./globalContext"
-import { Test, TestOptions } from "./Test"
-import { TestNodeOptions }   from "./TestNode"
-import { Suite, SetupCallbackFn, TestCallbackFn } from "./Suite"
-import { NormalizedConfig }  from "./Config"
-import { Version }           from "./Version"
-
-export interface Config extends NormalizedConfig {
-
-    /**
-     * Bulk Data API version to test for. Example: `1.0`, `1.2.3`, `2`.
-     * Defaults to `1.0.0`
-     */
-    apiVersion: string
-
-    /**
-     * A glob pattern to load test files from, relative to cwd. Defaults to
-     * `./build/testSuite\/**\/*.test.js`
-     */
-    pattern?: string
-
-    /**
-     * Specify a reporter to use. Defaults to "console"
-     */
-    reporter?: "console" | "json" | "stdout"
-
-    /**
-     * List loaded structure instead of executing tests. Defaults to `false`.
-     */
-    list?: boolean
-
-    /**
-     * Path to the test node to execute made up of zero-based indexes and dots.
-     * Examples:
-     * - `""` - Root node, meaning all tests (default)
-     * - `1.2` - the third child of the second child of the root node
-     */
-    path?: string
-
-    /**
-     * Path to the config file to load. Defaults to `./config.js`
-     */
-    configFile?: string
-
-    /**
-     * Exit on first error?
-     */
-    bail?: boolean
-
-    /**
-     * JS case-insensitive RegExp (as string) to run against the test name
-     */
-    match?: string
-
-    cli?: boolean
-
-    reporterOptions?: StdOutReporterOptions
-}
-
-export interface StdOutReporterOptions {
-    wrap?: number
-    colors?: boolean
-    verbose?: "always" | "never" | "auto"
-}
-
-const globalContext = ctx as GlobalContext
+import { bdt }               from "../../types"
 
 const reporters = {
     console: consoleReporter,
@@ -78,208 +18,349 @@ const reporters = {
     json   : jsonReporter
 };
 
-
-export async function bdt(options: Config): Promise<Suite>
-{
-    // settings ----------------------------------------------------------------
-    const config: Config = options
-    // try {
-    //     Object.assign(settings, require(Path.resolve(__dirname, APP.config)));
-    // } catch (ex) {
-    //     console.error(`Failed to load settings from "${APP.config}". ${ex.message}`);
-    //     process.exit(1);
-    // }
-
-    // load --------------------------------------------------------------------
-    load(options.pattern)
-
-    let node: any = getPath(options.path || "")
-    if (node) {
-        if (options.list) {
-            if (options.apiVersion) {
-                node = filterByVersion(node.toJSON(), options.apiVersion)
-            }
-            console.log(JSON.stringify(node, null, 4))
-        } else {
-            // runner ------------------------------------------------------------------
-            const runner = new TestRunner(config, !!globalContext.onlyMode);
-            
-            // reporter ----------------------------------------------------------------
-            reporters[options.reporter](runner, config.reporterOptions);
-
-            await runner.run(node)
-        }
-    }
-
-    return globalContext.root
-}
-
 interface GlobalContext {
     root?: Suite
     currentGroup?: Suite
     onlyMode?: boolean
 }
 
-function load(pattern: string): Suite
-{
-    globalContext.root = new Suite({ name: "__ROOT__", path: "" })
-    globalContext.currentGroup = globalContext.root
-    globalContext.onlyMode = false
+type SuiteFunction = {
+          (nameOrOptions: string | bdt.TestNodeOptions, fn: () => void)  : void
+    only: (nameOrOptions: string | bdt.TestNodeOptions, fn: () => void) => void
+}
 
-    const paths = sync(pattern);
-    paths.forEach((file: string) => {
-        const fullPath = path.resolve(file);
-        try {
-            require(fullPath);
+type TestFunction = {
+          <Context=Record<string, any>>(nameOrOptions: string | Omit<TestOptions, "fn">, fn?: bdt.TestCallbackFn<Context>)  : void
+    only: <Context=Record<string, any>>(nameOrOptions: string | Omit<TestOptions, "fn">, fn?: bdt.TestCallbackFn<Context>) => void
+    skip: <Context=Record<string, any>>(nameOrOptions: string | Omit<TestOptions, "fn">, fn?: bdt.TestCallbackFn<Context>) => void
+}
+
+export default class BDT
+{
+    globalContext: GlobalContext;
+
+    private config: bdt.BDTOptions;
+
+    public constructor(config?: bdt.BDTOptions)
+    {
+        this.globalContext = { onlyMode: false }
+        this.globalContext.root = new Suite({ name: "__ROOT__", path: "" })
+        this.globalContext.currentGroup = this.globalContext.root
+
+        if (config) {
+            this.configure(config)
         }
-        catch (e) {
-            console.log(`No tests could be loaded from ${fullPath}. ${e.stack}`);
-        }
-    });
-
-    return globalContext.root
-}
-
-/**
- * Given a path (which is a dot-separated list of indexes), finds and returns
- * the node at that path. For example getPath("2.1.5") will return the sixth
- * child of the second child of the third child of the root node.
- */
-function getPath(path = "")
-{
-    if (!path) {
-        return globalContext.root;
-    }
-    return path.split(".").reduce(
-        (out, i) => out && out.children ? out.children[+i] : undefined,
-        globalContext.root
-    );
-}
-
-function filterByVersion(node: Record<string, any>, version: string | Version)
-{
-    if (node.minVersion && new Version(node.minVersion).isAbove(version)) {
-        return undefined
-    }
-    if (node.maxVersion && new Version(node.maxVersion).isBelow(version)) {
-        return undefined
-    }
-    const out = { ...node }
-    if (Array.isArray(out.children)) {
-        out.children = out.children.map((child: Record<string, any>) => filterByVersion(child, version)).filter(Boolean)
-    }
-    return out
-}
-
-/**
- * Register a function to be executed before a test group execution starts.
- * @param fn Can return a promise for async stuff
- */
-export function before<Context=Record<string, any>>(fn: SetupCallbackFn<Context>) {
-    globalContext.currentGroup.before = fn;
-}
-
-/**
- * Register a function to be executed after a test group execution ends.
- * @param fn Can return a promise for async stuff
- */
-export function after<Context=Record<string, any>>(fn: SetupCallbackFn<Context>) {
-    globalContext.currentGroup.after = fn;
-}
-
-/**
- * Register a function to be executed before a test execution starts.
- * @param fn Can return a promise for async stuff
- */
-export function beforeEach<Context=Record<string, any>>(fn: TestCallbackFn<Context>) {
-    globalContext.currentGroup.beforeEach = fn;
-}
-
-/**
- * Register a function to be executed after a test execution ends.
- * @param fn Can return a promise for async stuff
- */
-export function afterEach<Context=Record<string, any>>(fn: TestCallbackFn<Context>) {
-    globalContext.currentGroup.afterEach = fn;
-}
-
-/**
- * This function is called by tests. It creates new group and appends it to the
- * current group.
- * @param nameOrOptions The group name or settings object
- * @param fn The function that will be called to build the group
- */
-export function suite(nameOrOptions: string | TestNodeOptions, fn: () => void): void {
-    if (typeof nameOrOptions === "string") {
-        return suite({ name: nameOrOptions }, fn);
     }
 
-    let group = new Suite({
-        ...nameOrOptions,
-        only: nameOrOptions.only || globalContext.currentGroup.only,
-        path: [
-            globalContext.currentGroup.path,
-            globalContext.currentGroup.children.length + ""
-        ].filter(Boolean).join(".")
-    });
+    public configure(config: bdt.BDTOptions)
+    {
+        this.config = config
+    }
+
+    public load(path = "**/*.test.js")
+    {
+        this.globalContext.root = new Suite({ name: "__ROOT__", path: "" })
+        this.globalContext.currentGroup = this.globalContext.root
+        this.globalContext.onlyMode = false
     
-    globalContext.currentGroup.children.push(group);
-    const parent = globalContext.currentGroup;
-    globalContext.currentGroup = group;
-    fn();
-    globalContext.currentGroup = parent;
+        const testsDir = Path.resolve(__dirname, "../../build/testSuite")
+
+        const paths = sync(path, { cwd: testsDir });
+
+        if (!paths.length) {
+            throw new Error(`No files were found in "${testsDir}" matching the pattern "${path}".`)
+        }
+        
+        paths.forEach((file: string) => {
+            const fullPath = Path.resolve(testsDir, file);
+            try {
+                const moduleWrapper = Function(
+                    "exports, require, module, __filename, __dirname, suite, test, before, beforeEach, after, afterEach",
+                    readFileSync(fullPath, "utf8")
+                );
+
+                moduleWrapper(
+                    exports,
+                    require,
+                    module,
+                    __filename,
+                    __dirname,
+                    this.suite.bind(this),
+                    this.test.bind(this),
+                    this.before.bind(this),
+                    this.beforeEach.bind(this),
+                    this.after.bind(this),
+                    this.afterEach.bind(this)
+                );
+            }
+            catch (e) {
+                console.log(`No tests could be loaded from ${fullPath}.\n${e.stack}`);
+            }
+        });
+    
+        return this.globalContext.root
+    }
+
+    public list(path = "")
+    {
+        let node = this.getPath(path)
+
+        if (!node) {
+            throw new Error(`No test node found at path ${JSON.stringify(path)}.`);
+        }
+
+        if (this.config.apiVersion) {
+            return this.filterByVersion(node.toJSON(), this.config.apiVersion)
+        }
+
+        return node.toJSON()
+    }
+
+    public createRunner()
+    {
+        return new TestRunner(this.config, !!this.globalContext.onlyMode, this.globalContext);
+    }
+
+    public getPath(path = ""): Test | Suite | undefined
+    {
+        if (!path) {
+            return this.globalContext.root;
+        }
+
+        return path.split(".").reduce(
+            (out, i) => out && out.children ? out.children[+i] : undefined,
+            this.globalContext.root
+        );
+    }
+
+    public filterByVersion(node: Record<string, any>, version: string | Version): Record<string, any>
+    {
+        if (node.minVersion && new Version(node.minVersion).isAbove(version)) {
+            return undefined
+        }
+
+        if (node.maxVersion && new Version(node.maxVersion).isBelow(version)) {
+            return undefined
+        }
+        
+        if (Array.isArray(node.children)) {
+            const out = { ...node, children: [] as any[] }
+            node.children.forEach(child => {
+                const result = this.filterByVersion(child, version)
+                if (result) {
+                    out.children.push(result)
+                }
+            })
+            return out
+        }
+
+        return node
+    }
+
+    /**
+     * This function is called by tests. It creates new group and appends it to
+     * the current group.
+     * @param nameOrOptions The group name or settings object
+     * @param fn The function that will be called to build the group
+     */
+    public suite(nameOrOptions: string | bdt.TestNodeOptions, fn: () => void): void {
+        if (typeof nameOrOptions === "string") {
+            return this.suite({ name: nameOrOptions }, fn);
+        }
+
+        let group = new Suite({
+            ...nameOrOptions,
+            only: nameOrOptions.only || this.globalContext.currentGroup.only,
+            path: [
+                this.globalContext.currentGroup.path,
+                this.globalContext.currentGroup.children.length + ""
+            ].filter(Boolean).join(".")
+        });
+        
+        this.globalContext.currentGroup.children.push(group);
+        const parent = this.globalContext.currentGroup;
+        this.globalContext.currentGroup = group;
+        fn();
+        this.globalContext.currentGroup = parent;
+    }
+
+    /**
+     * The `it` function that will be made available to tests. It will simply
+     * "remember" the test by appending it to the children structure of the parent
+     * group element.
+     */
+    public test<Context extends bdt.JSONObject>(
+        nameOrOptions: string | Omit<TestOptions, "fn">,
+        fn?: bdt.TestCallbackFn<Context>
+    ): void {
+        if (typeof nameOrOptions === "string") {
+            return this.test({ name: nameOrOptions }, fn);
+        }
+
+        const path = [
+            this.globalContext.currentGroup.path,
+            this.globalContext.currentGroup.children.length + ""
+        ].filter(Boolean).join(".");
+        const id = nameOrOptions.id || slug(path + "--" + nameOrOptions.name)
+
+        this.globalContext.currentGroup.children.push(new Test({
+            ...nameOrOptions,
+            only: nameOrOptions.only || this.globalContext.currentGroup.only,
+            path,
+            id,
+            fn
+        }));
+    }
+
+    /**
+     * Register a function to be executed before a test group execution starts.
+     * @param fn Can return a promise for async stuff
+     */
+    public before<Context extends bdt.JSONObject>(fn: bdt.SetupCallbackFn<Context>) {
+        this.globalContext.currentGroup.before = fn;
+    }
+
+    /**
+     * Register a function to be executed after a test group execution ends.
+     * @param fn Can return a promise for async stuff
+     */
+    public after<Context extends bdt.JSONObject>(fn: bdt.SetupCallbackFn<Context>) {
+        this.globalContext.currentGroup.after = fn;
+    }
+
+    /**
+     * Register a function to be executed before a test execution starts.
+     * @param fn Can return a promise for async stuff
+     */
+    public beforeEach<Context extends bdt.JSONObject>(fn: bdt.TestCallbackFn<Context>) {
+        this.globalContext.currentGroup.beforeEach = fn;
+    }
+
+    /**
+     * Register a function to be executed after a test execution ends.
+     * @param fn Can return a promise for async stuff
+     */
+    public afterEach<Context extends bdt.JSONObject>(fn: bdt.TestCallbackFn<Context>) {
+        this.globalContext.currentGroup.afterEach = fn;
+    }
+
+    // STATIC METHODS
+    // -------------------------------------------------------------------------
+
+    /**
+     * Given a path to JS configuration file:
+     * 1. Resolves it relative to CWD
+     * 2. Loads it using `require`
+     * 3. Validates it and throws if needed
+     * 4. Creates a [[Config]] object from it
+     * 5. Runs the `normalize` method on that object
+     * 6. Finally returns the `NormalizedConfig` object
+     * @param path path to JS configuration file, relative to CWD
+     * @param signal Optional AbortSignal to cancel async jobs 
+     */
+    public static async loadConfigFile(path: string, signal?: AbortSignal): Promise<bdt.NormalizedConfig>
+    {
+        const configPath = Path.resolve(process.cwd(), path);
+        try {
+            const options = require(configPath)
+            try {
+                await Config.validate(options, signal)
+            } catch (ex) {
+                const message = `Found some errors in your configuration file. ` +
+                    `Please fix them first.\n${ex.message}`;
+                throw new Error(message)
+            }
+            const config = new Config(options)
+            return await config.normalize(signal);
+        } catch (ex) {
+            throw new Error(
+                `Failed to load settings from "${configPath}".\n${ex.message}`
+            );
+        }
+    }
+
+    /**
+     * To get the tests list one needs to create new bdt instance, load the
+     * tests, find the right node and filter it's children by version. This
+     * method does all that in a single call
+     * @param [options]
+     * @param [options.path] The node path if any (e.g.: "1.2.3")
+     * @param [options.pattern] A glob pattern matching the test file names
+     * @param [options.apiVersion] To limit the results to that Api version 
+     */
+    public static list({ path, apiVersion, pattern }: { path?: string, apiVersion?: string, pattern?: string } = {}) {
+        const bdt = new BDT();
+        bdt.load(pattern);
+        const node = bdt.getPath(path).toJSON();
+        const filtered = bdt.filterByVersion(node, apiVersion);
+        if (!path) {
+            return filtered.children
+        }
+        return filtered
+    }
+
+    public static async test({
+        config,
+        path = "",
+        pattern, // = "**/*.test.js",
+        reporter,
+        reporterOptions = {}
+    }: {
+        config: bdt.BDTOptions
+        path?: string
+        pattern?: string
+        reporter?: keyof typeof reporters
+        reporterOptions?: {
+            wrap?: number
+            colors?: boolean
+            verbose?: "always" | "never" | "auto"
+        }
+    }) {
+        const bdt = new BDT(config);
+        bdt.load(pattern);
+        const node = bdt.getPath(path);
+        const runner = bdt.createRunner();
+        if (reporter) reporters[reporter](runner, reporterOptions);
+        await runner.run(node);
+        return node
+        // return { node, runner, bdt }
+    }
 }
 
-suite.only = function(nameOrOptions: string | TestNodeOptions, fn: () => void): void
-{
-    globalContext.onlyMode = true;
+// suite.only
+(BDT.prototype.suite as SuiteFunction).only = function(
+    nameOrOptions: string | bdt.TestNodeOptions,
+    fn: () => void
+): void {
+    this.globalContext.onlyMode = true;
     if (typeof nameOrOptions === "string") {
-        suite({ name: nameOrOptions, only: true }, fn);
+        this.suite({ name: nameOrOptions, only: true }, fn);
     } else {
-        suite({ ...nameOrOptions, only: true }, fn);
-    }
-};
- 
-/**
- * The `it` function that will be made available to tests. It will simply
- * "remember" the test by appending it to the children structure of the parent
- * group element.
- */
-export function test<Context=Record<string, any>>(nameOrOptions: string | Omit<TestOptions, "fn">, fn?: TestCallbackFn<Context>): void {
-    if (typeof nameOrOptions === "string") {
-        return test({ name: nameOrOptions }, fn);
-    }
-
-    const path = [
-        globalContext.currentGroup.path,
-        globalContext.currentGroup.children.length + ""
-    ].filter(Boolean).join(".");
-    const id = nameOrOptions.id || slug(path + "--" + nameOrOptions.name)
-
-    globalContext.currentGroup.children.push(new Test({
-        ...nameOrOptions,
-        only: nameOrOptions.only || globalContext.currentGroup.only,
-        path,
-        id,
-        fn
-    }));
-}
- 
-test.only = function<Context=Record<string, any>>(nameOrOptions: string | Omit<TestOptions, "fn">, fn?: TestCallbackFn<Context>): void
-{
-    globalContext.onlyMode = true;
-    if (typeof nameOrOptions === "string") {
-        test({ name: nameOrOptions, only: true }, fn);
-    } else {
-        test({ ...nameOrOptions, only: true }, fn);
+        this.suite({ ...nameOrOptions, only: true }, fn);
     }
 };
 
-test.skip = function<Context=Record<string, any>>(nameOrOptions: string | Omit<TestOptions, "fn">, fn?: TestCallbackFn<Context>): void
-{
+// test.only
+(BDT.prototype.suite as TestFunction).only = function<Context=Record<string, any>>(
+    nameOrOptions: string | Omit<TestOptions, "fn">,
+    fn?: bdt.TestCallbackFn<Context>
+): void {
+    this.globalContext.onlyMode = true;
     if (typeof nameOrOptions === "string") {
-        test({ name: nameOrOptions, only: true });
+        this.test({ name: nameOrOptions, only: true }, fn);
     } else {
-        test({ ...nameOrOptions, only: true });
+        this.test({ ...nameOrOptions, only: true }, fn);
+    }
+};
+
+// suite.skip
+(BDT.prototype.suite as TestFunction).skip = function<Context=Record<string, any>>(
+    nameOrOptions: string | Omit<TestOptions, "fn">,
+    fn?: bdt.TestCallbackFn<Context>
+): void {
+    if (typeof nameOrOptions === "string") {
+        this.test({ name: nameOrOptions, only: true });
+    } else {
+        this.test({ ...nameOrOptions, only: true });
     }
 };

@@ -5,254 +5,13 @@ import { NotSupportedError } from "./errors"
 import { formatHttpError, getErrorMessageFromResponse, wait } from "./lib";
 import { TestAPI } from "./TestAPI"
 import { expectSuccessfulKickOff, HTTP_DATE_FORMATS } from "./assertions"
-import { createAuthToken, createAuthTokenOptions, SupportedJWKAlgorithm } from "./auth"
-import { NormalizedConfig } from "./Config"
+import { createAuthToken } from "./auth"
 // @ts-ignore
 import pkg from "../../package.json"
+import { bdt } from "../../types";
 
-export namespace FHIR {
-    
-    export interface Resource<T = string> extends Record<string, any> {
-        resourceType: T
-    }
 
-    export interface CapabilityStatement extends Resource<"CapabilityStatement"> {}
 
-    export interface OperationOutcome extends Resource<"OperationOutcome"> {}
-}
-
-export namespace BulkData {
-    /**
-     * The response expected upon successful kick-off and status pulling 
-     */
-    export interface ExportManifest {
-            
-        /**
-         * indicates the server's time when the query is run. The response
-         * SHOULD NOT include any resources modified after this instant,
-         * and SHALL include any matching resources modified up to and
-         * including this instant.
-         * Note: To properly meet these constraints, a FHIR Server might need
-         * to wait for any pending transactions to resolve in its database
-         * before starting the export process.
-         */
-        transactionTime: string // FHIR instant
-
-        /**
-         * the full URL of the original bulk data kick-off request
-         */
-        request: string
-
-        /**
-         * indicates whether downloading the generated files requires a
-         * bearer access token.
-         * Value SHALL be true if both the file server and the FHIR API server
-         * control access using OAuth 2.0 bearer tokens. Value MAY be false for
-         * file servers that use access-control schemes other than OAuth 2.0,
-         * such as downloads from Amazon S3 bucket URLs or verifiable file
-         * servers within an organization's firewall.
-         */
-        requiresAccessToken: boolean
-        
-        /**
-         * an array of file items with one entry for each generated file.
-         * If no resources are returned from the kick-off request, the server
-         * SHOULD return an empty array.
-         */
-        output: ExportManifestFile[]
-
-        /**
-         * array of error file items following the same structure as the output
-         * array.
-         * Errors that occurred during the export should only be included here
-         * (not in output). If no errors occurred, the server SHOULD return an
-         * empty array. Only the OperationOutcome resource type is currently
-         * supported, so a server SHALL generate files in the same format as
-         * bulk data output files that contain OperationOutcome resources.
-         */
-        error: ExportManifestFile<"OperationOutcome">[]
-
-        /**
-         * An array of deleted file items following the same structure as the
-         * output array.
-         * 
-         * When a `_since` timestamp is supplied in the export request, this
-         * array SHALL be populated with output files containing FHIR
-         * Transaction Bundles that indicate which FHIR resources would have
-         * been returned, but have been deleted subsequent to that date. If no
-         * resources have been deleted or the _since parameter was not supplied,
-         * the server MAY omit this key or MAY return an empty array.
-         * 
-         * Each line in the output file SHALL contain a FHIR Bundle with a type
-         * of transaction which SHALL contain one or more entry items that
-         * reflect a deleted resource. In each entry, the request.url and
-         * request.method elements SHALL be populated. The request.method
-         * element SHALL be set to DELETE.
-         * 
-         * Example deleted resource bundle (represents one line in output file):
-         * @example 
-         * ```json
-         * {
-         *     "resourceType": "Bundle",
-         *     "id": "bundle-transaction",
-         *     "meta": { "lastUpdated": "2020-04-27T02:56:00Z" },
-         *     "type": "transaction",
-         *     "entry":[{
-         *         "request": { "method": "DELETE", "url": "Patient/123" }
-         *         ...
-         *     }]
-         * }
-         * ```
-         */
-        deleted?: ExportManifestFile<"Bundle">[]
-
-        /**
-         * To support extensions, this implementation guide reserves the name
-         * extension and will never define a field with that name, allowing
-         * server implementations to use it to provide custom behavior and
-         * information. For example, a server may choose to provide a custom
-         * extension that contains a decryption key for encrypted ndjson files.
-         * The value of an extension element SHALL be a pre-coordinated JSON
-         * object.
-         */
-        extension?: Record<string, any>
-    }
-
-    /**
-     * Each file or output entry in export manifest
-     */
-    export interface ExportManifestFile<Type = string> {
-        
-        /**
-         * the FHIR resource type that is contained in the file.
-         * Each file SHALL contain resources of only one type, but a server MAY
-         * create more than one file for each resource type returned. The number
-         * of resources contained in a file MAY vary between servers. If no data
-         * are found for a resource, the server SHOULD NOT return an output item
-         * for that resource in the response. These rules apply only to top-level
-         * resources within the response; as always in FHIR, any resource MAY
-         * have a "contained" array that includes referenced resources of other
-         * types.
-         */
-        type: Type
-
-        /**
-         * the path to the file. The format of the file SHOULD reflect that
-         * requested in the _outputFormat parameter of the initial kick-off
-         * request.
-         */
-        url: string 
-
-        /**
-         * the number of resources in the file, represented as a JSON number.
-         */
-        count?: number
-    }
-
-    export type StatusResponse<T=ExportManifest | FHIR.OperationOutcome | void> = Response<T>
-}
-
-export namespace OAuth {
-    export type errorType = (
-        /**
-         * The request is missing a required parameter, includes an
-         * unsupported parameter value (other than grant type),
-         * repeats a parameter, includes multiple credentials,
-         * utilizes more than one mechanism for authenticating the
-         * client, or is otherwise malformed.
-         */
-        "invalid_request" |
-
-        /**
-         * Client authentication failed (e.g., unknown client, no
-         * client authentication included, or unsupported
-         * authentication method).  The authorization server MAY
-         * return an HTTP 401 (Unauthorized) status code to indicate
-         * which HTTP authentication schemes are supported.  If the
-         * client attempted to authenticate via the "Authorization"
-         * request header field, the authorization server MUST
-         * respond with an HTTP 401 (Unauthorized) status code and
-         * include the "WWW-Authenticate" response header field
-         * matching the authentication scheme used by the client.
-         */
-        "invalid_client" |
-
-        /**
-         * The provided authorization grant (e.g., authorization
-         * code, resource owner credentials) or refresh token is
-         * invalid, expired, revoked, does not match the redirection
-         * URI used in the authorization request, or was issued to
-         * another client.
-         */
-        "invalid_grant" |
-
-        /**
-         * The authenticated client is not authorized to use this
-         * authorization grant type.
-         */
-        "unauthorized_client" |
-        
-        /**
-         * The authorization grant type is not supported by the
-         * authorization server.
-         */
-        "unsupported_grant_type" |
-        
-        /**
-         * The requested scope is invalid, unknown, malformed, or
-         * exceeds the scope granted by the resource owner.
-         */
-        "invalid_scope"
-    )
-   
-    export interface ErrorResponse {
-
-        error: errorType
-
-        /**
-         * OPTIONAL.  Human-readable ASCII [USASCII] text providing
-         * additional information, used to assist the client developer in
-         * understanding the error that occurred.
-         */
-        error_description?: string
-
-        /**
-         * OPTIONAL.  A URI identifying a human-readable web page with
-         * information about the error, used to provide the client
-         * developer with additional information about the error.
-         * Values for the "error_uri" parameter MUST conform to the
-         */
-        error_uri?: string
-    }
-
-    /**
-     * Access token response
-     */
-    export interface TokenResponse {
-
-        /**
-         * The access token issued by the authorization server.
-         */
-        access_token: string
-
-        /**
-         * Fixed value: bearer.
-         */
-        token_type:	"bearer"
-
-        /**
-         * The lifetime in seconds of the access token. The recommended value
-         * is 300, for a five-minute token lifetime.
-         */
-        expires_in: number
-
-        /**
-         * Scope of access authorized. Note that this can be different from the
-         * scopes requested by the app.
-         */
-        scope: string
-    }
-}
 
 
 
@@ -302,7 +61,7 @@ export class BulkDataClient
     /**
      * The capability statement
      */
-    private _capabilityStatement?: FHIR.CapabilityStatement;
+    private _capabilityStatement?: bdt.FHIR.CapabilityStatement;
 
     /**
      * The access token (if any) is stored here so that different parts of
@@ -311,16 +70,16 @@ export class BulkDataClient
      */
     accessToken: string | null = null;
 
-    options: NormalizedConfig;
+    options: bdt.NormalizedConfig;
     
     testApi: TestAPI;
     
     kickOffRequest?: Request;
     kickOffResponse?: Response;
     statusRequest?: Request;
-    statusResponse?: Response<BulkData.ExportManifest>
+    statusResponse?: Response<bdt.BulkData.ExportManifest>
 
-    constructor(options: NormalizedConfig, testApi: TestAPI)
+    constructor(options: bdt.NormalizedConfig, testApi: TestAPI)
     {
         this.options = options;
         this.testApi = testApi;
@@ -336,7 +95,7 @@ export class BulkDataClient
     async getCapabilityStatement()
     {
         if (this._capabilityStatement === undefined) {
-            const { body, error } = await this.request<FHIR.CapabilityStatement>({
+            const { body, error } = await this.request<bdt.FHIR.CapabilityStatement>({
                 requestLabel: "CapabilityStatement Request",
                 responseLabel: "CapabilityStatement Response",
                 url: 'metadata?_format=json',
@@ -373,7 +132,7 @@ export class BulkDataClient
      * })
      * ```
      */
-    createAuthenticationToken(options: Partial<createAuthTokenOptions> = {}): string {
+    createAuthenticationToken(options: Partial<bdt.createAuthTokenOptions> = {}): string {
         return createAuthToken({
             tokenEndpoint: this.options.authentication.tokenEndpoint,
             clientId     : this.options.authentication.clientId,
@@ -383,7 +142,7 @@ export class BulkDataClient
             algorithm    : (
                 this.options.authentication.privateKey?.alg ||
                 this.options.authentication.tokenSignAlgorithm
-            ) as SupportedJWKAlgorithm,                       
+            ) as bdt.SupportedJWKAlgorithm,
             ...options,
             header: {
                 ...this.options.authentication.customTokenHeaders,
@@ -539,7 +298,7 @@ export class BulkDataClient
 
         const authHeader = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
 
-        const { body } = await this.request<OAuth.TokenResponse>({
+        const { body } = await this.request<bdt.OAuth.TokenResponse>({
             url   : tokenEndpoint,
             method: "POST",
             requestLabel,
@@ -594,7 +353,7 @@ export class BulkDataClient
 
         const authToken = this.createAuthenticationToken()
 
-        const { body, response } = await this.request<OAuth.TokenResponse>({
+        const { body, response } = await this.request<bdt.OAuth.TokenResponse>({
             url: tokenEndpoint,
             requestLabel,
             responseLabel,
@@ -692,7 +451,7 @@ export class BulkDataClient
                 throw new NotSupportedError("Group-level export is not supported by this server");
             }
         } else {
-            path = (systemExportEndpoint || patientExportEndpoint || groupExportEndpoint);
+            path = (groupExportEndpoint || patientExportEndpoint || systemExportEndpoint);
             if (!path) {
                 throw new NotSupportedError("No export endpoints defined in configuration");
             }
@@ -871,7 +630,7 @@ export class BulkDataClient
             );
         }
 
-        const { response } = await this.request<BulkData.ExportManifest>({
+        const { response } = await this.request<bdt.BulkData.ExportManifest>({
             url : this.kickOffResponse.headers["content-location"],
             requestLabel: "Status Request",
             responseLabel: "Status Response"
@@ -902,7 +661,7 @@ export class BulkDataClient
             );
         }
 
-        const { request, response } = await this.request<BulkData.ExportManifest>({
+        const { request, response } = await this.request<bdt.BulkData.ExportManifest>({
             url : this.kickOffResponse.headers["content-location"],
             responseType : "json",
             requestLabel : "Status Request "  + suffix,
@@ -920,7 +679,7 @@ export class BulkDataClient
 
     /**
      */
-     async getExportManifest(res: Response, suffix = 1): Promise<BulkData.ExportManifest>
+     async getExportManifest(res: Response, suffix = 1): Promise<bdt.BulkData.ExportManifest>
      {
          if (!res.headers["content-location"]) {
              throw new Error(
@@ -929,7 +688,7 @@ export class BulkDataClient
              );
          }
  
-         const { response } = await this.request<BulkData.ExportManifest>({
+         const { response } = await this.request<bdt.BulkData.ExportManifest>({
              url : res.headers["content-location"],
              responseType : "json",
              requestLabel : "Status Request "  + suffix,

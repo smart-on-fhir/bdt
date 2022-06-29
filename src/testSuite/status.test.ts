@@ -1,6 +1,5 @@
 import moment            from "moment"
 import { expect }        from "@hapi/code"
-import { suite, test }   from "../lib/bdt"
 import { BulkDataClient} from "../lib/BulkDataClient"
 import { assert }        from "../lib/assertions";
 

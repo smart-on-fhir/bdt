@@ -1,14 +1,6 @@
-import { Version } from "./Version";
+import { Version } from "./Version"
+import { bdt }     from "../../types"
 
-export interface TestNodeOptions {
-    name: string
-    description?: string
-    minVersion?: string
-    maxVersion?: string
-    path?: string
-    only?: boolean
-    skip?: boolean
-}
 
 /**
  * This is the base class for Test and Group classes which are nodes in the test
@@ -57,7 +49,7 @@ export abstract class TestNode
 
     readonly skip?: boolean = false
 
-    constructor(options: TestNodeOptions)
+    constructor(options: bdt.TestNodeOptions)
     {
         const {
             minVersion, maxVersion, name, description, path, only, skip

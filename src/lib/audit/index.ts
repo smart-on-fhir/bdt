@@ -1,6 +1,5 @@
 import "colors"
-import { NormalizedConfig } from "../Config"
-import { Config as ConfigType } from "../bdt"
+import { bdt } from "../../../types"
 import EventEmitter from "events"
 import pug from "pug"
 import fs from "fs"
@@ -37,7 +36,7 @@ type Weights = {
     performance?: weight | WeightDescriptor
 } 
 
-export type suiteFunction = (ctx: { config: NormalizedConfig, check: (options: checkOptions, fn: () => any) => Promise<void> }) => any
+export type suiteFunction = (ctx: { config: bdt.NormalizedConfig, check: (options: checkOptions, fn: () => any) => Promise<void> }) => any
 
 interface checkOptions {
     name: string
@@ -58,7 +57,7 @@ class Audit extends EventEmitter
 
     private checkModules: { suite: suiteFunction }[] = [];
 
-    constructor(private options: ConfigType) {
+    constructor(private options: bdt.BDTOptions) {
         super()
     }
 
@@ -93,6 +92,7 @@ class Audit extends EventEmitter
             result = await fn();
         } catch (e) {
             if (!(e instanceof NotSupportedError)) {
+                console.log("\n\n\n")
                 console.error(e)
             }
             result = false
@@ -154,7 +154,7 @@ class Audit extends EventEmitter
 
 
 
-async function report(options: ConfigType, destination: string, openFile = false) {
+async function report(options: bdt.BDTOptions, destination: string, openFile = false) {
     console.log("\nRunning audit for " + options.baseURL + "\n\n\n")
     const audit = new Audit(options)
     audit.load()
@@ -177,19 +177,22 @@ async function report(options: ConfigType, destination: string, openFile = false
     })
 
     audit.once("end", score => {
-        process.stdout.write("\u001b[2A\u001b[2K" + "FINAL SCORE:".bold + "\u001b[2B\n")
-
         const html = pug.renderFile("./audit-report-template.pug", {
             score,
             server: options.baseURL
         });
-        fs.writeFileSync(destination, html)
-        console.log(`Report saved to "${resolve(destination)}"`)
-        if (openFile) {
-            open(resolve(destination)).catch(e => {
-                console.log(`Failed opening "${resolve(destination)}" in browser:`)
-                console.error(e)
-            });
+        if (destination) {
+            destination = resolve(process.cwd(), destination)
+            fs.writeFileSync(destination, html)
+            console.log(`Report saved to "${destination}"`)
+            if (openFile) {
+                open(destination).catch(e => {
+                    console.log(`Failed opening "${destination}" in browser:`)
+                    console.error(e)
+                });
+            }
+        } else {
+            console.log(html)
         }
     })
 

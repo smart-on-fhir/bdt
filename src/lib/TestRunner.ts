@@ -1,17 +1,16 @@
-import EventEmitter from "events";
-import { Config } from "./bdt";
-import { NotSupportedError } from "./errors";
-import { Suite } from "./Suite";
-import { Test } from "./Test";
-import { TestAPI } from "./TestAPI";
-import ctx                   from "./globalContext"
+import EventEmitter          from "events"
+import { NotSupportedError } from "./errors"
+import { Suite }             from "./Suite"
+import { Test }              from "./Test"
+import { TestAPI }           from "./TestAPI"
+import { bdt }               from "../../types"
 
 
 export default class TestRunner extends EventEmitter
 {
     canceled: boolean = false;
 
-    public settings: Config;
+    public settings: bdt.BDTOptions;
 
     currentGroup: Suite;
 
@@ -19,11 +18,11 @@ export default class TestRunner extends EventEmitter
 
     onlyMode: boolean = false;
 
-    context: typeof ctx
+    context: Record<string, any>
 
     startPath: string | null = null
 
-    constructor(settings: Config, onlyMode = false, context = ctx)
+    constructor(settings: bdt.BDTOptions, onlyMode = false, context = {})
     {
         super()
 

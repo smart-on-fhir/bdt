@@ -1,4 +1,3 @@
-import { suite, test } from "../lib/bdt"
 import { expect }  from "@hapi/code"
 import { BulkDataClient } from "../lib/BulkDataClient"
 

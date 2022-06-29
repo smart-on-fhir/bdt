@@ -1,4 +1,3 @@
-/// <reference path="../index.d.ts" />
 
 /*
 (Open, R4) 
@@ -15,7 +14,7 @@ Private Key: https://bulk-data.smarthealthit.org/keys/RS384.private.json
 */
 
 /**
- * @type { BDT.ServerConfig }
+ * @type { import("../types").bdt.ServerConfig }
  */
 module.exports = {
     baseURL: "https://fhir-ehr.stagingcerner.com/beta/ec2458f2-1e24-41c8-b71b-0e701af7583d",

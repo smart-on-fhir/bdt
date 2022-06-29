@@ -1,5 +1,4 @@
-import { suite, test, beforeEach } from "../lib/bdt"
-import { BulkDataClient, exportType, OAuth } from "../lib/BulkDataClient"
+import { BulkDataClient, exportType } from "../lib/BulkDataClient"
 import jose   from "node-jose"
 import {
     expectOAuthError,
@@ -10,6 +9,7 @@ import {
     isJsonResponse
 } from "../lib/assertions"
 import { expect } from "@hapi/code";
+import { bdt } from "../../types"
 
 interface TokenTestsContext {
     client: BulkDataClient
@@ -134,7 +134,7 @@ suite("Authorization", () => {
             description: "Does not test any edge cases. Just verifies that the " +
                 "authorization works with the provided settings"
         }, async ({ config, context, api }) => {
-            const { response } = await context.client.request<OAuth.TokenResponse>({
+            const { response } = await context.client.request<bdt.OAuth.TokenResponse>({
                 method: "POST", 
                 url   : config.authentication.tokenEndpoint,
                 form  : context.form
@@ -349,7 +349,7 @@ suite("Authorization", () => {
             ];
 
             for (const scope of scopes) {
-                const { response } = await context.client.request<OAuth.TokenResponse>({
+                const { response } = await context.client.request<bdt.OAuth.TokenResponse>({
                     method: "POST",
                     url   : config.authentication.tokenEndpoint,
                     form: { ...context.form, scope }
@@ -393,7 +393,7 @@ suite("Authorization", () => {
             ];
 
             for (const scope of scopes) {
-                const { response } = await context.client.request<OAuth.TokenResponse>({
+                const { response } = await context.client.request<bdt.OAuth.TokenResponse>({
                     method: "POST",
                     url   : config.authentication.tokenEndpoint,
                     form: { ...context.form, scope }
@@ -425,7 +425,7 @@ suite("Authorization", () => {
             description: "Verifies that scopes like `system/*.read` are supported."
         }, async ({ config, context }) => {
 
-            const { response } = await context.client.request<OAuth.TokenResponse>({
+            const { response } = await context.client.request<bdt.OAuth.TokenResponse>({
                 method   : "POST",
                 url      : config.authentication.tokenEndpoint,
                 form: {
@@ -446,7 +446,7 @@ suite("Authorization", () => {
             minVersion: "2"
         }, async ({ config, context }) => {
 
-            const { response } = await context.client.request<OAuth.TokenResponse>({
+            const { response } = await context.client.request<bdt.OAuth.TokenResponse>({
                 method   : "POST",
                 url      : config.authentication.tokenEndpoint,
                 form: {
@@ -577,7 +577,7 @@ suite("Authorization", () => {
                 "to V2. Converting V2 scope to V1 is not lossless, thus it is considered an error.",
         }, async ({ config, context }) => {
 
-            const { response } = await context.client.request<OAuth.TokenResponse>({
+            const { response } = await context.client.request<bdt.OAuth.TokenResponse>({
                 method   : "POST",
                 url      : config.authentication.tokenEndpoint,
                 form: {
@@ -713,7 +713,7 @@ suite("Authorization", () => {
                 }
             );
 
-            const { response } = await context.client.request<OAuth.TokenResponse>({
+            const { response } = await context.client.request<bdt.OAuth.TokenResponse>({
                 method: "POST",
                 url   : config.authentication.tokenEndpoint,
                 form: {

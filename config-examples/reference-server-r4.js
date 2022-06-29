@@ -1,7 +1,7 @@
 /**
  * This file will configure BDT to test an R4 instance of the
  * reference bulk data server (https://bulk-data.smarthealthit.org)
- * @type { import("../src/lib/Config").ServerConfig }
+ * @type { import("../types").bdt.ServerConfig }
  */
 module.exports = {
     baseURL: "https://bulk-data.smarthealthit.org/eyJlcnIiOiIiLCJwYWdlIjoxMDAwMCwiZHVyIjoxMCwidGx0IjoxNSwibSI6MSwic3R1Ijo0LCJkZWwiOjB9/fhir",

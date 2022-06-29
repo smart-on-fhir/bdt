@@ -1,11 +1,11 @@
-import { Console } from "./Console"
-import { TestCallbackFn } from "./Suite";
-import { TestNode, TestNodeOptions } from "./TestNode"
+import { Console }  from "./Console"
+import { TestNode } from "./TestNode"
+import { bdt }      from "../../types"
 
 
-export interface TestOptions extends TestNodeOptions {
+export interface TestOptions extends bdt.TestNodeOptions {
     id?: string
-    fn?: TestCallbackFn
+    fn?: bdt.TestCallbackFn
 }
 
 export type TestStatus = "succeeded"
@@ -26,7 +26,7 @@ export class Test extends TestNode
      * the test is considered "not implemented" or "todo". Can only be set once
      * while constructing the instance via the `fn` option.
      */
-    readonly fn?: TestCallbackFn
+    readonly fn?: bdt.TestCallbackFn
 
     /**
      * Each test must have unique ID. The test itself does not need this to
@@ -48,7 +48,7 @@ export class Test extends TestNode
 
     public console: Console;
 
-    public after?: TestCallbackFn
+    public after?: bdt.TestCallbackFn
 
     // -------------------------------------------------------------------------
 

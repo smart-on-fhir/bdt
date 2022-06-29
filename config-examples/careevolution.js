@@ -1,6 +1,6 @@
 /**
  * Use this to template define new configurations
- * @type { import("../src/lib/Config").ServerConfig }
+ * @type { import("../types").bdt.ServerConfig }
  */
 module.exports = {
 

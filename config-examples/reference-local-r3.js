@@ -1,7 +1,7 @@
 /**
  * This file will configure BDT to test a locally running instance of the
  * reference bulk data server (https://github.com/smart-on-fhir/bulk-data-server)
- * @type { import("../src/lib/Config").ServerConfig }
+ * @type { import("../types").bdt.ServerConfig }
  */
 module.exports = {
     baseURL: "http://localhost:9443/eyJlcnIiOiIiLCJwYWdlIjoxMDAwMCwiZHVyIjoxMCwidGx0IjoxNSwibSI6MSwic3R1IjozfQ/fhir",

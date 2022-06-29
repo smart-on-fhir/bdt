@@ -1,5 +1,5 @@
 /**
- * @type { import("../src/lib/Config").ServerConfig }
+ * @type { import("../types").bdt.ServerConfig }
  */
 module.exports = {
     baseURL: "http://hapi.fhir.org/baseR5",

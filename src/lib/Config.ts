@@ -1,281 +1,27 @@
 import jose        from "node-jose"
-import { JWK as JoseJWK } from "node-jose"
 import { expect }  from "@hapi/code"
-import got         from "got/dist/source"
-// import jwt         from "jsonwebtoken"
-// import crypto      from "crypto"
 import { getPath } from "./lib"
-import {
-    SupportedJWKAlgorithm,
-    AuthTokenHeader,
-    AuthTokenClaims
-} from "./auth"
-import { FHIR } from "./BulkDataClient"
-import ms from "ms"
+import ms          from "ms"
+import { bdt }     from "../../types"
 
-export interface AuthenticationOptions {
-
-    /**
-     * Can be:
-     * - `backend-services` (*default*) all tests will be executed.
-     * - `client-credentials` - uses client_id and client_secret. Most of the
-     *    authorization tests will be skipped.
-     * - `none` - no authorization will be performed and all the authorization 
-     *    tests will be skipped.
-     */
-    type: "backend-services" | "client-credentials" | "none"
-
-    /**
-     * Set to true if auth if supported but not required
-     */
-    optional?: boolean
-
-    /**
-     * Required if authType is other than "none"
-     */
-    clientId?: string
-
-    /**
-     * Required if authType is set to "client-credentials"
-     */
-    clientSecret?: string
-    
-    /**
-     * Not used if authType is set to "none"
-     * Defaults to "system/*.read"
-     */
-    scope?: string
-
-    /**
-     * The full URL of the token endpoint. Required, unless authType is set
-     * to "none"
-     */
-    tokenEndpoint?: string
-    
-    privateKey?: JoseJWK.Key
-
-    /**
-     * Custom values to be merged with the authentication token claims.
-     * NOTE that the following cannot be overridden:
-     * - `iss` (equals the clientId)
-     * - `sub` (equals the clientId)
-     * - `aud` (equals the tokenUrl)
-     * - `jti` random value generated at runtime
-     */ 
-    customTokenClaims?: AuthTokenClaims
-    
-    /**
-     * Custom properties to be merged with the authentication token
-     * header before signing it.
-     * NOTE that the following cannot be overridden:
-     * - `typ` (equals "JWT")
-     * - `alg` (@see `tokenSignAlgorithm` below)
-     * - `kty` (equals the private key `kty`)
-     * - `jku` (equals the current `jwks_url` if any)
-     */
-    customTokenHeaders?: AuthTokenHeader
-
-    /**
-     * The specifications states that:
-     * > *The authentication JWT SHALL include the following claims, and
-     *   SHALL be signed with the client’s private key (which **SHOULD
-     *   be an RS384 or ES384 signature**).*
-     * 
-     * We sign with RS384 by default, but allow more!
-     * Acceptable values are: RS256, RS384, RS512, ES256, ES384 and ES512
-     */
-    tokenSignAlgorithm?: SupportedJWKAlgorithm,
-
-    /**
-     * Expressed in seconds or a string describing a time span (Eg: `60`,
-     * `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as
-     * a seconds count. If you use a string be sure you provide the time
-     * units (days, hours, etc), otherwise milliseconds unit is used by
-     * default ("120" is equal to "120ms").
-     * If not provided, we will use "5m" as default.
-     * @see [zeit/ms](https://github.com/zeit/ms)
-     */
-    tokenExpiresIn?: string | number
-    
-    jwksUrl?: string
-}
-
-export interface ServerConfig {
-
-    /**
-     * FHIR server base URL.
-     */
-    baseURL: string
-
-    /**
-     * Authentication options
-     */
-    authentication: AuthenticationOptions
-
-    requests: {
-        strictSSL?: boolean
-        timeout  ?: number
-        customHeaders: Record<string, any>
-    }
-
-    /**
-     * By default BDT will fetch and parse the CapabilityStatement to try to
-     * detect if the server supports system-level export and at what endpoint.
-     * However, if the server does not have a CapabilityStatement or if it is
-     * not properly declaring the system export support, you can skip that check
-     * by declaring the `systemExportEndpoint` below. The value should be a path
-     * relative to the `baseURL` (typically just "$export").
-     */
-    systemExportEndpoint?: string // will be auto-detected if not defined
-
-    /**
-     * By default BDT will fetch and parse the CapabilityStatement to try to
-     * detect if the server supports patient-level export and at what endpoint.
-     * However, if the server does not have a CapabilityStatement or if it is
-     * not properly declaring the patient export support, you can skip that
-     * check by declaring the `patientExportEndpoint` below. The value should be
-     * a path relative to the `baseURL` (typically "Patient/$export").
-     */
-    patientExportEndpoint?: string // will be auto-detected if not defined
-
-    /**
-     * Set this to your group-level export endpoint to enable the group-level
-     * tests. The value should be a path relative to the `baseURL` (typically
-     * "Group/{GroupID}/$export"), where {GroupID} is the ID of the group you'd
-     * like to to test.
-     */
-    groupExportEndpoint?: string
-
-    fastestResource?: string
-    
-    supportedResourceTypes?: string[]
-}
-
-export interface NormalizedConfig {
-    baseURL: string
-    
-    authentication: {
-        type: "backend-services" | "client-credentials" | "none"
-        optional: boolean
-        // Required if authType is not set to "none"
-        clientId?: string
-        // Required if authType is set to "client-credentials"
-        clientSecret?: string
-        
-        /**
-         * Not used if authType is set to "none"
-         * Defaults to "system/*.read"
-         */
-        scope: string
-
-        /**
-         * The full URL of the token endpoint. Required, unless authType is set
-         * to "none"
-         */
-        tokenEndpoint?: string
-        privateKey?: JoseJWK.Key
-
-        /**
-         * Custom values to be merged with the authentication token claims.
-         * NOTE that the following cannot be overridden:
-         * - `iss` (equals the clientId)
-         * - `sub` (equals the clientId)
-         * - `aud` (equals the tokenUrl)
-         * - `jti` random value generated at runtime
-         */ 
-        customTokenClaims?: Record<string, any>
-        
-        /**
-         * Custom properties to be merged with the authentication token
-         * header before signing it.
-         * NOTE that the following cannot be overridden:
-         * - `typ` (equals "JWT")
-         * - `alg` (@see `tokenSignAlgorithm` below)
-         * - `kty` (equals the private key `kty`)
-         * - `jku` (equals the current `jwks_url` if any)
-         */
-        customTokenHeaders?: Record<string, any>
-
-        /**
-         * The specifications states that:
-         * > *The authentication JWT SHALL include the following claims, and
-         *   SHALL be signed with the client’s private key (which **SHOULD
-         *   be an RS384 or ES384 signature**).*
-         * 
-         * We sign with RS384 by default, but allow other algorithms for
-         * servers that are not yet fully compliant
-         */
-        tokenSignAlgorithm?: SupportedJWKAlgorithm,
-
-        /**
-         * Expressed in seconds or a string describing a time span (Eg: `60`,
-         * `"2 days"`, `"10h"`, `"7d"`. A numeric value is interpreted as
-         * a seconds count. If you use a string be sure you provide the time
-         * units (days, hours, etc), otherwise milliseconds unit is used by
-         * default ("120" is equal to "120ms").
-         * If not provided, we will use "5m" as default.
-         * @see [zeit/ms](https://github.com/zeit/ms)
-         */
-        tokenExpiresIn?: string | number
-        
-        jwksUrl?: string
-    }
-
-    requests: {
-        strictSSL: boolean
-        customHeaders: Record<string, any>
-        timeout: number
-    }
-
-    /**
-     * By default BDT will fetch and parse the CapabilityStatement to try to
-     * detect if the server supports system-level export and at what endpoint.
-     * However, if the server does not have a CapabilityStatement or if it is
-     * not properly declaring the system export support, you can skip that check
-     * by declaring the `systemExportEndpoint` below. The value should be a path
-     * relative to the `baseURL` (typically just "$export").
-     */
-    systemExportEndpoint?: string // will be auto-detected if not defined
-
-    /**
-     * By default BDT will fetch and parse the CapabilityStatement to try to
-     * detect if the server supports patient-level export and at what endpoint.
-     * However, if the server does not have a CapabilityStatement or if it is
-     * not properly declaring the patient export support, you can skip that
-     * check by declaring the `patientExportEndpoint` below. The value should be
-     * a path relative to the `baseURL` (typically "Patient/$export").
-     */
-    patientExportEndpoint?: string // will be auto-detected if not defined
-
-    /**
-     * Set this to your group-level export endpoint to enable the group-level
-     * tests. The value should be a path relative to the `baseURL` (typically
-     * "Group/{GroupID}/$export"), where {GroupID} is the ID of the group you'd
-     * like to to test.
-     */
-    groupExportEndpoint?: string
-
-    fastestResource: string
-
-    supportedResourceTypes: string[]
-}
 
 export default class Config
 {
-    private originalConfig: ServerConfig
+    private originalConfig: bdt.ServerConfig
 
-    private normalizedConfig: NormalizedConfig
+    private normalizedConfig: bdt.NormalizedConfig
 
-    private _capabilityStatement: FHIR.CapabilityStatement
+    private _capabilityStatement: bdt.FHIR.CapabilityStatement
 
-    constructor(originalConfig: ServerConfig)
+
+    constructor(originalConfig: bdt.ServerConfig)
     {
         this.originalConfig = originalConfig
     }
 
-    async normalize(signal?: AbortSignal): Promise<NormalizedConfig>
+    async normalize(signal?: AbortSignal): Promise<bdt.NormalizedConfig>
     {
-        const out: Partial<NormalizedConfig> = {
+        const out: Partial<bdt.NormalizedConfig> = {
             systemExportEndpoint: "",
             patientExportEndpoint: "",
             groupExportEndpoint: "",
@@ -399,7 +145,7 @@ export default class Config
             ).to.include(tokenSignAlgorithm)
             out.authentication.tokenSignAlgorithm = tokenSignAlgorithm
         } else {
-            out.authentication.tokenSignAlgorithm = out.authentication.privateKey?.alg as SupportedJWKAlgorithm
+            out.authentication.tokenSignAlgorithm = out.authentication.privateKey?.alg as bdt.SupportedJWKAlgorithm
         }
 
         // tokenExpiresIn
@@ -495,10 +241,10 @@ export default class Config
             "At least one export endpoint must be configured (groupExportEndpoint|patientExportEndpoint|systemExportEndpoint)"
         )
 
-        return out as NormalizedConfig
+        return out as bdt.NormalizedConfig
     }
 
-    private async getCapabilityStatement(options: Partial<NormalizedConfig>, signal?: AbortSignal)
+    private async getCapabilityStatement(options: Partial<bdt.NormalizedConfig>, signal?: AbortSignal)
     {
         if (this._capabilityStatement === undefined) {
             this._capabilityStatement = null
@@ -514,7 +260,7 @@ export default class Config
                 });
 
                 const json = await response.json()
-                this._capabilityStatement = json as FHIR.CapabilityStatement
+                this._capabilityStatement = json as bdt.FHIR.CapabilityStatement
             } catch (ex) {
                 console.error(`Could not fetch the CapabilityStatement from ${url}: ${ex.message}`)
             }
@@ -532,7 +278,7 @@ export default class Config
         });
     }
 
-    private async getTokenEndpoint(options: Partial<NormalizedConfig>, signal?: AbortSignal)
+    private async getTokenEndpoint(options: Partial<bdt.NormalizedConfig>, signal?: AbortSignal)
     {
         const capabilityStatement = await this.getCapabilityStatement(options, signal);
         if (capabilityStatement) {
@@ -544,7 +290,7 @@ export default class Config
         return ""
     }
 
-    private async getSystemExportEndpoint(options: Partial<NormalizedConfig>, signal?: AbortSignal)
+    private async getSystemExportEndpoint(options: Partial<bdt.NormalizedConfig>, signal?: AbortSignal)
     {
         const capabilityStatement = await this.getCapabilityStatement(options, signal);
         if (capabilityStatement) {
@@ -554,7 +300,7 @@ export default class Config
         return ""
     }
 
-    private async getPatientExportEndpoint(options: Partial<NormalizedConfig>, signal?: AbortSignal)
+    private async getPatientExportEndpoint(options: Partial<bdt.NormalizedConfig>, signal?: AbortSignal)
     {
         const capabilityStatement = await this.getCapabilityStatement(options, signal);
         if (capabilityStatement) {
@@ -570,7 +316,7 @@ export default class Config
         return ""
     }
 
-    private async getSupportedResourceTypes(options: Partial<NormalizedConfig>, signal?: AbortSignal)
+    private async getSupportedResourceTypes(options: Partial<bdt.NormalizedConfig>, signal?: AbortSignal)
     {
         const capabilityStatement = await this.getCapabilityStatement(options, signal);
         if (capabilityStatement) {
@@ -579,7 +325,12 @@ export default class Config
         return []
     }
 
-    static async validate(cfg: Partial<ServerConfig>) {
+    static async validate(cfg: Partial<bdt.ServerConfig>, signal?: AbortSignal) {
+
+        if (signal?.aborted) {
+            // @ts-ignore
+            throw new DOMException(signal.reason || "Aborted", "AbortError");
+        }
         
         // baseURL -------------------------------------------------------------
         expect(cfg, "The baseURL property is required").to.include("baseURL")

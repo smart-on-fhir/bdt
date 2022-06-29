@@ -1,9 +1,9 @@
 import { Response } from "got/dist/source"
 import { expect } from "@hapi/code";
 import { getErrorMessageFromResponse, getUnfulfilledScopes, roundToPrecision, scopeSet } from "./lib";
-import { OAuth, BulkData, FHIR } from "./BulkDataClient";
 import moment from "moment";
 import { NotSupportedError } from "./errors";
+import { bdt } from "../../types"
 
 const REGEXP_INSTANT = new RegExp(
     "([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-" +
@@ -82,7 +82,7 @@ export interface StatusResponseAssertions {
      * assert.bulkData.status.OK(response, "Status response is invalid")
      * ```
      */
-    OK(response: BulkData.StatusResponse<BulkData.ExportManifest>, prefix?: string): void
+    OK(response: bdt.BulkData.StatusResponse<bdt.BulkData.ExportManifest>, prefix?: string): void
 
     /**
      * Asserts that the status endpoint reply is valid, but also produces
@@ -92,7 +92,7 @@ export interface StatusResponseAssertions {
      * assert.bulkData.status.notEmpty(response, "No files exported")
      * ```
      */
-    notEmpty(response: BulkData.StatusResponse<BulkData.ExportManifest>, prefix?: string): void
+    notEmpty(response: bdt.BulkData.StatusResponse<bdt.BulkData.ExportManifest>, prefix?: string): void
     
     /**
      * @tutorial https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---error-status-1
@@ -101,7 +101,7 @@ export interface StatusResponseAssertions {
      * assert.bulkData.status.notOK(response, "The status endpoint was expected to fail")
      * ```
      */
-    notOK(res: BulkData.StatusResponse<FHIR.OperationOutcome>, prefix?: string): void
+    notOK(res: bdt.BulkData.StatusResponse<bdt.FHIR.OperationOutcome>, prefix?: string): void
 
     /**
      * Asserts that:
@@ -125,14 +125,14 @@ export interface StatusResponseAssertions {
      * assert.bulkData.status.pending(response, "The status must be pending")
      * ```
      */
-    pending(res: BulkData.StatusResponse<any>, prefix?: string): void
+    pending(res: bdt.BulkData.StatusResponse<any>, prefix?: string): void
 }
 
 /**
  * A set of assertions to verify the proper structure of the export manifest
  */
 export interface ManifestAssertions {
-    OK(res: Response<BulkData.ExportManifest>, prefix?: string): void
+    OK(res: Response<bdt.BulkData.ExportManifest>, prefix?: string): void
     body: ManifestBodyAssertions
     deleted: ManifestDeletedAssertions
     error: ManifestErrorAssertions
@@ -143,22 +143,22 @@ export interface ManifestAssertions {
  * Assertions for the body of the export manifest
  */
 export interface ManifestBodyAssertions {
-    OK(manifest: BulkData.ExportManifest, kickOffUrl: string, prefix?: string): void
+    OK(manifest: bdt.BulkData.ExportManifest, kickOffUrl: string, prefix?: string): void
 }
 
 export interface ManifestDeletedAssertions {
-    OK(items: BulkData.ExportManifestFile<"Bundle">[], prefix?: string): void
+    OK(items: bdt.BulkData.ExportManifestFile<"Bundle">[], prefix?: string): void
 }
 
 export interface ManifestErrorAssertions {
-    OK(items: BulkData.ExportManifestFile<"OperationOutcome">[], prefix?: string): void
+    OK(items: bdt.BulkData.ExportManifestFile<"OperationOutcome">[], prefix?: string): void
 };
 
 /**
  * Assertions for the body of the export manifest
  */
 export interface ManifestOutputAssertions {
-    OK(items: BulkData.ExportManifestFile<string>[], type: string, prefix?: string): void
+    OK(items: bdt.BulkData.ExportManifestFile<string>[], type: string, prefix?: string): void
 }
 
 export interface ResponseAssertions {
@@ -169,7 +169,7 @@ export interface ResponseAssertions {
     json(response: Response, prefix?: string): void;
     ndJson(response: Response, prefix?: string): void;
     oauthError(response: Response, prefix?: string): void;
-    oauthErrorType(response: Response, type: OAuth.errorType, prefix?: string): void;
+    oauthErrorType(response: Response, type: bdt.OAuth.errorType, prefix?: string): void;
     statusCode(response: Response, code: number | number[], prefix?: string): void;
     statusText(response: Response, text: string | string[], prefix?: string): void
 }
@@ -334,7 +334,7 @@ export function expectFhirResource(response: Response, prefix = "")
 export function expectFhirResourceType(response: Response, resourceType: string, prefix = "")
 {
     expectFhirResource(response, prefix)
-    expect((response.body as FHIR.Resource).resourceType, concat(prefix, "Unexpected resourceType")).to.equal(resourceType)
+    expect((response.body as bdt.FHIR.Resource).resourceType, concat(prefix, "Unexpected resourceType")).to.equal(resourceType)
 }
 
 /**
@@ -372,7 +372,7 @@ export function expectOAuthError(response: Response, prefix = ""): void
     expectJsonResponse(response, prefix + "Invalid OAuth error response! ")
     expectClientError(response, prefix + "Invalid OAuth error response! ")
 
-    const body = response.body as OAuth.ErrorResponse;
+    const body = response.body as bdt.OAuth.ErrorResponse;
 
     const validErrorTypes = [
         "invalid_request",
@@ -407,11 +407,11 @@ export function expectOAuthError(response: Response, prefix = ""): void
 /**
  * @category Response Assertion
  */
-export function expectOAuthErrorType(response: Response, type: OAuth.errorType, prefix = ""): void {
+export function expectOAuthErrorType(response: Response, type: bdt.OAuth.errorType, prefix = ""): void {
     expectOAuthError(response, prefix)
     const err = "Got " + getErrorMessageFromResponse(response)
     expect(
-        (response.body as OAuth.ErrorResponse).error,
+        (response.body as bdt.OAuth.ErrorResponse).error,
         concat(prefix, err, `The OAuth error 'error' property is expected to equal "${type}"`)
     ).to.equal(type)
 }
@@ -423,7 +423,7 @@ export function expectSuccessfulAuth(response: Response, prefix = "")
 {
     expectJsonResponse(response, prefix)
 
-    const { access_token, expires_in, token_type, scope } = response.body as OAuth.TokenResponse
+    const { access_token, expires_in, token_type, scope } = response.body as bdt.OAuth.TokenResponse
 
     const error = "Got " + getErrorMessageFromResponse(response)
 
@@ -660,7 +660,7 @@ export function expectNDJSONElements(body: string, elements: string[], prefix = 
  * @param prefix 
  * @internal
  */
-export function expectValidManifestEntry(item: BulkData.ExportManifestFile, type: string, prefix = "") {
+export function expectValidManifestEntry(item: bdt.BulkData.ExportManifestFile, type: string, prefix = "") {
     // type - the FHIR resource type that is contained in the file. Note: Each file MUST contain
     // resources of only one type, but a server MAY create more than one file for each resource
     // type returned. The number of resources contained in a file MAY vary between servers. If no
@@ -751,11 +751,11 @@ export const assert: AssertAPI = {
             }
         },
         manifest: {
-            OK: (res: Response<BulkData.ExportManifest>, prefix="") => {
+            OK: (res: Response<bdt.BulkData.ExportManifest>, prefix="") => {
                 assert.bulkData.manifest.body.OK(res.body, concat(prefix, "Invalid manifest body"))
             },
             body: {
-                OK: (manifest: BulkData.ExportManifest, kickOffUrl: string, prefix="") => {
+                OK: (manifest: bdt.BulkData.ExportManifest, kickOffUrl: string, prefix="") => {
 
                     // transactionTime - a FHIR instant type that indicates the server's time when the query is run.
                     // The response SHOULD NOT include any resources modified after this instant, and SHALL include
@@ -801,21 +801,21 @@ export const assert: AssertAPI = {
                 }
             },
             output: {
-                OK: (items: BulkData.ExportManifestFile[], type: string, prefix="") => {
+                OK: (items: bdt.BulkData.ExportManifestFile[], type: string, prefix="") => {
                     items.forEach((item, i) => {
                         expectValidManifestEntry(item, type, concat(prefix, `Invalid manifest entry at manifest.output[${i}]`))
                     });
                 },
             },
             deleted: {
-                OK: (items: BulkData.ExportManifestFile<"Bundle">[], prefix="") => {
+                OK: (items: bdt.BulkData.ExportManifestFile<"Bundle">[], prefix="") => {
                     items.forEach((item, i) => {
                         expectValidManifestEntry(item, "Bundle", concat(prefix, `Invalid manifest entry at manifest.deleted[${i}]`))
                     });
                 },
             },
             error: {
-                OK: (items: BulkData.ExportManifestFile<"OperationOutcome">[], prefix="") => {
+                OK: (items: bdt.BulkData.ExportManifestFile<"OperationOutcome">[], prefix="") => {
                     items.forEach((item, i) => {
                         expectValidManifestEntry(item, "OperationOutcome", concat(prefix, `Invalid manifest entry at manifest.error[${i}]`))
                     });
@@ -858,7 +858,7 @@ function checkKickOffSupport(response: Response)
     }
 }
 
-function checkForGrantedWriteScopes(response: Response<OAuth.TokenResponse>, console: Console)
+function checkForGrantedWriteScopes(response: Response<bdt.OAuth.TokenResponse>, console: Console)
 {
     const grantedScopeSet = scopeSet(response.body.scope)
 
@@ -881,12 +881,12 @@ function checkForGrantedWriteScopes(response: Response<OAuth.TokenResponse>, con
     }
 }
 
-function getImplicitlyGrantedWriteScopes(response: Response<OAuth.TokenResponse>)
+function getImplicitlyGrantedWriteScopes(response: Response<bdt.OAuth.TokenResponse>)
 {
     return scopeSet(response.body.scope).filter(s => s.action === "*")
 }
 
-function getExplicitlyGrantedWriteScopes(response: Response<OAuth.TokenResponse>)
+function getExplicitlyGrantedWriteScopes(response: Response<bdt.OAuth.TokenResponse>)
 {
     return scopeSet(response.body.scope).filter(s => s.action === "write")
 }

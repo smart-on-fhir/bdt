@@ -1,5 +1,4 @@
 import { expect }         from "@hapi/code"
-import { suite, test }    from "../lib/bdt"
 import { BulkDataClient, exportType } from "../lib/BulkDataClient"
 import {
     expectClientError,

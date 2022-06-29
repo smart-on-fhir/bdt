@@ -1,19 +1,9 @@
-import { NormalizedConfig } from "./Config"
+import { bdt } from "../../types"
 import { Test } from "./Test"
-import { TestAPI } from "./TestAPI"
 import { TestNode } from "./TestNode"
 
 
-export type SetupCallbackFn<ContextType=Record<string, any>> = (context: {
-    config: NormalizedConfig
-    context: ContextType
-}) => any
 
-export type TestCallbackFn<ContextType=Record<string, any>> = (context: {
-    config: NormalizedConfig
-    api: TestAPI
-    context: ContextType
-}) => any
 
 /**
  * Suite is a structural [[TestNode]] that has other [[Suite]] and/or [[Test]]
@@ -23,10 +13,10 @@ export class Suite extends TestNode
 {
     children: (Suite|Test)[] = []
 
-    before?: SetupCallbackFn
-    beforeEach?: TestCallbackFn
-    after?: SetupCallbackFn
-    afterEach?: TestCallbackFn
+    before?: bdt.SetupCallbackFn
+    beforeEach?: bdt.TestCallbackFn
+    after?: bdt.SetupCallbackFn
+    afterEach?: bdt.TestCallbackFn
 
     /**
      * This is a magic method that will be called internally when you

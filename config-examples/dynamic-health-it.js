@@ -1,6 +1,6 @@
 
 /**
- * @type { import("../src/lib/Config").ServerConfig }
+ * @type { import("../types").bdt.ServerConfig }
  */
 module.exports = {
     baseURL: "https://r4devbulk.dynamicfhirsandbox.com/fhir/dhit/practicetwo/r4",

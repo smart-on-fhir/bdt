@@ -1,23 +1,7 @@
-import { Console } from "./Console";
-import { NotSupportedError } from "./errors";
-import { TestCallbackFn } from "./Suite";
-import { Test, TestStatus } from "./Test";
-
-export interface Prerequisite {
-
-    /**
-     * This will be converted to boolean and if evaluates to false
-     * it means that a prerequisite requirement is not met. If
-     * function, it will be called with no arguments first, and then
-     * the returned value will be converted to boolean
-     */
-    assertion: any
-
-    /**
-     * The error message if the assertion fails
-     */
-    message: string
-}
+import { Console }           from "./Console"
+import { NotSupportedError } from "./errors"
+import { Test, TestStatus }  from "./Test"
+import { bdt }               from "../../types"
 
 export class TestAPI
 {
@@ -57,7 +41,7 @@ export class TestAPI
      * @returns void
      * @throws NotSupportedError
      */
-    prerequisite(...conditions: Prerequisite[]) {
+    prerequisite(...conditions: bdt.Prerequisite[]) {
         for (const { assertion, message } of conditions) {
             const x = typeof assertion == "function" ? assertion() : !!assertion;
             if (!x) {
@@ -66,7 +50,7 @@ export class TestAPI
         }
     }
 
-    after(fn: TestCallbackFn) {
+    after(fn: bdt.TestCallbackFn) {
         this.test.after = fn
     }
 }

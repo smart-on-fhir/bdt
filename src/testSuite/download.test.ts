@@ -1,7 +1,6 @@
-import { expect }      from "@hapi/code"
-import { suite, test } from "../lib/bdt"
+import { expect }         from "@hapi/code"
+import isBase64           from "is-base64"
 import { BulkDataClient } from "../lib/BulkDataClient"
-import isBase64        from "is-base64"
 import { getErrorMessageFromResponse } from "../lib/lib"
 import { expectResponseCode, expectSuccessfulDownload, expectSuccessfulExport, expectSuccessfulKickOff } from "../lib/assertions"
 
