@@ -1,8 +1,9 @@
+import got         from "got/dist/source"
 import jose        from "node-jose"
 import { expect }  from "@hapi/code"
-import { getPath } from "./lib"
 import ms          from "ms"
 import { bdt }     from "../../types"
+import { getPath } from "./lib"
 
 
 export default class Config
@@ -10,7 +11,6 @@ export default class Config
     private originalConfig: bdt.ServerConfig
 
     private _capabilityStatement: bdt.FHIR.CapabilityStatement
-
 
     constructor(originalConfig: bdt.ServerConfig)
     {
@@ -245,19 +245,28 @@ export default class Config
     private async getCapabilityStatement(options: Partial<bdt.NormalizedConfig>, signal?: AbortSignal)
     {
         if (this._capabilityStatement === undefined) {
+
+            if (signal?.aborted) {
+                // @ts-ignore
+                throw new DOMException(signal.reason || "Aborted", "AbortError");
+            }
+
             this._capabilityStatement = null
 
             const url = `${options.baseURL}/metadata?_format=json`
             try {
-
-                const response = await fetch(url, {
-                    signal,
+                const req = got(url, {
                     headers: {
                         accept: "application/fhir+json,application/json+fhir,application/json"
                     }
-                });
+                })
 
-                const json = await response.json()
+                if (signal) {
+                    signal.addEventListener("abort", () => req.cancel(), { once: true });
+                }
+
+                const json = await req.json()
+
                 this._capabilityStatement = json as bdt.FHIR.CapabilityStatement
             } catch (ex) {
                 console.error(`Could not fetch the CapabilityStatement from ${url}: ${ex.message}`)
@@ -265,7 +274,6 @@ export default class Config
         }
         return this._capabilityStatement
     }
-
 
     private getOperationDefinition(operations: any[], name: string, ref: string) {
         return operations.find((e: any) => {
