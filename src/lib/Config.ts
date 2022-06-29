@@ -9,8 +9,6 @@ export default class Config
 {
     private originalConfig: bdt.ServerConfig
 
-    private normalizedConfig: bdt.NormalizedConfig
-
     private _capabilityStatement: bdt.FHIR.CapabilityStatement
 
 
