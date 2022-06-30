@@ -95,9 +95,12 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="testrunner.default.html#canceled" class="tsd-kind-icon">canceled</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="testrunner.default.html#context" class="tsd-kind-icon">context</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="testrunner.default.html#currentgroup" class="tsd-kind-icon">current<wbr>Group</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="testrunner.default.html#currenttestapi" class="tsd-kind-icon">current<wbr>Test<wbr>Api</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="testrunner.default.html#onlymode" class="tsd-kind-icon">only<wbr>Mode</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="testrunner.default.html#settings" class="tsd-kind-icon">settings</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="testrunner.default.html#startpath" class="tsd-kind-icon">start<wbr>Path</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="testrunner.default.html#capturerejectionsymbol" class="tsd-kind-icon">capture<wbr>Rejection<wbr>Symbol</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="testrunner.default.html#capturerejections" class="tsd-kind-icon">capture<wbr>Rejections</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="testrunner.default.html#defaultmaxlisteners" class="tsd-kind-icon">default<wbr>Max<wbr>Listeners</a></li>
@@ -107,6 +110,8 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="testrunner.default.html#_run" class="tsd-kind-icon">_run</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="testrunner.default.html#abort" class="tsd-kind-icon">abort</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="testrunner.default.html#addlistener" class="tsd-kind-icon">add<wbr>Listener</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="testrunner.default.html#emit" class="tsd-kind-icon">emit</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="testrunner.default.html#endgroup" class="tsd-kind-icon">end<wbr>Group</a></li>
@@ -126,9 +131,11 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="testrunner.default.html#run" class="tsd-kind-icon">run</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="testrunner.default.html#runtest" class="tsd-kind-icon">run<wbr>Test</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="testrunner.default.html#setmaxlisteners" class="tsd-kind-icon">set<wbr>Max<wbr>Listeners</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="testrunner.default.html#geteventlisteners" class="tsd-kind-icon">get<wbr>Event<wbr>Listeners</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="testrunner.default.html#listenercount-1" class="tsd-kind-icon">listener<wbr>Count</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="testrunner.default.html#on-1" class="tsd-kind-icon">on</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="testrunner.default.html#once-1" class="tsd-kind-icon">once</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external"><a href="testrunner.default.html#setmaxlisteners-1" class="tsd-kind-icon">set<wbr>Max<wbr>Listeners</a></li>
 							</ul>
 						</section>
 					</div>
@@ -140,23 +147,28 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">new default<span class="tsd-signature-symbol">(</span>settings<span class="tsd-signature-symbol">: </span><a href="../interfaces/bdt.config.html" class="tsd-signature-type" data-tsd-kind="Interface">Config</a>, onlyMode<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
+						<li class="tsd-signature tsd-kind-icon">new default<span class="tsd-signature-symbol">(</span>settings<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BDTOptions</span>, onlyMode<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span>, context<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Overrides EventEmitter.constructor</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/TestRunner.ts#L18">src/lib/TestRunner.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/TestRunner.ts#L24">src/lib/TestRunner.ts:24</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>settings: <a href="../interfaces/bdt.config.html" class="tsd-signature-type" data-tsd-kind="Interface">Config</a></h5>
+									<h5>settings: <span class="tsd-signature-type">BDTOptions</span></h5>
 								</li>
 								<li>
 									<h5>onlyMode: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></h5>
+								</li>
+								<li>
+									<h5>context: <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = {}</span></h5>
+									<ul class="tsd-parameters">
+									</ul>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></h4>
@@ -172,7 +184,17 @@
 					<div class="tsd-signature tsd-kind-icon">canceled<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/TestRunner.ts#L12">src/lib/TestRunner.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/TestRunner.ts#L12">src/lib/TestRunner.ts:12</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="context" class="tsd-anchor"></a>
+					<h3>context</h3>
+					<div class="tsd-signature tsd-kind-icon">context<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/TestRunner.ts#L22">src/lib/TestRunner.ts:22</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -182,7 +204,17 @@
 					<div class="tsd-signature tsd-kind-icon">current<wbr>Group<span class="tsd-signature-symbol">:</span> <a href="suite.suite-1.html" class="tsd-signature-type" data-tsd-kind="Class">Suite</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/TestRunner.ts#L16">src/lib/TestRunner.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/TestRunner.ts#L16">src/lib/TestRunner.ts:16</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="currenttestapi" class="tsd-anchor"></a>
+					<h3>current<wbr>Test<wbr>Api</h3>
+					<div class="tsd-signature tsd-kind-icon">current<wbr>Test<wbr>Api<span class="tsd-signature-symbol">:</span> <a href="testapi.testapi-1.html" class="tsd-signature-type" data-tsd-kind="Class">TestAPI</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/TestRunner.ts#L18">src/lib/TestRunner.ts:18</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -192,17 +224,27 @@
 					<div class="tsd-signature tsd-kind-icon">only<wbr>Mode<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/TestRunner.ts#L18">src/lib/TestRunner.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/TestRunner.ts#L20">src/lib/TestRunner.ts:20</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="settings" class="tsd-anchor"></a>
 					<h3>settings</h3>
-					<div class="tsd-signature tsd-kind-icon">settings<span class="tsd-signature-symbol">:</span> <a href="../interfaces/bdt.config.html" class="tsd-signature-type" data-tsd-kind="Interface">Config</a></div>
+					<div class="tsd-signature tsd-kind-icon">settings<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">BDTOptions</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/TestRunner.ts#L14">src/lib/TestRunner.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/TestRunner.ts#L14">src/lib/TestRunner.ts:14</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="startpath" class="tsd-anchor"></a>
+					<h3>start<wbr>Path</h3>
+					<div class="tsd-signature tsd-kind-icon">start<wbr>Path<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = null</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/TestRunner.ts#L24">src/lib/TestRunner.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -213,7 +255,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from EventEmitter.captureRejectionSymbol</p>
 						<ul>
-							<li>Defined in node_modules/@types/node/events.d.ts:38</li>
+							<li>Defined in node_modules/@types/node/events.d.ts:291</li>
 						</ul>
 					</aside>
 				</section>
@@ -224,7 +266,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from EventEmitter.captureRejections</p>
 						<ul>
-							<li>Defined in node_modules/@types/node/events.d.ts:44</li>
+							<li>Defined in node_modules/@types/node/events.d.ts:296</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -240,7 +282,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from EventEmitter.defaultMaxListeners</p>
 						<ul>
-							<li>Defined in node_modules/@types/node/events.d.ts:45</li>
+							<li>Defined in node_modules/@types/node/events.d.ts:297</li>
 						</ul>
 					</aside>
 				</section>
@@ -251,7 +293,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from EventEmitter.errorMonitor</p>
 						<ul>
-							<li>Defined in node_modules/@types/node/events.d.ts:37</li>
+							<li>Defined in node_modules/@types/node/events.d.ts:290</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -268,24 +310,83 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="_run" class="tsd-anchor"></a>
+					<h3>_run</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">_run<span class="tsd-signature-symbol">(</span>node<span class="tsd-signature-symbol">: </span><a href="suite.suite-1.html" class="tsd-signature-type" data-tsd-kind="Class">Suite</a><span class="tsd-signature-symbol"> | </span><a href="test.test-1.html" class="tsd-signature-type" data-tsd-kind="Class">Test</a>, context<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/TestRunner.ts#L124">src/lib/TestRunner.ts:124</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>node: <a href="suite.suite-1.html" class="tsd-signature-type" data-tsd-kind="Class">Suite</a><span class="tsd-signature-symbol"> | </span><a href="test.test-1.html" class="tsd-signature-type" data-tsd-kind="Class">Test</a></h5>
+								</li>
+								<li>
+									<h5>context: <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = {}</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="abort" class="tsd-anchor"></a>
+					<h3>abort</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">abort<span class="tsd-signature-symbol">(</span>aportAll<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/TestRunner.ts#L252">src/lib/TestRunner.ts:252</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>aportAll: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
 					<a name="addlistener" class="tsd-anchor"></a>
 					<h3>add<wbr>Listener</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">add<wbr>Listener<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Listener<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.addListener</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:57</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:317</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Alias for <code>emitter.on(eventName, listener)</code>.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v0.1.26</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
 								</li>
 								<li>
 									<h5>listener: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
@@ -317,20 +418,63 @@
 					<a name="emit" class="tsd-anchor"></a>
 					<h3>emit</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">emit<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+						<li class="tsd-signature tsd-kind-icon">emit<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.emit</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:67</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:573</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Synchronously calls each of the listeners registered for the event named<code>eventName</code>, in the order they were registered, passing the supplied arguments
+									to each.</p>
+								</div>
+								<p>Returns <code>true</code> if the event had listeners, <code>false</code> otherwise.</p>
+								<pre><code class="language-js"><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">EventEmitter</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">require</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;events&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">myEmitter</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">EventEmitter</span><span style="color: #24292EFF">();</span>
+
+<span style="color: #C2C3C5">// First listener</span>
+<span style="color: #1976D2">myEmitter</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;event&#039;</span><span style="color: #24292EFF">, </span><span style="color: #D32F2F">function</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">firstListener</span><span style="color: #24292EFF">() {</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;Helloooo! first listener&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">});</span>
+<span style="color: #C2C3C5">// Second listener</span>
+<span style="color: #1976D2">myEmitter</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;event&#039;</span><span style="color: #24292EFF">, </span><span style="color: #D32F2F">function</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">secondListener</span><span style="color: #24292EFF">(arg1, arg2) {</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">`event with parameters </span><span style="color: #D32F2F">${</span><span style="color: #24292EFF">arg1</span><span style="color: #D32F2F">}</span><span style="color: #22863A">, </span><span style="color: #D32F2F">${</span><span style="color: #24292EFF">arg2</span><span style="color: #D32F2F">}</span><span style="color: #22863A"> in second listener`</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">});</span>
+<span style="color: #C2C3C5">// Third listener</span>
+<span style="color: #1976D2">myEmitter</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;event&#039;</span><span style="color: #24292EFF">, </span><span style="color: #D32F2F">function</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">thirdListener</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">...</span><span style="color: #24292EFF">args) {</span>
+<span style="color: #24292EFF">  </span><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">parameters</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">args</span><span style="color: #6F42C1">.join</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;, &#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">`event with parameters </span><span style="color: #D32F2F">${</span><span style="color: #24292EFF">parameters</span><span style="color: #D32F2F">}</span><span style="color: #22863A"> in third listener`</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">});</span>
+
+<span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">myEmitter</span><span style="color: #6F42C1">.listeners</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;event&#039;</span><span style="color: #24292EFF">));</span>
+
+<span style="color: #1976D2">myEmitter</span><span style="color: #6F42C1">.emit</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;event&#039;</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">1</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">2</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">3</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">4</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">5</span><span style="color: #24292EFF">);</span>
+
+<span style="color: #C2C3C5">// Prints:</span>
+<span style="color: #C2C3C5">// [</span>
+<span style="color: #C2C3C5">//   [Function: firstListener],</span>
+<span style="color: #C2C3C5">//   [Function: secondListener],</span>
+<span style="color: #C2C3C5">//   [Function: thirdListener]</span>
+<span style="color: #C2C3C5">// ]</span>
+<span style="color: #C2C3C5">// Helloooo! first listener</span>
+<span style="color: #C2C3C5">// event with parameters 1, 2 in second listener</span>
+<span style="color: #C2C3C5">// event with parameters 1, 2, 3, 4, 5 in third listener</span>
+</code></pre>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v0.1.26</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
@@ -350,7 +494,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/TestRunner.ts#L85">src/lib/TestRunner.ts:85</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/TestRunner.ts#L97">src/lib/TestRunner.ts:97</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -382,7 +526,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/TestRunner.ts#L29">src/lib/TestRunner.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/TestRunner.ts#L36">src/lib/TestRunner.ts:36</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -412,9 +556,31 @@
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.eventNames</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:72</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:632</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns an array listing the events for which the emitter has registered
+									listeners. The values in the array are strings or <code>Symbol</code>s.</p>
+								</div>
+								<pre><code class="language-js"><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">EventEmitter</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">require</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;events&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">myEE</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">EventEmitter</span><span style="color: #24292EFF">();</span>
+<span style="color: #1976D2">myEE</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;foo&#039;</span><span style="color: #24292EFF">, () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {});</span>
+<span style="color: #1976D2">myEE</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;bar&#039;</span><span style="color: #24292EFF">, () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {});</span>
+
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">sym</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Symbol</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;symbol&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #1976D2">myEE</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(sym, () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {});</span>
+
+<span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">myEE</span><span style="color: #6F42C1">.eventNames</span><span style="color: #24292EFF">());</span>
+<span style="color: #C2C3C5">// Prints: [ &#039;foo&#039;, &#039;bar&#039;, Symbol(symbol) ]</span>
+</code></pre>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v6.0.0</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span></h4>
 						</li>
 					</ul>
@@ -430,9 +596,20 @@
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.getMaxListeners</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:64</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:489</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns the current max listener value for the <code>EventEmitter</code> which is either
+									set by <code>emitter.setMaxListeners(n)</code> or defaults to <a href="testrunner.default.html#defaultmaxlisteners">defaultMaxListeners</a>.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v1.0.0</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
 						</li>
 					</ul>
@@ -441,20 +618,33 @@
 					<a name="listenercount" class="tsd-anchor"></a>
 					<h3>listener<wbr>Count</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">listener<wbr>Count<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+						<li class="tsd-signature tsd-kind-icon">listener<wbr>Count<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.listenerCount</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:68</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:579</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns the number of listeners listening to the event named <code>eventName</code>.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v3.2.0</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The name of the event being listened for</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -465,20 +655,36 @@
 					<a name="listeners" class="tsd-anchor"></a>
 					<h3>listeners</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">listeners<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">[]</span></li>
+						<li class="tsd-signature tsd-kind-icon">listeners<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">[]</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.listeners</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:65</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:502</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a copy of the array of listeners for the event named <code>eventName</code>.</p>
+								</div>
+								<pre><code class="language-js"><span style="color: #1976D2">server</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;connection&#039;</span><span style="color: #24292EFF">, (stream) </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;someone connected!&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">});</span>
+<span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">util</span><span style="color: #6F42C1">.inspect</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">server</span><span style="color: #6F42C1">.listeners</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;connection&#039;</span><span style="color: #24292EFF">)));</span>
+<span style="color: #C2C3C5">// Prints: [ [Function] ]</span>
+</code></pre>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v0.1.26</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">[]</span></h4>
@@ -489,20 +695,30 @@
 					<a name="off" class="tsd-anchor"></a>
 					<h3>off</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">off<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
+						<li class="tsd-signature tsd-kind-icon">off<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.off</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:61</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:462</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Alias for <code>emitter.removeListener()</code>.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v10.0.0</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
 								</li>
 								<li>
 									<h5>listener: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
@@ -534,23 +750,57 @@
 					<a name="on" class="tsd-anchor"></a>
 					<h3>on</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">on<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
+						<li class="tsd-signature tsd-kind-icon">on<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.on</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:58</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:348</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Adds the <code>listener</code> function to the end of the listeners array for the
+										event named <code>eventName</code>. No checks are made to see if the <code>listener</code> has
+										already been added. Multiple calls passing the same combination of <code>eventName</code>and <code>listener</code> will result in the <code>listener</code> being added, and called, multiple
+									times.</p>
+								</div>
+								<pre><code class="language-js"><span style="color: #1976D2">server</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;connection&#039;</span><span style="color: #24292EFF">, (stream) </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;someone connected!&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">});</span>
+</code></pre>
+								<p>Returns a reference to the <code>EventEmitter</code>, so that calls can be chained.</p>
+								<p>By default, event listeners are invoked in the order they are added. The<code>emitter.prependListener()</code> method can be used as an alternative to add the
+								event listener to the beginning of the listeners array.</p>
+								<pre><code class="language-js"><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">myEE</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">EventEmitter</span><span style="color: #24292EFF">();</span>
+<span style="color: #1976D2">myEE</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;foo&#039;</span><span style="color: #24292EFF">, () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;a&#039;</span><span style="color: #24292EFF">));</span>
+<span style="color: #1976D2">myEE</span><span style="color: #6F42C1">.prependListener</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;foo&#039;</span><span style="color: #24292EFF">, () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;b&#039;</span><span style="color: #24292EFF">));</span>
+<span style="color: #1976D2">myEE</span><span style="color: #6F42C1">.emit</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;foo&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #C2C3C5">// Prints:</span>
+<span style="color: #C2C3C5">//   b</span>
+<span style="color: #C2C3C5">//   a</span>
+</code></pre>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v0.1.101</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The name of the event.</p>
+									</div>
 								</li>
 								<li>
 									<h5>listener: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The callback function</p>
+									</div>
 									<ul class="tsd-parameters">
 										<li class="tsd-parameter-signature">
 											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-external">
@@ -579,23 +829,55 @@
 					<a name="once" class="tsd-anchor"></a>
 					<h3>once</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">once<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
+						<li class="tsd-signature tsd-kind-icon">once<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.once</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:59</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:377</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Adds a <strong>one-time</strong><code>listener</code> function for the event named <code>eventName</code>. The
+									next time <code>eventName</code> is triggered, this listener is removed and then invoked.</p>
+								</div>
+								<pre><code class="language-js"><span style="color: #1976D2">server</span><span style="color: #6F42C1">.once</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;connection&#039;</span><span style="color: #24292EFF">, (stream) </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;Ah, we have our first user!&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">});</span>
+</code></pre>
+								<p>Returns a reference to the <code>EventEmitter</code>, so that calls can be chained.</p>
+								<p>By default, event listeners are invoked in the order they are added. The<code>emitter.prependOnceListener()</code> method can be used as an alternative to add the
+								event listener to the beginning of the listeners array.</p>
+								<pre><code class="language-js"><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">myEE</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">EventEmitter</span><span style="color: #24292EFF">();</span>
+<span style="color: #1976D2">myEE</span><span style="color: #6F42C1">.once</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;foo&#039;</span><span style="color: #24292EFF">, () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;a&#039;</span><span style="color: #24292EFF">));</span>
+<span style="color: #1976D2">myEE</span><span style="color: #6F42C1">.prependOnceListener</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;foo&#039;</span><span style="color: #24292EFF">, () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;b&#039;</span><span style="color: #24292EFF">));</span>
+<span style="color: #1976D2">myEE</span><span style="color: #6F42C1">.emit</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;foo&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #C2C3C5">// Prints:</span>
+<span style="color: #C2C3C5">//   b</span>
+<span style="color: #C2C3C5">//   a</span>
+</code></pre>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v0.3.0</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The name of the event.</p>
+									</div>
 								</li>
 								<li>
 									<h5>listener: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The callback function</p>
+									</div>
 									<ul class="tsd-parameters">
 										<li class="tsd-parameter-signature">
 											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-external">
@@ -624,23 +906,47 @@
 					<a name="prependlistener" class="tsd-anchor"></a>
 					<h3>prepend<wbr>Listener</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">prepend<wbr>Listener<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
+						<li class="tsd-signature tsd-kind-icon">prepend<wbr>Listener<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.prependListener</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:70</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:597</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Adds the <code>listener</code> function to the <em>beginning</em> of the listeners array for the
+										event named <code>eventName</code>. No checks are made to see if the <code>listener</code> has
+										already been added. Multiple calls passing the same combination of <code>eventName</code>and <code>listener</code> will result in the <code>listener</code> being added, and called, multiple
+									times.</p>
+								</div>
+								<pre><code class="language-js"><span style="color: #1976D2">server</span><span style="color: #6F42C1">.prependListener</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;connection&#039;</span><span style="color: #24292EFF">, (stream) </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;someone connected!&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">});</span>
+</code></pre>
+								<p>Returns a reference to the <code>EventEmitter</code>, so that calls can be chained.</p>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v6.0.0</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The name of the event.</p>
+									</div>
 								</li>
 								<li>
 									<h5>listener: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The callback function</p>
+									</div>
 									<ul class="tsd-parameters">
 										<li class="tsd-parameter-signature">
 											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-external">
@@ -669,23 +975,45 @@
 					<a name="prependoncelistener" class="tsd-anchor"></a>
 					<h3>prepend<wbr>Once<wbr>Listener</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">prepend<wbr>Once<wbr>Listener<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
+						<li class="tsd-signature tsd-kind-icon">prepend<wbr>Once<wbr>Listener<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.prependOnceListener</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:71</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:613</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Adds a <strong>one-time</strong><code>listener</code> function for the event named <code>eventName</code> to the_beginning_ of the listeners array. The next time <code>eventName</code> is triggered, this
+									listener is removed, and then invoked.</p>
+								</div>
+								<pre><code class="language-js"><span style="color: #1976D2">server</span><span style="color: #6F42C1">.prependOnceListener</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;connection&#039;</span><span style="color: #24292EFF">, (stream) </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;Ah, we have our first user!&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">});</span>
+</code></pre>
+								<p>Returns a reference to the <code>EventEmitter</code>, so that calls can be chained.</p>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v6.0.0</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The name of the event.</p>
+									</div>
 								</li>
 								<li>
 									<h5>listener: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The callback function</p>
+									</div>
 									<ul class="tsd-parameters">
 										<li class="tsd-parameter-signature">
 											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-external">
@@ -714,20 +1042,53 @@
 					<a name="rawlisteners" class="tsd-anchor"></a>
 					<h3>raw<wbr>Listeners</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">raw<wbr>Listeners<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">[]</span></li>
+						<li class="tsd-signature tsd-kind-icon">raw<wbr>Listeners<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">[]</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.rawListeners</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:66</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:532</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a copy of the array of listeners for the event named <code>eventName</code>,
+									including any wrappers (such as those created by <code>.once()</code>).</p>
+								</div>
+								<pre><code class="language-js"><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">emitter</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">EventEmitter</span><span style="color: #24292EFF">();</span>
+<span style="color: #1976D2">emitter</span><span style="color: #6F42C1">.once</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;log&#039;</span><span style="color: #24292EFF">, () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;log once&#039;</span><span style="color: #24292EFF">));</span>
+
+<span style="color: #C2C3C5">// Returns a new Array with a function `onceWrapper` which has a property</span>
+<span style="color: #C2C3C5">// `listener` which contains the original listener bound above</span>
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">listeners</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">emitter</span><span style="color: #6F42C1">.rawListeners</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;log&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">logFnWrapper</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> listeners[</span><span style="color: #1976D2">0</span><span style="color: #24292EFF">];</span>
+
+<span style="color: #C2C3C5">// Logs &quot;log once&quot; to the console and does not unbind the `once` event</span>
+<span style="color: #1976D2">logFnWrapper</span><span style="color: #6F42C1">.listener</span><span style="color: #24292EFF">();</span>
+
+<span style="color: #C2C3C5">// Logs &quot;log once&quot; to the console and removes the listener</span>
+<span style="color: #6F42C1">logFnWrapper</span><span style="color: #24292EFF">();</span>
+
+<span style="color: #1976D2">emitter</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;log&#039;</span><span style="color: #24292EFF">, () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;log persistently&#039;</span><span style="color: #24292EFF">));</span>
+<span style="color: #C2C3C5">// Will return a new Array with a single function bound by `.on()` above</span>
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">newListeners</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">emitter</span><span style="color: #6F42C1">.rawListeners</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;log&#039;</span><span style="color: #24292EFF">);</span>
+
+<span style="color: #C2C3C5">// Logs &quot;log persistently&quot; twice</span>
+<span style="color: #24292EFF">newListeners[</span><span style="color: #1976D2">0</span><span style="color: #24292EFF">]();</span>
+<span style="color: #1976D2">emitter</span><span style="color: #6F42C1">.emit</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;log&#039;</span><span style="color: #24292EFF">);</span>
+</code></pre>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v9.4.0</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">[]</span></h4>
@@ -745,9 +1106,23 @@
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.removeAllListeners</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:62</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:473</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Removes all listeners, or those of the specified <code>eventName</code>.</p>
+								</div>
+								<p>It is bad practice to remove listeners added elsewhere in the code,
+									particularly when the <code>EventEmitter</code> instance was created by some other
+								component or module (e.g. sockets or file streams).</p>
+								<p>Returns a reference to the <code>EventEmitter</code>, so that calls can be chained.</p>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v0.1.26</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -762,20 +1137,94 @@
 					<a name="removelistener" class="tsd-anchor"></a>
 					<h3>remove<wbr>Listener</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">remove<wbr>Listener<span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
+						<li class="tsd-signature tsd-kind-icon">remove<wbr>Listener<span class="tsd-signature-symbol">(</span>eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, listener<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="testrunner.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.removeListener</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:60</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:457</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Removes the specified <code>listener</code> from the listener array for the event named<code>eventName</code>.</p>
+								</div>
+								<pre><code class="language-js"><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">callback</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> (stream) </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;someone connected!&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">};</span>
+<span style="color: #1976D2">server</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;connection&#039;</span><span style="color: #24292EFF">, callback);</span>
+<span style="color: #C2C3C5">// ...</span>
+<span style="color: #1976D2">server</span><span style="color: #6F42C1">.removeListener</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;connection&#039;</span><span style="color: #24292EFF">, callback);</span>
+</code></pre>
+								<p><code>removeListener()</code> will remove, at most, one instance of a listener from the
+									listener array. If any single listener has been added multiple times to the
+									listener array for the specified <code>eventName</code>, then <code>removeListener()</code> must be
+								called multiple times to remove each instance.</p>
+								<p>Once an event is emitted, all listeners attached to it at the
+									time of emitting are called in order. This implies that any<code>removeListener()</code> or <code>removeAllListeners()</code> calls <em>after</em> emitting and_before_ the last listener finishes execution will
+								not remove them from<code>emit()</code> in progress. Subsequent events behave as expected.</p>
+								<pre><code class="language-js"><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">myEmitter</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">MyEmitter</span><span style="color: #24292EFF">();</span>
+
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">callbackA</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;A&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">myEmitter</span><span style="color: #6F42C1">.removeListener</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;event&#039;</span><span style="color: #24292EFF">, callbackB);</span>
+<span style="color: #24292EFF">};</span>
+
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">callbackB</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;B&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">};</span>
+
+<span style="color: #1976D2">myEmitter</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;event&#039;</span><span style="color: #24292EFF">, callbackA);</span>
+
+<span style="color: #1976D2">myEmitter</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;event&#039;</span><span style="color: #24292EFF">, callbackB);</span>
+
+<span style="color: #C2C3C5">// callbackA removes listener callbackB but it will still be called.</span>
+<span style="color: #C2C3C5">// Internal listener array at time of emit [callbackA, callbackB]</span>
+<span style="color: #1976D2">myEmitter</span><span style="color: #6F42C1">.emit</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;event&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #C2C3C5">// Prints:</span>
+<span style="color: #C2C3C5">//   A</span>
+<span style="color: #C2C3C5">//   B</span>
+
+<span style="color: #C2C3C5">// callbackB is now removed.</span>
+<span style="color: #C2C3C5">// Internal listener array [callbackA]</span>
+<span style="color: #1976D2">myEmitter</span><span style="color: #6F42C1">.emit</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;event&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #C2C3C5">// Prints:</span>
+<span style="color: #C2C3C5">//   A</span>
+</code></pre>
+								<p>Because listeners are managed using an internal array, calling this will
+									change the position indices of any listener registered <em>after</em> the listener
+									being removed. This will not impact the order in which listeners are called,
+									but it means that any copies of the listener array as returned by
+								the <code>emitter.listeners()</code> method will need to be recreated.</p>
+								<p>When a single function has been added as a handler multiple times for a single
+									event (as in the example below), <code>removeListener()</code> will remove the most
+								recently added instance. In the example the <code>once(&#39;ping&#39;)</code>listener is removed:</p>
+								<pre><code class="language-js"><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">ee</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">EventEmitter</span><span style="color: #24292EFF">();</span>
+
+<span style="color: #D32F2F">function</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">pong</span><span style="color: #24292EFF">() {</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;pong&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">}</span>
+
+<span style="color: #1976D2">ee</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;ping&#039;</span><span style="color: #24292EFF">, pong);</span>
+<span style="color: #1976D2">ee</span><span style="color: #6F42C1">.once</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;ping&#039;</span><span style="color: #24292EFF">, pong);</span>
+<span style="color: #1976D2">ee</span><span style="color: #6F42C1">.removeListener</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;ping&#039;</span><span style="color: #24292EFF">, pong);</span>
+
+<span style="color: #1976D2">ee</span><span style="color: #6F42C1">.emit</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;ping&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #1976D2">ee</span><span style="color: #6F42C1">.emit</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;ping&#039;</span><span style="color: #24292EFF">);</span>
+</code></pre>
+								<p>Returns a reference to the <code>EventEmitter</code>, so that calls can be chained.</p>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v0.1.26</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
 								</li>
 								<li>
 									<h5>listener: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
@@ -813,7 +1262,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/TestRunner.ts#L105">src/lib/TestRunner.ts:105</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/TestRunner.ts#L118">src/lib/TestRunner.ts:118</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -839,7 +1288,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/TestRunner.ts#L146">src/lib/TestRunner.ts:146</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/TestRunner.ts#L162">src/lib/TestRunner.ts:162</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -866,9 +1315,23 @@
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.setMaxListeners</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:63</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:483</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>By default <code>EventEmitter</code>s will print a warning if more than <code>10</code> listeners are
+										added for a particular event. This is a useful default that helps finding
+										memory leaks. The <code>emitter.setMaxListeners()</code> method allows the limit to be
+									modified for this specific <code>EventEmitter</code> instance. The value can be set to<code>Infinity</code> (or <code>0</code>) to indicate an unlimited number of listeners.</p>
+								</div>
+								<p>Returns a reference to the <code>EventEmitter</code>, so that calls can be chained.</p>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v0.3.5</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -880,23 +1343,92 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+					<a name="geteventlisteners" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> get<wbr>Event<wbr>Listeners</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Event<wbr>Listeners<span class="tsd-signature-symbol">(</span>emitter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">EventEmitter</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DOMEventTarget</span>, name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from EventEmitter.getEventListeners</p>
+								<ul>
+									<li>Defined in node_modules/@types/node/events.d.ts:262</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a copy of the array of listeners for the event named <code>eventName</code>.</p>
+								</div>
+								<p>For <code>EventEmitter</code>s this behaves exactly the same as calling <code>.listeners</code> on
+								the emitter.</p>
+								<p>For <code>EventTarget</code>s this is the only way to get the event listeners for the
+								event target. This is useful for debugging and diagnostic purposes.</p>
+								<pre><code class="language-js"><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> { </span><span style="color: #1976D2">getEventListeners</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">EventEmitter</span><span style="color: #24292EFF"> } </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">require</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;events&#039;</span><span style="color: #24292EFF">);</span>
+
+<span style="color: #24292EFF">{</span>
+<span style="color: #24292EFF">  </span><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">ee</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">EventEmitter</span><span style="color: #24292EFF">();</span>
+<span style="color: #24292EFF">  </span><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">listener</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;Events are fun&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">ee</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;foo&#039;</span><span style="color: #24292EFF">, listener);</span>
+<span style="color: #24292EFF">  </span><span style="color: #6F42C1">getEventListeners</span><span style="color: #24292EFF">(ee, </span><span style="color: #22863A">&#039;foo&#039;</span><span style="color: #24292EFF">); </span><span style="color: #C2C3C5">// [listener]</span>
+<span style="color: #24292EFF">}</span>
+<span style="color: #24292EFF">{</span>
+<span style="color: #24292EFF">  </span><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">et</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">EventTarget</span><span style="color: #24292EFF">();</span>
+<span style="color: #24292EFF">  </span><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">listener</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;Events are fun&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">et</span><span style="color: #6F42C1">.addEventListener</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;foo&#039;</span><span style="color: #24292EFF">, listener);</span>
+<span style="color: #24292EFF">  </span><span style="color: #6F42C1">getEventListeners</span><span style="color: #24292EFF">(et, </span><span style="color: #22863A">&#039;foo&#039;</span><span style="color: #24292EFF">); </span><span style="color: #C2C3C5">// [listener]</span>
+<span style="color: #24292EFF">}</span>
+</code></pre>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v15.2.0, v14.17.0</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>emitter: <span class="tsd-signature-type">EventEmitter</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DOMEventTarget</span></h5>
+								</li>
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
 					<a name="listenercount-1" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> listener<wbr>Count</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">listener<wbr>Count<span class="tsd-signature-symbol">(</span>emitter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">EventEmitter</span>, event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+						<li class="tsd-signature tsd-kind-icon">listener<wbr>Count<span class="tsd-signature-symbol">(</span>emitter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">EventEmitter</span>, eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.listenerCount</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:26</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:234</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>A class method that returns the number of listeners for the given <code>eventName</code>registered on the given <code>emitter</code>.</p>
+								</div>
+								<pre><code class="language-js"><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> { </span><span style="color: #1976D2">EventEmitter</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">listenerCount</span><span style="color: #24292EFF"> } </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">require</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;events&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">myEmitter</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">EventEmitter</span><span style="color: #24292EFF">();</span>
+<span style="color: #1976D2">myEmitter</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;event&#039;</span><span style="color: #24292EFF">, () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {});</span>
+<span style="color: #1976D2">myEmitter</span><span style="color: #6F42C1">.on</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;event&#039;</span><span style="color: #24292EFF">, () </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {});</span>
+<span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #6F42C1">listenerCount</span><span style="color: #24292EFF">(myEmitter, </span><span style="color: #22863A">&#039;event&#039;</span><span style="color: #24292EFF">));</span>
+<span style="color: #C2C3C5">// Prints: 2</span>
+</code></pre>
 								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v0.9.12</p>
+									</dd>
 									<dt>deprecated</dt>
-									<dd><p>since v4.0.0</p>
+									<dd><p>Since v3.2.0 - Use <code>listenerCount</code> instead.</p>
 									</dd>
 								</dl>
 							</div>
@@ -904,9 +1436,15 @@
 							<ul class="tsd-parameters">
 								<li>
 									<h5>emitter: <span class="tsd-signature-type">EventEmitter</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The emitter to query</p>
+									</div>
 								</li>
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The event name</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
@@ -917,26 +1455,91 @@
 					<a name="on-1" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> on</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">on<span class="tsd-signature-symbol">(</span>emitter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">EventEmitter</span>, event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AsyncIterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">on<span class="tsd-signature-symbol">(</span>emitter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">EventEmitter</span>, eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">StaticEventEmitterOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">AsyncIterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.on</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:23</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:217</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>```js
+									const { on, EventEmitter } = require(&#39;events&#39;);</p>
+								</div>
+								<p>(async () =&gt; {
+								const ee = new EventEmitter();</p>
+								<p>  // Emit later on
+									process.nextTick(() =&gt; {
+									ee.emit(&#39;foo&#39;, &#39;bar&#39;);
+									ee.emit(&#39;foo&#39;, 42);
+								});</p>
+								<p>  for await (const event of on(ee, &#39;foo&#39;)) {
+									// The execution of this inner block is synchronous and it
+									// processes one event at a time (even with await). Do not use
+									// if concurrent execution is required.
+									console.log(event); // prints [&#39;bar&#39;] [42]
+									}
+									// Unreachable here
+								})();</p>
+								<pre><code>
+<span style="color: #24292EFF">Returns an </span><span style="color: #22863A">`AsyncIterator`</span><span style="color: #24292EFF"> that iterates </span><span style="color: #22863A">`eventName`</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">events</span><span style="color: #24292EFF">. It will </span><span style="color: #D32F2F">throw</span>
+<span style="color: #D32F2F">if</span><span style="color: #24292EFF"> the </span><span style="color: #22863A">`EventEmitter`</span><span style="color: #24292EFF"> emits </span><span style="color: #22863A">`&#039;error&#039;`</span><span style="color: #24292EFF">. It removes all listeners when</span>
+<span style="color: #24292EFF">exiting the </span><span style="color: #1976D2">loop</span><span style="color: #24292EFF">. The </span><span style="color: #22863A">`value`</span><span style="color: #24292EFF"> returned by each iteration is an array</span>
+<span style="color: #24292EFF">composed </span><span style="color: #D32F2F">of</span><span style="color: #24292EFF"> the emitted event arguments.</span>
+
+<span style="color: #24292EFF">An </span><span style="color: #22863A">`AbortSignal`</span><span style="color: #24292EFF"> can be used to cancel waiting on events:</span>
+
+<span style="color: #22863A">```js</span>
+<span style="color: #22863A">const { on, EventEmitter } = require(&#039;events&#039;);</span>
+<span style="color: #22863A">const ac = new AbortController();</span>
+
+<span style="color: #22863A">(async () =&gt; {</span>
+<span style="color: #22863A">  const ee = new EventEmitter();</span>
+
+<span style="color: #22863A">  // Emit later on</span>
+<span style="color: #22863A">  process.nextTick(() =&gt; {</span>
+<span style="color: #22863A">    ee.emit(&#039;foo&#039;, &#039;bar&#039;);</span>
+<span style="color: #22863A">    ee.emit(&#039;foo&#039;, 42);</span>
+<span style="color: #22863A">  });</span>
+
+<span style="color: #22863A">  for await (const event of on(ee, &#039;foo&#039;, { signal: ac.signal })) {</span>
+<span style="color: #22863A">    // The execution of this inner block is synchronous and it</span>
+<span style="color: #22863A">    // processes one event at a time (even with await). Do not use</span>
+<span style="color: #22863A">    // if concurrent execution is required.</span>
+<span style="color: #22863A">    console.log(event); // prints [&#039;bar&#039;] [42]</span>
+<span style="color: #22863A">  }</span>
+<span style="color: #22863A">  // Unreachable here</span>
+<span style="color: #22863A">})();</span>
+
+<span style="color: #22863A">process.nextTick(() =&gt; ac.abort());</span>
+</code></pre>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v13.6.0, v12.16.0</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>emitter: <span class="tsd-signature-type">EventEmitter</span></h5>
 								</li>
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The name of the event being listened for</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <span class="tsd-signature-type">StaticEventEmitterOptions</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">AsyncIterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>that iterates <code>eventName</code> events emitted by the <code>emitter</code></p>
 						</li>
 					</ul>
 				</section>
@@ -944,24 +1547,106 @@
 					<a name="once-1" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> once</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">once<span class="tsd-signature-symbol">(</span>emitter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">NodeEventTarget</span>, event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
-						<li class="tsd-signature tsd-kind-icon">once<span class="tsd-signature-symbol">(</span>emitter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DOMEventTarget</span>, event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">once<span class="tsd-signature-symbol">(</span>emitter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">NodeEventTarget</span>, eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">StaticEventEmitterOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">once<span class="tsd-signature-symbol">(</span>emitter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">DOMEventTarget</span>, eventName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">StaticEventEmitterOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.once</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:21</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:157</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a <code>Promise</code> that is fulfilled when the <code>EventEmitter</code> emits the given
+										event or that is rejected if the <code>EventEmitter</code> emits <code>&#39;error&#39;</code> while waiting.
+										The <code>Promise</code> will resolve with an array of all the arguments emitted to the
+									given event.</p>
+								</div>
+								<p>This method is intentionally generic and works with the web platform <a href="https://dom.spec.whatwg.org/#interface-eventtarget">EventTarget</a> interface, which has no special<code>&#39;error&#39;</code> event
+								semantics and does not listen to the <code>&#39;error&#39;</code> event.</p>
+								<pre><code class="language-js"><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> { </span><span style="color: #1976D2">once</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">EventEmitter</span><span style="color: #24292EFF"> } </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">require</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;events&#039;</span><span style="color: #24292EFF">);</span>
+
+<span style="color: #D32F2F">async</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">function</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">run</span><span style="color: #24292EFF">() {</span>
+<span style="color: #24292EFF">  </span><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">ee</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">EventEmitter</span><span style="color: #24292EFF">();</span>
+
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">process</span><span style="color: #6F42C1">.nextTick</span><span style="color: #24292EFF">(() </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {</span>
+<span style="color: #24292EFF">    </span><span style="color: #1976D2">ee</span><span style="color: #6F42C1">.emit</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;myevent&#039;</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">42</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">  });</span>
+
+<span style="color: #24292EFF">  </span><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> [</span><span style="color: #1976D2">value</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">await</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">once</span><span style="color: #24292EFF">(ee, </span><span style="color: #22863A">&#039;myevent&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(value);</span>
+
+<span style="color: #24292EFF">  </span><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">err</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Error</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;kaboom&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">  </span><span style="color: #1976D2">process</span><span style="color: #6F42C1">.nextTick</span><span style="color: #24292EFF">(() </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> {</span>
+<span style="color: #24292EFF">    </span><span style="color: #1976D2">ee</span><span style="color: #6F42C1">.emit</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;error&#039;</span><span style="color: #24292EFF">, err);</span>
+<span style="color: #24292EFF">  });</span>
+
+<span style="color: #24292EFF">  </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> {</span>
+<span style="color: #24292EFF">    </span><span style="color: #D32F2F">await</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">once</span><span style="color: #24292EFF">(ee, </span><span style="color: #22863A">&#039;myevent&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">  } </span><span style="color: #D32F2F">catch</span><span style="color: #24292EFF"> (err) {</span>
+<span style="color: #24292EFF">    </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;error happened&#039;</span><span style="color: #24292EFF">, err);</span>
+<span style="color: #24292EFF">  }</span>
+<span style="color: #24292EFF">}</span>
+
+<span style="color: #6F42C1">run</span><span style="color: #24292EFF">();</span>
+</code></pre>
+								<p>The special handling of the <code>&#39;error&#39;</code> event is only used when <code>events.once()</code>is used to wait for another event. If <code>events.once()</code> is used to wait for the
+									&#39;<code>error&#39;</code> event itself, then it is treated as any other kind of event without
+								special handling:</p>
+								<pre><code class="language-js"><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> { </span><span style="color: #1976D2">EventEmitter</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">once</span><span style="color: #24292EFF"> } </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">require</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;events&#039;</span><span style="color: #24292EFF">);</span>
+
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">ee</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">EventEmitter</span><span style="color: #24292EFF">();</span>
+
+<span style="color: #6F42C1">once</span><span style="color: #24292EFF">(ee, </span><span style="color: #22863A">&#039;error&#039;</span><span style="color: #24292EFF">)</span>
+<span style="color: #24292EFF">  </span><span style="color: #6F42C1">.then</span><span style="color: #24292EFF">(([err]) </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;ok&#039;</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">err</span><span style="color: #24292EFF">.message))</span>
+<span style="color: #24292EFF">  </span><span style="color: #6F42C1">.catch</span><span style="color: #24292EFF">((err) </span><span style="color: #D32F2F">=&gt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;error&#039;</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">err</span><span style="color: #24292EFF">.message));</span>
+
+<span style="color: #1976D2">ee</span><span style="color: #6F42C1">.emit</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;error&#039;</span><span style="color: #24292EFF">, </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Error</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;boom&#039;</span><span style="color: #24292EFF">));</span>
+
+<span style="color: #C2C3C5">// Prints: ok boom</span>
+</code></pre>
+								<p>An <code>AbortSignal</code> can be used to cancel waiting for the event:</p>
+								<pre><code class="language-js"><span style="color: #D32F2F">const</span><span style="color: #24292EFF"> { </span><span style="color: #1976D2">EventEmitter</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">once</span><span style="color: #24292EFF"> } </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">require</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;events&#039;</span><span style="color: #24292EFF">);</span>
+
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">ee</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">EventEmitter</span><span style="color: #24292EFF">();</span>
+<span style="color: #D32F2F">const</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">ac</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">AbortController</span><span style="color: #24292EFF">();</span>
+
+<span style="color: #D32F2F">async</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">function</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">foo</span><span style="color: #24292EFF">(emitter, event, signal) {</span>
+<span style="color: #24292EFF">  </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> {</span>
+<span style="color: #24292EFF">    </span><span style="color: #D32F2F">await</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">once</span><span style="color: #24292EFF">(emitter, event, { signal });</span>
+<span style="color: #24292EFF">    </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.log</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;event emitted!&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">  } </span><span style="color: #D32F2F">catch</span><span style="color: #24292EFF"> (error) {</span>
+<span style="color: #24292EFF">    </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">error</span><span style="color: #24292EFF">.name </span><span style="color: #D32F2F">===</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&#039;AbortError&#039;</span><span style="color: #24292EFF">) {</span>
+<span style="color: #24292EFF">      </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.error</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;Waiting for the event was canceled!&#039;</span><span style="color: #24292EFF">);</span>
+<span style="color: #24292EFF">    } </span><span style="color: #D32F2F">else</span><span style="color: #24292EFF"> {</span>
+<span style="color: #24292EFF">      </span><span style="color: #1976D2">console</span><span style="color: #6F42C1">.error</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;There was an error&#039;</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">error</span><span style="color: #24292EFF">.message);</span>
+<span style="color: #24292EFF">    }</span>
+<span style="color: #24292EFF">  }</span>
+<span style="color: #24292EFF">}</span>
+
+<span style="color: #6F42C1">foo</span><span style="color: #24292EFF">(ee, </span><span style="color: #22863A">&#039;foo&#039;</span><span style="color: #24292EFF">, </span><span style="color: #1976D2">ac</span><span style="color: #24292EFF">.signal);</span>
+<span style="color: #1976D2">ac</span><span style="color: #6F42C1">.abort</span><span style="color: #24292EFF">(); </span><span style="color: #C2C3C5">// Abort waiting for the event</span>
+<span style="color: #1976D2">ee</span><span style="color: #6F42C1">.emit</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#039;foo&#039;</span><span style="color: #24292EFF">); </span><span style="color: #C2C3C5">// Prints: Waiting for the event was canceled!</span>
+</code></pre>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v11.13.0, v10.16.0</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>emitter: <span class="tsd-signature-type">NodeEventTarget</span></h5>
 								</li>
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <span class="tsd-signature-type">StaticEventEmitterOptions</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -970,7 +1655,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from EventEmitter.once</p>
 								<ul>
-									<li>Defined in node_modules/@types/node/events.d.ts:22</li>
+									<li>Defined in node_modules/@types/node/events.d.ts:158</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -979,10 +1664,61 @@
 									<h5>emitter: <span class="tsd-signature-type">DOMEventTarget</span></h5>
 								</li>
 								<li>
-									<h5>event: <span class="tsd-signature-type">string</span></h5>
+									<h5>eventName: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <span class="tsd-signature-type">StaticEventEmitterOptions</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+					<a name="setmaxlisteners-1" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> set<wbr>Max<wbr>Listeners</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Max<wbr>Listeners<span class="tsd-signature-symbol">(</span>n<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, <span class="tsd-signature-symbol">...</span>eventTargets<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">EventEmitter</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DOMEventTarget</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from EventEmitter.setMaxListeners</p>
+								<ul>
+									<li>Defined in node_modules/@types/node/events.d.ts:280</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>```js
+										const {
+										setMaxListeners,
+										EventEmitter
+									} = require(&#39;events&#39;);</p>
+								</div>
+								<p>const target = new EventTarget();
+								const emitter = new EventEmitter();</p>
+								<p>setMaxListeners(5, target, emitter);
+								```</p>
+								<dl class="tsd-comment-tags">
+									<dt>since</dt>
+									<dd><p>v15.4.0</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> n: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A non-negative number. The maximum number of listeners per <code>EventTarget</code> event.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>eventTargets: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">EventEmitter</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">DOMEventTarget</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -1046,13 +1782,16 @@
 						<a href="../modules/bdt.html">bdt</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="../modules/bin.html">bin</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="../modules/errors.html">errors</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/evaluate.html">evaluate</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="../modules/globalcontext.html">global<wbr>Context</a>
+						<a href="../modules/index.html">index</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/lib.html">lib</a>
@@ -1073,13 +1812,22 @@
 								<a href="testrunner.default.html#canceled" class="tsd-kind-icon">canceled</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="testrunner.default.html#context" class="tsd-kind-icon">context</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="testrunner.default.html#currentgroup" class="tsd-kind-icon">current<wbr>Group</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="testrunner.default.html#currenttestapi" class="tsd-kind-icon">current<wbr>Test<wbr>Api</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="testrunner.default.html#onlymode" class="tsd-kind-icon">only<wbr>Mode</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="testrunner.default.html#settings" class="tsd-kind-icon">settings</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="testrunner.default.html#startpath" class="tsd-kind-icon">start<wbr>Path</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
 								<a href="testrunner.default.html#capturerejectionsymbol" class="tsd-kind-icon">capture<wbr>Rejection<wbr>Symbol</a>
@@ -1092,6 +1840,12 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
 								<a href="testrunner.default.html#errormonitor" class="tsd-kind-icon">error<wbr>Monitor</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="testrunner.default.html#_run" class="tsd-kind-icon">_run</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="testrunner.default.html#abort" class="tsd-kind-icon">abort</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
 								<a href="testrunner.default.html#addlistener" class="tsd-kind-icon">add<wbr>Listener</a>
@@ -1151,6 +1905,9 @@
 								<a href="testrunner.default.html#setmaxlisteners" class="tsd-kind-icon">set<wbr>Max<wbr>Listeners</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+								<a href="testrunner.default.html#geteventlisteners" class="tsd-kind-icon">get<wbr>Event<wbr>Listeners</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
 								<a href="testrunner.default.html#listenercount-1" class="tsd-kind-icon">listener<wbr>Count</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
@@ -1158,6 +1915,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
 								<a href="testrunner.default.html#once-1" class="tsd-kind-icon">once</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-static tsd-is-external">
+								<a href="testrunner.default.html#setmaxlisteners-1" class="tsd-kind-icon">set<wbr>Max<wbr>Listeners</a>
 							</li>
 						</ul>
 					</li>
@@ -1173,12 +1933,10 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>

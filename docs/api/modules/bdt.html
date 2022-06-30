@@ -70,295 +70,12 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Namespaces</h3>
+							<h3>Classes</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-namespace tsd-parent-kind-module"><a href="bdt.suite.html" class="tsd-kind-icon">suite</a></li>
-								<li class="tsd-kind-namespace tsd-parent-kind-module"><a href="bdt.test.html" class="tsd-kind-icon">test</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
-							<h3>Interfaces</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/bdt.config.html" class="tsd-kind-icon">Config</a></li>
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/bdt.stdoutreporteroptions.html" class="tsd-kind-icon">Std<wbr>Out<wbr>Reporter<wbr>Options</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
-							<h3>Functions</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="bdt.html#after" class="tsd-kind-icon">after</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="bdt.html#aftereach" class="tsd-kind-icon">after<wbr>Each</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="bdt.html#bdt-1" class="tsd-kind-icon">bdt</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="bdt.html#before" class="tsd-kind-icon">before</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="bdt.html#beforeeach" class="tsd-kind-icon">before<wbr>Each</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="bdt.html#suite-1" class="tsd-kind-icon">suite</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="bdt.html#test-1" class="tsd-kind-icon">test</a></li>
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/bdt.default.html" class="tsd-kind-icon">default</a></li>
 							</ul>
 						</section>
 					</div>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Functions</h2>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-					<a name="after" class="tsd-anchor"></a>
-					<h3>after</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">after&lt;Context&gt;<span class="tsd-signature-symbol">(</span>fn<span class="tsd-signature-symbol">: </span><a href="suite.html#setupcallbackfn" class="tsd-signature-type" data-tsd-kind="Type alias">SetupCallbackFn</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/bdt.ts#L186">src/lib/bdt.ts:186</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Register a function to be executed after a test group execution ends.</p>
-								</div>
-							</div>
-							<h4 class="tsd-type-parameters-title">Type parameters</h4>
-							<ul class="tsd-type-parameters">
-								<li>
-									<h4>Context = <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
-								</li>
-							</ul>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>fn: <a href="suite.html#setupcallbackfn" class="tsd-signature-type" data-tsd-kind="Type alias">SetupCallbackFn</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">&gt;</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>Can return a promise for async stuff</p>
-									</div>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-					<a name="aftereach" class="tsd-anchor"></a>
-					<h3>after<wbr>Each</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">after<wbr>Each&lt;Context&gt;<span class="tsd-signature-symbol">(</span>fn<span class="tsd-signature-symbol">: </span><a href="suite.html#testcallbackfn" class="tsd-signature-type" data-tsd-kind="Type alias">TestCallbackFn</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/bdt.ts#L202">src/lib/bdt.ts:202</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Register a function to be executed after a test execution ends.</p>
-								</div>
-							</div>
-							<h4 class="tsd-type-parameters-title">Type parameters</h4>
-							<ul class="tsd-type-parameters">
-								<li>
-									<h4>Context = <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
-								</li>
-							</ul>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>fn: <a href="suite.html#testcallbackfn" class="tsd-signature-type" data-tsd-kind="Type alias">TestCallbackFn</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">&gt;</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>Can return a promise for async stuff</p>
-									</div>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="bdt-1" class="tsd-anchor"></a>
-					<h3>bdt</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">bdt<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><a href="../interfaces/bdt.config.html" class="tsd-signature-type" data-tsd-kind="Interface">Config</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/suite.suite-1.html" class="tsd-signature-type" data-tsd-kind="Class">Suite</a><span class="tsd-signature-symbol">&gt;</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/bdt.ts#L82">src/lib/bdt.ts:82</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>options: <a href="../interfaces/bdt.config.html" class="tsd-signature-type" data-tsd-kind="Interface">Config</a></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/suite.suite-1.html" class="tsd-signature-type" data-tsd-kind="Class">Suite</a><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-					<a name="before" class="tsd-anchor"></a>
-					<h3>before</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">before&lt;Context&gt;<span class="tsd-signature-symbol">(</span>fn<span class="tsd-signature-symbol">: </span><a href="suite.html#setupcallbackfn" class="tsd-signature-type" data-tsd-kind="Type alias">SetupCallbackFn</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/bdt.ts#L178">src/lib/bdt.ts:178</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Register a function to be executed before a test group execution starts.</p>
-								</div>
-							</div>
-							<h4 class="tsd-type-parameters-title">Type parameters</h4>
-							<ul class="tsd-type-parameters">
-								<li>
-									<h4>Context = <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
-								</li>
-							</ul>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>fn: <a href="suite.html#setupcallbackfn" class="tsd-signature-type" data-tsd-kind="Type alias">SetupCallbackFn</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">&gt;</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>Can return a promise for async stuff</p>
-									</div>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-					<a name="beforeeach" class="tsd-anchor"></a>
-					<h3>before<wbr>Each</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">before<wbr>Each&lt;Context&gt;<span class="tsd-signature-symbol">(</span>fn<span class="tsd-signature-symbol">: </span><a href="suite.html#testcallbackfn" class="tsd-signature-type" data-tsd-kind="Type alias">TestCallbackFn</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/bdt.ts#L194">src/lib/bdt.ts:194</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Register a function to be executed before a test execution starts.</p>
-								</div>
-							</div>
-							<h4 class="tsd-type-parameters-title">Type parameters</h4>
-							<ul class="tsd-type-parameters">
-								<li>
-									<h4>Context = <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
-								</li>
-							</ul>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>fn: <a href="suite.html#testcallbackfn" class="tsd-signature-type" data-tsd-kind="Type alias">TestCallbackFn</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">&gt;</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>Can return a promise for async stuff</p>
-									</div>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="suite-1" class="tsd-anchor"></a>
-					<h3>suite</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">suite<span class="tsd-signature-symbol">(</span>nameOrOptions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/testnode.testnodeoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">TestNodeOptions</a>, fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/bdt.ts#L212">src/lib/bdt.ts:212</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>This function is called by tests. It creates new group and appends it to the
-									current group.</p>
-								</div>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>nameOrOptions: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/testnode.testnodeoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">TestNodeOptions</a></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The group name or settings object</p>
-									</div>
-								</li>
-								<li>
-									<h5>fn: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The function that will be called to build the group</p>
-									</div>
-									<ul class="tsd-parameters">
-										<li class="tsd-parameter-signature">
-											<ul class="tsd-signatures tsd-kind-type-literal">
-												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-											</ul>
-											<ul class="tsd-descriptions">
-												<li class="tsd-description">
-													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-												</li>
-											</ul>
-										</li>
-									</ul>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-					<a name="test-1" class="tsd-anchor"></a>
-					<h3>test</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">test&lt;Context&gt;<span class="tsd-signature-symbol">(</span>nameOrOptions<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Omit</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/test.testoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">TestOptions</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">&quot;fn&quot;</span><span class="tsd-signature-symbol">&gt;</span>, fn<span class="tsd-signature-symbol">?: </span><a href="suite.html#testcallbackfn" class="tsd-signature-type" data-tsd-kind="Type alias">TestCallbackFn</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/bdt.ts#L248">src/lib/bdt.ts:248</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>The <code>it</code> function that will be made available to tests. It will simply
-										&quot;remember&quot; the test by appending it to the children structure of the parent
-									group element.</p>
-								</div>
-							</div>
-							<h4 class="tsd-type-parameters-title">Type parameters</h4>
-							<ul class="tsd-type-parameters">
-								<li>
-									<h4>Context = <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
-								</li>
-							</ul>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>nameOrOptions: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Omit</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/test.testoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">TestOptions</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">&quot;fn&quot;</span><span class="tsd-signature-symbol">&gt;</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> fn: <a href="suite.html#testcallbackfn" class="tsd-signature-type" data-tsd-kind="Type alias">TestCallbackFn</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">&gt;</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
 				</section>
 			</section>
 		</div>
@@ -418,14 +135,9 @@
 					</li>
 					<li class="current tsd-kind-module">
 						<a href="bdt.html">bdt</a>
-						<ul>
-							<li class=" tsd-kind-namespace tsd-parent-kind-module">
-								<a href="bdt.suite.html">suite</a>
-							</li>
-							<li class=" tsd-kind-namespace tsd-parent-kind-module">
-								<a href="bdt.test.html">test</a>
-							</li>
-						</ul>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="bin.html">bin</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="errors.html">errors</a>
@@ -434,7 +146,7 @@
 						<a href="evaluate.html">evaluate</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="globalcontext.html">global<wbr>Context</a>
+						<a href="index.html">index</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="lib.html">lib</a>
@@ -443,32 +155,8 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/bdt.config.html" class="tsd-kind-icon">Config</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/bdt.stdoutreporteroptions.html" class="tsd-kind-icon">Std<wbr>Out<wbr>Reporter<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-						<a href="bdt.html#after" class="tsd-kind-icon">after</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-						<a href="bdt.html#aftereach" class="tsd-kind-icon">after<wbr>Each</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="bdt.html#bdt-1" class="tsd-kind-icon">bdt</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-						<a href="bdt.html#before" class="tsd-kind-icon">before</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-						<a href="bdt.html#beforeeach" class="tsd-kind-icon">before<wbr>Each</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="bdt.html#suite-1" class="tsd-kind-icon">suite</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-						<a href="bdt.html#test-1" class="tsd-kind-icon">test</a>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/bdt.default.html" class="tsd-kind-icon">default</a>
 					</li>
 				</ul>
 			</nav>
@@ -480,12 +168,10 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>

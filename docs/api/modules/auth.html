@@ -70,20 +70,6 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Interfaces</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/auth.authtokenclaims.html" class="tsd-kind-icon">Auth<wbr>Token<wbr>Claims</a></li>
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/auth.authtokenheader.html" class="tsd-kind-icon">Auth<wbr>Token<wbr>Header</a></li>
-								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/auth.createauthtokenoptions.html" class="tsd-kind-icon">create<wbr>Auth<wbr>Token<wbr>Options</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
-							<h3>Type aliases</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="auth.html#supportedjwkalgorithm" class="tsd-kind-icon">SupportedJWKAlgorithm</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="auth.html#createauthtoken" class="tsd-kind-icon">create<wbr>Auth<wbr>Token</a></li>
@@ -93,31 +79,18 @@
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Type aliases</h2>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
-					<a name="supportedjwkalgorithm" class="tsd-anchor"></a>
-					<h3>SupportedJWKAlgorithm</h3>
-					<div class="tsd-signature tsd-kind-icon">SupportedJWKAlgorithm<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;RS256&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;RS384&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;RS512&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;ES256&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;ES384&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;ES512&quot;</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/auth.ts#L5">src/lib/auth.ts:5</a></li>
-						</ul>
-					</aside>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
 					<a name="createauthtoken" class="tsd-anchor"></a>
 					<h3>create<wbr>Auth<wbr>Token</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">create<wbr>Auth<wbr>Token<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><a href="../interfaces/auth.createauthtokenoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">createAuthTokenOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Auth<wbr>Token<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">bdt.createAuthTokenOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/auth.ts#L138">src/lib/auth.ts:138</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/auth.ts#L13">src/lib/auth.ts:13</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -131,7 +104,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>__namedParameters: <a href="../interfaces/auth.createauthtokenoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">createAuthTokenOptions</a></h5>
+									<h5>__namedParameters: <span class="tsd-signature-type">bdt.createAuthTokenOptions</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -198,13 +171,16 @@
 						<a href="bdt.html">bdt</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="bin.html">bin</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="errors.html">errors</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="evaluate.html">evaluate</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="globalcontext.html">global<wbr>Context</a>
+						<a href="index.html">index</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="lib.html">lib</a>
@@ -213,18 +189,6 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/auth.authtokenclaims.html" class="tsd-kind-icon">Auth<wbr>Token<wbr>Claims</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/auth.authtokenheader.html" class="tsd-kind-icon">Auth<wbr>Token<wbr>Header</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/auth.createauthtokenoptions.html" class="tsd-kind-icon">create<wbr>Auth<wbr>Token<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="auth.html#supportedjwkalgorithm" class="tsd-kind-icon">SupportedJWKAlgorithm</a>
-					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="auth.html#createauthtoken" class="tsd-kind-icon">create<wbr>Auth<wbr>Token</a>
 					</li>
@@ -238,12 +202,10 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>

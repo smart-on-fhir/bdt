@@ -90,7 +90,6 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="config.default.html#_capabilitystatement" class="tsd-kind-icon">_capability<wbr>Statement</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="config.default.html#normalizedconfig" class="tsd-kind-icon">normalized<wbr>Config</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="config.default.html#originalconfig" class="tsd-kind-icon">original<wbr>Config</a></li>
 							</ul>
 						</section>
@@ -98,6 +97,7 @@
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="config.default.html#getcapabilitystatement" class="tsd-kind-icon">get<wbr>Capability<wbr>Statement</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="config.default.html#getoperationdefinition" class="tsd-kind-icon">get<wbr>Operation<wbr>Definition</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="config.default.html#getpatientexportendpoint" class="tsd-kind-icon">get<wbr>Patient<wbr>Export<wbr>Endpoint</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="config.default.html#getsupportedresourcetypes" class="tsd-kind-icon">get<wbr>Supported<wbr>Resource<wbr>Types</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="config.default.html#getsystemexportendpoint" class="tsd-kind-icon">get<wbr>System<wbr>Export<wbr>Endpoint</a></li>
@@ -115,19 +115,19 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new default<span class="tsd-signature-symbol">(</span>originalConfig<span class="tsd-signature-symbol">: </span><a href="../interfaces/config.serverconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">ServerConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="config.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
+						<li class="tsd-signature tsd-kind-icon">new default<span class="tsd-signature-symbol">(</span>originalConfig<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ServerConfig</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="config.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/Config.ts#L269">src/lib/Config.ts:269</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/Config.ts#L13">src/lib/Config.ts:13</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>originalConfig: <a href="../interfaces/config.serverconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">ServerConfig</a></h5>
+									<h5>originalConfig: <span class="tsd-signature-type">ServerConfig</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="config.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></h4>
@@ -140,30 +140,20 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a name="_capabilitystatement" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _capability<wbr>Statement</h3>
-					<div class="tsd-signature tsd-kind-icon">_capability<wbr>Statement<span class="tsd-signature-symbol">:</span> <a href="../interfaces/bulkdataclient.fhir.capabilitystatement.html" class="tsd-signature-type" data-tsd-kind="Interface">CapabilityStatement</a></div>
+					<div class="tsd-signature tsd-kind-icon">_capability<wbr>Statement<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">CapabilityStatement</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/Config.ts#L269">src/lib/Config.ts:269</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="normalizedconfig" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> normalized<wbr>Config</h3>
-					<div class="tsd-signature tsd-kind-icon">normalized<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/Config.ts#L267">src/lib/Config.ts:267</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/Config.ts#L13">src/lib/Config.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a name="originalconfig" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> original<wbr>Config</h3>
-					<div class="tsd-signature tsd-kind-icon">original<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="../interfaces/config.serverconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">ServerConfig</a></div>
+					<div class="tsd-signature tsd-kind-icon">original<wbr>Config<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ServerConfig</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/Config.ts#L265">src/lib/Config.ts:265</a></li>
+							<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/Config.ts#L11">src/lib/Config.ts:11</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -174,22 +164,54 @@
 					<a name="getcapabilitystatement" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> get<wbr>Capability<wbr>Statement</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Capability<wbr>Statement<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/bulkdataclient.fhir.capabilitystatement.html" class="tsd-signature-type" data-tsd-kind="Interface">CapabilityStatement</a><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Capability<wbr>Statement<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NormalizedConfig</span><span class="tsd-signature-symbol">&gt;</span>, signal<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">AbortSignal</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">CapabilityStatement</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/Config.ts#L497">src/lib/Config.ts:497</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/Config.ts#L245">src/lib/Config.ts:245</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NormalizedConfig</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> signal: <span class="tsd-signature-type">AbortSignal</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/bulkdataclient.fhir.capabilitystatement.html" class="tsd-signature-type" data-tsd-kind="Interface">CapabilityStatement</a><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">CapabilityStatement</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="getoperationdefinition" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> get<wbr>Operation<wbr>Definition</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Operation<wbr>Definition<span class="tsd-signature-symbol">(</span>operations<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span>, name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, ref<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/Config.ts#L278">src/lib/Config.ts:278</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>operations: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>ref: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -197,19 +219,22 @@
 					<a name="getpatientexportendpoint" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> get<wbr>Patient<wbr>Export<wbr>Endpoint</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Patient<wbr>Export<wbr>Endpoint<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;Patient/$export&quot;</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Patient<wbr>Export<wbr>Endpoint<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NormalizedConfig</span><span class="tsd-signature-symbol">&gt;</span>, signal<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">AbortSignal</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;Patient/$export&quot;</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/Config.ts#L547">src/lib/Config.ts:547</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/Config.ts#L309">src/lib/Config.ts:309</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NormalizedConfig</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> signal: <span class="tsd-signature-type">AbortSignal</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;Patient/$export&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -220,19 +245,22 @@
 					<a name="getsupportedresourcetypes" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> get<wbr>Supported<wbr>Resource<wbr>Types</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Supported<wbr>Resource<wbr>Types<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Supported<wbr>Resource<wbr>Types<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NormalizedConfig</span><span class="tsd-signature-symbol">&gt;</span>, signal<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">AbortSignal</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/Config.ts#L567">src/lib/Config.ts:567</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/Config.ts#L325">src/lib/Config.ts:325</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NormalizedConfig</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> signal: <span class="tsd-signature-type">AbortSignal</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -243,19 +271,22 @@
 					<a name="getsystemexportendpoint" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> get<wbr>System<wbr>Export<wbr>Endpoint</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>System<wbr>Export<wbr>Endpoint<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;$export&quot;</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>System<wbr>Export<wbr>Endpoint<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NormalizedConfig</span><span class="tsd-signature-symbol">&gt;</span>, signal<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">AbortSignal</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;$export&quot;</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/Config.ts#L532">src/lib/Config.ts:532</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/Config.ts#L299">src/lib/Config.ts:299</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NormalizedConfig</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> signal: <span class="tsd-signature-type">AbortSignal</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">&quot;&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;$export&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -266,19 +297,22 @@
 					<a name="gettokenendpoint" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> get<wbr>Token<wbr>Endpoint</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Token<wbr>Endpoint<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Token<wbr>Endpoint<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NormalizedConfig</span><span class="tsd-signature-symbol">&gt;</span>, signal<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">AbortSignal</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/Config.ts#L520">src/lib/Config.ts:520</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/Config.ts#L287">src/lib/Config.ts:287</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>options: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NormalizedConfig</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> signal: <span class="tsd-signature-type">AbortSignal</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -289,16 +323,22 @@
 					<a name="normalize" class="tsd-anchor"></a>
 					<h3>normalize</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">normalize<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">normalize<span class="tsd-signature-symbol">(</span>signal<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">AbortSignal</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NormalizedConfig</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/Config.ts#L276">src/lib/Config.ts:276</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/Config.ts#L20">src/lib/Config.ts:20</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/config.normalizedconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">NormalizedConfig</a><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> signal: <span class="tsd-signature-type">AbortSignal</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">NormalizedConfig</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -306,19 +346,22 @@
 					<a name="validate" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> validate</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
-						<li class="tsd-signature tsd-kind-icon">validate<span class="tsd-signature-symbol">(</span>cfg<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/config.serverconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">ServerConfig</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">validate<span class="tsd-signature-symbol">(</span>cfg<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ServerConfig</span><span class="tsd-signature-symbol">&gt;</span>, signal<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">AbortSignal</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/534fa8e/src/lib/Config.ts#L576">src/lib/Config.ts:576</a></li>
+									<li>Defined in <a href="https://github.com/smart-on-fhir/bdt/blob/f08b5c5/src/lib/Config.ts#L334">src/lib/Config.ts:334</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>cfg: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/config.serverconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">ServerConfig</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>cfg: <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ServerConfig</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> signal: <span class="tsd-signature-type">AbortSignal</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -385,13 +428,16 @@
 						<a href="../modules/bdt.html">bdt</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="../modules/bin.html">bin</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="../modules/errors.html">errors</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/evaluate.html">evaluate</a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="../modules/globalcontext.html">global<wbr>Context</a>
+						<a href="../modules/index.html">index</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/lib.html">lib</a>
@@ -412,13 +458,13 @@
 								<a href="config.default.html#_capabilitystatement" class="tsd-kind-icon">_capability<wbr>Statement</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="config.default.html#normalizedconfig" class="tsd-kind-icon">normalized<wbr>Config</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="config.default.html#originalconfig" class="tsd-kind-icon">original<wbr>Config</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
 								<a href="config.default.html#getcapabilitystatement" class="tsd-kind-icon">get<wbr>Capability<wbr>Statement</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="config.default.html#getoperationdefinition" class="tsd-kind-icon">get<wbr>Operation<wbr>Definition</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
 								<a href="config.default.html#getpatientexportendpoint" class="tsd-kind-icon">get<wbr>Patient<wbr>Export<wbr>Endpoint</a>
@@ -442,15 +488,6 @@
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/config.authenticationoptions.html" class="tsd-kind-icon">Authentication<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/config.normalizedconfig.html" class="tsd-kind-icon">Normalized<wbr>Config</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="../interfaces/config.serverconfig.html" class="tsd-kind-icon">Server<wbr>Config</a>
-					</li>
 				</ul>
 			</nav>
 		</div>
@@ -461,12 +498,10 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
