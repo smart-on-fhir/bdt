@@ -7,6 +7,10 @@ BDT as Bulk Data testing app for CLI
 git clone https://github.com/smart-on-fhir/bdt
 cd bdt
 npm i
+
+# To register bdt as globally available executable also run this:
+npm i -g .
+# Otherwise you will have to run it using "node ." from the project folder
 ```
 
 ## Contribution
@@ -17,7 +21,7 @@ Contributions are welcome, just make sure you check out the [API Docs](https://d
 **Quick start**
 ```sh
 # Here "my/config.js" is the path to your configuration file
-node . test --config my/config.js
+bdt test --config my/config.js
 ```
 
 ### Commands
@@ -28,29 +32,29 @@ The bdt tool contains 3 subcommands:
 
 The usage is
 ```sh
-node . [options] [command]
+bdt [options] [command]
 # or
-node . [command] [options]
+bdt [command] [options]
 ```
 For more information run one of:
-- `node . --help` - common usage
-- `node . help test` - **test** command usage
-- `node . help list` - **list** command usage
-- `node . help audit` - **audit** command usage
+- `bdt --help` - common usage
+- `bdt help test` - **test** command usage
+- `bdt help list` - **list** command usage
+- `bdt help audit` - **audit** command usage
 
 ## Examples
 
 Tests a server
 ```sh
-node . test -c config-examples/reference-server-r4.js
+bdt test -c config-examples/reference-server-r4.js
 ```
 
 Tests a server but only run authorization-related tests
 ```sh
-node . test -c config-examples/reference-server-r4.js --pattern './build/testSuite/**/authorization.test.js'
+bdt test -c config-examples/reference-server-r4.js --pattern './build/testSuite/**/authorization.test.js'
 ```
 
 Tests a server against Bulk Data v2
 ```sh
-node . test -c config-examples/reference-server-r4.js --api-version 2
+bdt test -c config-examples/reference-server-r4.js --api-version 2
 ```

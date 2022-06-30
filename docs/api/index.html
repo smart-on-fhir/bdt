@@ -69,6 +69,10 @@
 				<pre><code class="language-sh"><span style="color: #24292EFF">git clone https://github.com/smart-on-fhir/bdt</span>
 <span style="color: #6F42C1">cd</span><span style="color: #24292EFF"> bdt</span>
 <span style="color: #24292EFF">npm i</span>
+
+<span style="color: #C2C3C5"># To register bdt as globally available executable also run this:</span>
+<span style="color: #24292EFF">npm i -g </span><span style="color: #6F42C1">.</span>
+<span style="color: #C2C3C5"># Otherwise you will have to run it using &quot;node .&quot; from the project folder</span>
 </code></pre>
 				<a href="#contribution" id="contribution" style="color: inherit; text-decoration: none;">
 					<h2>Contribution</h2>
@@ -79,7 +83,7 @@
 				</a>
 				<p><strong>Quick start</strong></p>
 				<pre><code class="language-sh"><span style="color: #C2C3C5"># Here &quot;my/config.js&quot; is the path to your configuration file</span>
-<span style="color: #24292EFF">node </span><span style="color: #6F42C1">.</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">test</span><span style="color: #24292EFF"> --config my/config.js</span>
+<span style="color: #24292EFF">bdt </span><span style="color: #6F42C1">test</span><span style="color: #24292EFF"> --config my/config.js</span>
 </code></pre>
 				<a href="#commands" id="commands" style="color: inherit; text-decoration: none;">
 					<h3>Commands</h3>
@@ -91,28 +95,28 @@
 					<li><code>audit</code> - Generates audit reports</li>
 				</ul>
 				<p>The usage is</p>
-				<pre><code class="language-sh"><span style="color: #24292EFF">node </span><span style="color: #6F42C1">.</span><span style="color: #24292EFF"> [options] [command]</span>
+				<pre><code class="language-sh"><span style="color: #24292EFF">bdt [options] [command]</span>
 <span style="color: #C2C3C5"># or</span>
-<span style="color: #24292EFF">node </span><span style="color: #6F42C1">.</span><span style="color: #24292EFF"> [command] [options]</span>
+<span style="color: #24292EFF">bdt [command] [options]</span>
 </code></pre>
 				<p>For more information run one of:</p>
 				<ul>
-					<li><code>node . --help</code> - common usage</li>
-					<li><code>node . help test</code> - <strong>test</strong> command usage</li>
-					<li><code>node . help list</code> - <strong>list</strong> command usage</li>
-					<li><code>node . help audit</code> - <strong>audit</strong> command usage</li>
+					<li><code>bdt --help</code> - common usage</li>
+					<li><code>bdt help test</code> - <strong>test</strong> command usage</li>
+					<li><code>bdt help list</code> - <strong>list</strong> command usage</li>
+					<li><code>bdt help audit</code> - <strong>audit</strong> command usage</li>
 				</ul>
 				<a href="#examples" id="examples" style="color: inherit; text-decoration: none;">
 					<h2>Examples</h2>
 				</a>
 				<p>Tests a server</p>
-				<pre><code class="language-sh"><span style="color: #24292EFF">node </span><span style="color: #6F42C1">.</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">test</span><span style="color: #24292EFF"> -c config-examples/reference-server-r4.js</span>
+				<pre><code class="language-sh"><span style="color: #24292EFF">bdt </span><span style="color: #6F42C1">test</span><span style="color: #24292EFF"> -c config-examples/reference-server-r4.js</span>
 </code></pre>
 				<p>Tests a server but only run authorization-related tests</p>
-				<pre><code class="language-sh"><span style="color: #24292EFF">node </span><span style="color: #6F42C1">.</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">test</span><span style="color: #24292EFF"> -c config-examples/reference-server-r4.js --pattern </span><span style="color: #22863A">&#039;./build/testSuite/**/authorization.test.js&#039;</span>
+				<pre><code class="language-sh"><span style="color: #24292EFF">bdt </span><span style="color: #6F42C1">test</span><span style="color: #24292EFF"> -c config-examples/reference-server-r4.js --pattern </span><span style="color: #22863A">&#039;./build/testSuite/**/authorization.test.js&#039;</span>
 </code></pre>
 				<p>Tests a server against Bulk Data v2</p>
-				<pre><code class="language-sh"><span style="color: #24292EFF">node </span><span style="color: #6F42C1">.</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">test</span><span style="color: #24292EFF"> -c config-examples/reference-server-r4.js --api-version 2</span>
+				<pre><code class="language-sh"><span style="color: #24292EFF">bdt </span><span style="color: #6F42C1">test</span><span style="color: #24292EFF"> -c config-examples/reference-server-r4.js --api-version 2</span>
 </code></pre>
 			</div>
 		</div>
