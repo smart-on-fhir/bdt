@@ -4,7 +4,7 @@ import { Suite }             from "./Suite"
 import { Test }              from "./Test"
 import { TestAPI }           from "./TestAPI"
 import { bdt }               from "../../types"
-import { wait } from "./lib"
+import { wait }              from "./lib"
 
 
 export default class TestRunner extends EventEmitter
