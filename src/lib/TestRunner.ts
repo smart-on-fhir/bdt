@@ -4,6 +4,7 @@ import { Suite }             from "./Suite"
 import { Test }              from "./Test"
 import { TestAPI }           from "./TestAPI"
 import { bdt }               from "../../types"
+import { wait } from "./lib"
 
 
 export default class TestRunner extends EventEmitter
@@ -132,7 +133,7 @@ export default class TestRunner extends EventEmitter
             this.currentGroup = this.context.root.getNodeAt(path.join(".")) as Suite;
             return await this.runTest(node, context)
         }
-        
+
         let parentGroup = this.currentGroup
         this.currentGroup = node;
 
@@ -148,10 +149,11 @@ export default class TestRunner extends EventEmitter
         }
 
         for (const child of node.children) {
-            await this._run(child, context);
             if (this.canceled) {
                 break;
             }
+            await wait(50)
+            await this._run(child, context);
         }
 
         await this.endGroup(node, parentGroup, context);
