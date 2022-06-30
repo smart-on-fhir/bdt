@@ -139,4 +139,5 @@ export declare class Console {
      * ```
      */
     forEach(callback: (entry: ConsoleEntry, index?: number, all?: ConsoleEntry[]) => void): void;
+    clear(): void;
 }

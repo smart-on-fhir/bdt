@@ -4,13 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const code_1 = require("@hapi/code");
-const bdt_1 = require("../lib/bdt");
-const BulkDataClient_1 = require("../lib/BulkDataClient");
 const is_base64_1 = __importDefault(require("is-base64"));
+const BulkDataClient_1 = require("../lib/BulkDataClient");
 const lib_1 = require("../lib/lib");
 const assertions_1 = require("../lib/assertions");
-bdt_1.suite("Download Endpoint", () => {
-    bdt_1.test({
+suite("Download Endpoint", () => {
+    test({
         name: "Requires valid access token if the requiresAccessToken field in the status body is true",
         description: "If the `requiresAccessToken` field in the Complete Status body is " +
             "set to true, the request MUST include a valid access token."
@@ -37,7 +36,7 @@ bdt_1.suite("Download Endpoint", () => {
             await client.cancelIfStarted(kickOffResponse);
         }
     });
-    bdt_1.test({
+    test({
         name: "Does not require access token if the requiresAccessToken field in the status body is not true",
         description: "Verifies that files can be downloaded without authorization if the `requiresAccessToken` field in the complete status body is not set to true"
     }, async ({ config, api }) => {
@@ -63,7 +62,7 @@ bdt_1.suite("Download Endpoint", () => {
             }
         }
     });
-    bdt_1.test({
+    test({
         name: "Generates valid file response",
         description: "Runs a set of assertions to verify that:\n" +
             "- The server returns HTTP status of **200 OK**.\n" +
@@ -107,7 +106,7 @@ bdt_1.suite("Download Endpoint", () => {
             }
         }
     });
-    bdt_1.test({
+    test({
         name: "Rejects a download if the client scopes do not cover that resource type",
         description: "If the download endpoint requires authorization, it should also " +
             "verify that the client has been granted access to the resource type that it " +
@@ -122,7 +121,7 @@ bdt_1.suite("Download Endpoint", () => {
         const client = new BulkDataClient_1.BulkDataClient(config, api);
         // Do an export using the full access scopes
         const { response } = await client.kickOff({ params: { _type: [config.fastestResource] } });
-        assertions_1.expectSuccessfulKickOff(response, api, "Export failed");
+        assertions_1.expectSuccessfulKickOff(response, "Export failed");
         const resp = await client.getExportResponse();
         if (!client.statusResponse.body.requiresAccessToken) {
             await client.cancel(response);
@@ -152,7 +151,7 @@ bdt_1.suite("Download Endpoint", () => {
         await client.cancelIfStarted(response);
         code_1.expect(resp2.statusCode, `Download should fail if the client does not have proper scopes. ${lib_1.getErrorMessageFromResponse(resp2)}`).to.be.above(399);
     });
-    bdt_1.test({
+    test({
         name: "Supports binary file attachments in DocumentReference resources",
         description: "This test verifies that:\n" +
             "1. The server can export `DocumentReference` resources (if available)\n" +
@@ -266,7 +265,7 @@ bdt_1.suite("Download Endpoint", () => {
             await client.cancel(kickOffResponse);
         }
     });
-    bdt_1.test({
+    test({
         name: "Requesting deleted files returns 404 responses",
         description: "After a bulk data request has been started, a client **MAY** " +
             "send a **DELETE** request to the URL provided in the `Content-Location` " +

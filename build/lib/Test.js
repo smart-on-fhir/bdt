@@ -11,6 +11,13 @@ class Test extends TestNode_1.TestNode {
         this.fn = options.fn;
         this.console = new Console_1.Console();
     }
+    reset() {
+        this._status = undefined;
+        this.startedAt = undefined;
+        this.endedAt = undefined;
+        this.error = undefined;
+        this.console.clear();
+    }
     toJSON() {
         const json = super.toJSON();
         json.id = this.id;

@@ -1,22 +1,10 @@
 import { Console } from "./Console";
-import { TestCallbackFn } from "./Suite";
 import { Test, TestStatus } from "./Test";
-export interface Prerequisite {
-    /**
-     * This will be converted to boolean and if evaluates to false
-     * it means that a prerequisite requirement is not met. If
-     * function, it will be called with no arguments first, and then
-     * the returned value will be converted to boolean
-     */
-    assertion: any;
-    /**
-     * The error message if the assertion fails
-     */
-    message: string;
-}
+import { bdt } from "../../types";
 export declare class TestAPI {
     protected test: Test;
     console: Console;
+    readonly abortController: AbortController;
     constructor(test: Test);
     /**
      * Sets the status of this test
@@ -34,6 +22,6 @@ export declare class TestAPI {
      * @returns void
      * @throws NotSupportedError
      */
-    prerequisite(...conditions: Prerequisite[]): void;
-    after(fn: TestCallbackFn): void;
+    prerequisite(...conditions: bdt.Prerequisite[]): void;
+    after(fn: bdt.TestCallbackFn): void;
 }

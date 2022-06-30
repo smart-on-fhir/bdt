@@ -1,11 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const bdt_1 = require("../lib/bdt");
 const code_1 = require("@hapi/code");
 const BulkDataClient_1 = require("../lib/BulkDataClient");
-bdt_1.suite("Metadata", () => {
-    bdt_1.suite("CapabilityStatement", () => {
-        bdt_1.test({
+suite("Metadata", () => {
+    suite("CapabilityStatement", () => {
+        test({
             name: "The CapabilityStatement instantiates the bulk-data CapabilityStatement",
             description: "To declare conformance with this IG, a server should include " +
                 "the following URL in its own `CapabilityStatement.instantiates`: \n" +
@@ -25,7 +24,7 @@ bdt_1.suite("Metadata", () => {
                 api.console.warn("http://hl7.org/fhir/uv/bulkdata/CapabilityStatement/bulk-data was not found in CapabilityStatement.instantiates");
             }
         });
-        bdt_1.test({
+        test({
             name: 'Includes the token endpoint in the CapabilityStatement',
             description: "If a server requires SMART on FHIR authorization " +
                 "for access, its metadata **must** support automated discovery " +
@@ -73,7 +72,7 @@ bdt_1.suite("Metadata", () => {
                 throw new Error(`Unable to find the "token" endpoint in the conformance statement`);
             }
         });
-        bdt_1.test({
+        test({
             name: `Check if "export" operation is defined in the CapabilityStatement`,
             description: "This test expects to find in the CapabilityStatement " +
                 'an entry like:\n```\n"rest": [\n' +
@@ -99,7 +98,7 @@ bdt_1.suite("Metadata", () => {
                 throw new Error(`Unable to find "export" operation at "${config.baseURL}/metadata"`);
             }
         });
-        bdt_1.test({
+        test({
             name: `Check if "patient-export" operation is defined in the CapabilityStatement`,
             description: "This test expects to find in the CapabilityStatement " +
                 'an entry like:\n```\n"rest": [\n' +
@@ -131,7 +130,7 @@ bdt_1.suite("Metadata", () => {
                 throw new Error(`Unable to find "export" operation at "${config.baseURL}/metadata"`);
             }
         });
-        bdt_1.test({
+        test({
             name: `Check if "group-export" operation is defined in the CapabilityStatement`,
             description: "This test expects to find in the CapabilityStatement " +
                 'an entry like:\n```\n"rest": [\n' +
@@ -164,8 +163,8 @@ bdt_1.suite("Metadata", () => {
             }
         });
     });
-    bdt_1.suite("Well Known SMART Configuration", () => {
-        bdt_1.test({
+    suite("Well Known SMART Configuration", () => {
+        test({
             name: "Includes token_endpoint definition",
             description: 'This test verifies that the server provides a ' +
                 '`/.well-known/smart-configuration` and that ' +
@@ -177,7 +176,8 @@ bdt_1.suite("Metadata", () => {
                 url: ".well-known/smart-configuration",
                 responseType: "json",
                 requestLabel: ".well-known/smart-configuration request",
-                responseLabel: ".well-known/smart-configuration response"
+                responseLabel: ".well-known/smart-configuration response",
+                skipAuth: true
             });
             // Having a WellKnown JSON is optional but we show a warning if
             // it is missing.

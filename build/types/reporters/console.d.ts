@@ -1,3 +1,3 @@
 import TestRunner from "../lib/TestRunner";
-import { StdOutReporterOptions } from "../lib/bdt";
-export default function StdoutReporter(runner: TestRunner, options: StdOutReporterOptions): void;
+import { bdt } from "../../types";
+export default function StdoutReporter(runner: TestRunner, options: bdt.StdOutReporterOptions): void;

@@ -1,15 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const code_1 = require("@hapi/code");
-const bdt_1 = require("../lib/bdt");
 const BulkDataClient_1 = require("../lib/BulkDataClient");
 const assertions_1 = require("../lib/assertions");
-bdt_1.suite("Kick-off Endpoint", () => {
+suite("Kick-off Endpoint", () => {
     ["patient", "system", "group"].forEach((type) => {
-        bdt_1.suite(`Making a ${type}-level export`, () => {
-            bdt_1.suite("Request Headers", () => {
+        suite(`Making a ${type}-level export`, () => {
+            suite("Request Headers", () => {
                 // Accept ------------------------------------------------------
-                bdt_1.test({
+                test({
                     name: "Requires Accept header",
                     description: 'The Accept header specifies the format of the optional ' +
                         'OperationOutcome response to the kick-off request. Currently, ' +
@@ -30,11 +29,11 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     // might have been started. Make sure we cancel that!
                     await client.cancelIfStarted(response);
                     // Finally check that we have got an error response
-                    assertions_1.expectFailedKickOff(response, api, "The accept header is not required");
+                    assertions_1.expectFailedKickOff(response, "The accept header is not required");
                 });
-                bdt_1.test({
+                test({
                     name: "Requires Accept header in POST requests",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: 'The Accept header specifies the format of the optional ' +
                         'OperationOutcome response to the kick-off request. Currently, ' +
                         'only `application/fhir+json` is supported. This test makes an ' +
@@ -55,10 +54,10 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     // might actually been started. Make sure we cancel that!
                     await client.cancelIfStarted(response);
                     // Finally check that we have got an error response
-                    assertions_1.expectFailedKickOff(response, api, "The accept header is not required");
+                    assertions_1.expectFailedKickOff(response, "The accept header is not required");
                 });
                 // Prefer ------------------------------------------------------
-                bdt_1.test({
+                test({
                     name: "Requires the Prefer header to contain respond-async",
                     description: 'The **Prefer** request header is required and specifies ' +
                         'whether the response is immediate or asynchronous. ' +
@@ -78,11 +77,11 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     // might actually been started. Make sure we cancel that!
                     await client.cancelIfStarted(response);
                     // Finally check that we have got an error response
-                    assertions_1.expectFailedKickOff(response, api, "The prefer header is not validated");
+                    assertions_1.expectFailedKickOff(response, "The prefer header is not validated");
                 });
-                bdt_1.test({
+                test({
                     name: "Requires the Prefer header to contain respond-async in POST requests",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: 'The **Prefer** request header is required and specifies ' +
                         'whether the response is immediate or asynchronous. ' +
                         'The header MUST be set to **respond-async**. ' +
@@ -102,10 +101,11 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     // might actually been started. Make sure we cancel that!
                     await client.cancelIfStarted(response);
                     // Finally check that we have got an error response
-                    assertions_1.expectFailedKickOff(response, api, "The prefer header is not validated");
+                    assertions_1.expectFailedKickOff(response, "The prefer header is not validated");
                 });
-                bdt_1.test({
-                    name: 'Allows the Prefer header to contain "handling=lenient"'
+                test({
+                    name: 'Allows the Prefer header to contain "handling=lenient"',
+                    minVersion: "2"
                 }, async ({ config, api }) => {
                     const client = new BulkDataClient_1.BulkDataClient(config, api);
                     // By default the kickOff method will do a proper request to the
@@ -114,40 +114,40 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     const { response } = await client.kickOff({
                         type,
                         params: { _type: [config.fastestResource] },
-                        headers: { prefer: ["respond-async", "handling=lenient"] }
+                        headers: { prefer: "respond-async, handling=lenient" }
                     });
                     // If the server did not return an error as expected, an export
                     // might actually been started. Make sure we cancel that!
                     await client.cancelIfStarted(response);
                     // Finally check that we have got an error response
-                    assertions_1.expectSuccessfulKickOff(response, api, "The 'handling=lenient' Prefer header is not supported");
+                    assertions_1.expectSuccessfulKickOff(response, "The 'handling=lenient' portion of the Prefer header is not supported");
                 });
             });
-            bdt_1.suite("Request Parameters", () => {
+            suite("Request Parameters", () => {
                 // _outputFormat -----------------------------------------------
                 ([
                     "application/fhir+ndjson",
                     "application/ndjson",
                     "ndjson"
                 ].forEach(_outputFormat => {
-                    bdt_1.test({
+                    test({
                         name: `Accepts _outputFormat=${_outputFormat}`,
                         description: `Verifies that the server accepts \`${_outputFormat}\` as **_outputFormat** parameter`
                     }, async ({ config, api }) => {
                         const client = new BulkDataClient_1.BulkDataClient(config, api);
                         const { response } = await client.kickOff({ type, params: { _outputFormat } });
                         await client.cancelIfStarted(response);
-                        assertions_1.expectSuccessfulKickOff(response, api, `The _outputFormat parameter does not support "${_outputFormat}" value`);
+                        assertions_1.expectSuccessfulKickOff(response, `The _outputFormat parameter does not support "${_outputFormat}" value`);
                     });
-                    bdt_1.test({
+                    test({
                         name: `Accepts _outputFormat=${_outputFormat} in POST requests`,
-                        minVersion: "1.2",
+                        minVersion: "2",
                         description: `Verifies that the server accepts \`${_outputFormat}\` as **_outputFormat** parameter`
                     }, async ({ config, api }) => {
                         const client = new BulkDataClient_1.BulkDataClient(config, api);
                         const { response } = await client.kickOff({ method: "POST", type, params: { _outputFormat } });
                         await client.cancelIfStarted(response);
-                        assertions_1.expectSuccessfulKickOff(response, api, `The _outputFormat parameter does not support "${_outputFormat}" value`);
+                        assertions_1.expectSuccessfulKickOff(response, `The _outputFormat parameter does not support "${_outputFormat}" value`);
                     });
                 }));
                 ([
@@ -155,7 +155,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     "text/html",
                     "x-custom"
                 ].forEach(_outputFormat => {
-                    bdt_1.test({
+                    test({
                         name: `Rejects unsupported format "_outputFormat=${_outputFormat}"`,
                         description: `This tests if the server rejects \`_outputFormat=${_outputFormat}\` ` +
                             `parameter, even though \`${_outputFormat}\` is valid mime type.`
@@ -163,10 +163,10 @@ bdt_1.suite("Kick-off Endpoint", () => {
                         const client = new BulkDataClient_1.BulkDataClient(config, api);
                         const { response } = await client.kickOff({ type, params: { _outputFormat } });
                         await client.cancelIfStarted(response);
-                        assertions_1.expectFailedKickOff(response, api, `Parameter "_outputFormat=${_outputFormat}" was not rejected`);
+                        assertions_1.expectFailedKickOff(response, `Parameter "_outputFormat=${_outputFormat}" was not rejected`);
                     });
-                    bdt_1.test({
-                        minVersion: "1.2",
+                    test({
+                        minVersion: "2",
                         name: `Rejects unsupported format "_outputFormat=${_outputFormat}" in POST requests`,
                         description: `This tests if the server rejects \`_outputFormat=${_outputFormat}\` ` +
                             `parameter, even though \`${_outputFormat}\` is valid mime type.`
@@ -174,60 +174,60 @@ bdt_1.suite("Kick-off Endpoint", () => {
                         const client = new BulkDataClient_1.BulkDataClient(config, api);
                         const { response } = await client.kickOff({ method: "POST", type, params: { _outputFormat } });
                         await client.cancelIfStarted(response);
-                        assertions_1.expectFailedKickOff(response, api, `Parameter "_outputFormat=${_outputFormat}" was not rejected`);
+                        assertions_1.expectFailedKickOff(response, `Parameter "_outputFormat=${_outputFormat}" was not rejected`);
                     });
                 }));
                 // _since ------------------------------------------------------
-                bdt_1.test({
+                test({
                     name: "Rejects _since={invalid date} parameter",
                     description: "The server should reject exports if the `_since` parameter is not a valid date"
                 }, async ({ config, api }) => {
                     const client = new BulkDataClient_1.BulkDataClient(config, api);
                     const { response } = await client.kickOff({ type, params: { _since: "0000-60-01T30:70:80+05:00" } });
                     await client.cancelIfStarted(response);
-                    assertions_1.expectFailedKickOff(response, api, `Parameter "_since=0000-60-01T30:70:80+05:00" was not rejected`);
+                    assertions_1.expectFailedKickOff(response, `Parameter "_since=0000-60-01T30:70:80+05:00" was not rejected`);
                 });
-                bdt_1.test({
-                    minVersion: "1.2",
+                test({
+                    minVersion: "2",
                     name: "Rejects _since={invalid date} parameter in POST requests",
                     description: "The server should reject exports if the `_since` parameter is not a valid date"
                 }, async ({ config, api }) => {
                     const client = new BulkDataClient_1.BulkDataClient(config, api);
                     const { response } = await client.kickOff({ method: "POST", type, params: { _since: "0000-60-01T30:70:80+05:00" } });
                     await client.cancelIfStarted(response);
-                    assertions_1.expectFailedKickOff(response, api, `Parameter "_since=0000-60-01T30:70:80+05:00" was not rejected`);
+                    assertions_1.expectFailedKickOff(response, `Parameter "_since=0000-60-01T30:70:80+05:00" was not rejected`);
                 });
-                bdt_1.test({
+                test({
                     name: "Rejects _since={future date} parameter",
                     description: "The server should reject exports if the `_since` parameter is a date in the future"
                 }, async ({ config, api }) => {
                     const client = new BulkDataClient_1.BulkDataClient(config, api);
                     const { response } = await client.kickOff({ type, params: { _since: "2057-01-01T00:00:00+05:00" } });
                     await client.cancelIfStarted(response);
-                    assertions_1.expectFailedKickOff(response, api, `Parameter "_since=2057-01-01T00:00:00+05:00" was not rejected`);
+                    assertions_1.expectFailedKickOff(response, `Parameter "_since=2057-01-01T00:00:00+05:00" was not rejected`);
                 });
-                bdt_1.test({
-                    minVersion: "1.2",
+                test({
+                    minVersion: "2",
                     name: "Rejects _since={future date} parameter in POST requests",
                     description: "The server should reject exports if the `_since` parameter is a date in the future"
                 }, async ({ config, api }) => {
                     const client = new BulkDataClient_1.BulkDataClient(config, api);
                     const { response } = await client.kickOff({ method: "POST", type, params: { _since: "2057-01-01T00:00:00+05:00" } });
                     await client.cancelIfStarted(response);
-                    assertions_1.expectFailedKickOff(response, api, `Parameter "_since=2057-01-01T00:00:00+05:00" was not rejected`);
+                    assertions_1.expectFailedKickOff(response, `Parameter "_since=2057-01-01T00:00:00+05:00" was not rejected`);
                 });
                 // _type -------------------------------------------------------
-                bdt_1.test({
+                test({
                     name: "Validates the _type parameter",
                     description: "Verifies that the request is rejected if the `_type` contains invalid resource type"
                 }, async ({ config, api }) => {
                     const client = new BulkDataClient_1.BulkDataClient(config, api);
                     const { response } = await client.kickOff({ type, params: { _type: ["MissingType"] } });
                     await client.cancelIfStarted(response);
-                    assertions_1.expectFailedKickOff(response, api, `Parameter "_type=MissingType" was not rejected`);
+                    assertions_1.expectFailedKickOff(response, `Parameter "_type=MissingType" was not rejected`);
                 });
-                bdt_1.test({
-                    minVersion: "1.2",
+                test({
+                    minVersion: "2",
                     name: "Accepts multiple _type parameters",
                     description: "Clients can use multiple `_type` parameters instead of single comma-separated lists"
                 }, async ({ config, api }) => {
@@ -239,21 +239,21 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     const client = new BulkDataClient_1.BulkDataClient(config, api);
                     const { response } = await client.kickOff({ type, params: { _type: types.slice(0, 2) } });
                     await client.cancelIfStarted(response);
-                    assertions_1.expectSuccessfulKickOff(response, api, "Kick-off with multiple _type parameters failed");
+                    assertions_1.expectSuccessfulKickOff(response, "Kick-off with multiple _type parameters failed");
                 });
-                bdt_1.test({
-                    minVersion: "1.2",
+                test({
+                    minVersion: "2",
                     name: "Validates the _type parameter in POST requests",
                     description: "Verifies that the request is rejected if the `_type` contains invalid resource type"
                 }, async ({ config, api }) => {
                     const client = new BulkDataClient_1.BulkDataClient(config, api);
                     const { response } = await client.kickOff({ method: "POST", type, params: { _type: "MissingType" } });
                     await client.cancelIfStarted(response);
-                    assertions_1.expectFailedKickOff(response, api, "Parameter _type=MissingType was not rejected");
+                    assertions_1.expectFailedKickOff(response, "Parameter _type=MissingType was not rejected");
                 });
-                bdt_1.test({
+                test({
                     name: "Accepts the includeAssociatedData parameter",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: "When provided, servers with support for the parameter and " +
                         "requested values SHALL return or omit a pre-defined set of FHIR " +
                         "resources associated with the request. The `includeAssociatedData` " +
@@ -272,7 +272,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     // values SHOULD return an error and OperationOutcome resource
                     // so clients can re-submit a request that omits those values
                     // (for example, if a server does not retain provenance data). 
-                    assertions_1.expectFailedKickOff(response1, api, "Kick-off failed");
+                    assertions_1.expectFailedKickOff(response1, "Kick-off failed");
                     // Now try standard export with
                     // includeAssociatedData=LatestProvenanceResources, plus a
                     // "handling=lenient" value in the Prefer header. In this case,
@@ -281,7 +281,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     const { response: response2 } = await client.kickOff({
                         type,
                         headers: {
-                            prefer: ["respond-async", "handling=lenient"]
+                            prefer: "respond-async, handling=lenient"
                         },
                         params: {
                             includeAssociatedData: "LatestProvenanceResources"
@@ -294,16 +294,16 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     //     throw new Error("It appears that the includeAssociatedData parameter " +
                     //     "(or the handling=lenient value in the prefer header) is not supported by this server");
                     // }
-                    assertions_1.expectSuccessfulKickOff(response2, api, "It appears that the includeAssociatedData parameter " +
+                    assertions_1.expectSuccessfulKickOff(response2, "It appears that the includeAssociatedData parameter " +
                         "(or the handling=lenient value in the prefer header) is not supported by this server");
                     // TODO: We should also verify that Provenance resources are
                     // actually included in the export. However, we cannot know if
                     // Provenance is available for every resource, and if not, which
                     // resources to try to export.
                 });
-                bdt_1.test({
+                test({
                     name: "Accepts multiple includeAssociatedData values as comma separated list",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: "When provided, servers with support for the parameter and " +
                         "requested values SHALL return or omit a pre-defined set of FHIR " +
                         "resources associated with the request. The `includeAssociatedData` " +
@@ -320,11 +320,11 @@ bdt_1.suite("Kick-off Endpoint", () => {
                         labelPrefix: "multiple comma-separated includeAssociatedData params - "
                     });
                     await client.cancelIfStarted(response, "Request with multiple comma-separated includeAssociatedData params - ");
-                    assertions_1.expectSuccessfulKickOff(response, api, "Failed to start an export using multiple includeAssociatedData values as comma separated list");
+                    assertions_1.expectSuccessfulKickOff(response, "Failed to start an export using multiple includeAssociatedData values as comma separated list");
                 });
-                bdt_1.test({
+                test({
                     name: "Accepts multiple includeAssociatedData parameters",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: "When provided, servers with support for the parameter and " +
                         "requested values SHALL return or omit a pre-defined set of FHIR " +
                         "resources associated with the request. The `includeAssociatedData` " +
@@ -344,10 +344,10 @@ bdt_1.suite("Kick-off Endpoint", () => {
                         labelPrefix: "multiple includeAssociatedData params - "
                     });
                     await client.cancelIfStarted(response, "Request with multiple includeAssociatedData params - ");
-                    assertions_1.expectSuccessfulKickOff(response, api, "Failed to start an export using multiple includeAssociatedData parameters");
+                    assertions_1.expectSuccessfulKickOff(response, "Failed to start an export using multiple includeAssociatedData parameters");
                 });
                 // _typeFilter -------------------------------------------------
-                bdt_1.test({
+                test({
                     name: "Accepts the _typeFilter parameter (v1)",
                     maxVersion: "1.0",
                     description: "The `_typeFilter` parameter is optional so the servers can " +
@@ -370,15 +370,13 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     // verify that the presence of the _typeFilter did not result in
                     // a server error
                     if (response.statusCode === 202) {
-                        return assertions_1.expectSuccessfulKickOff(response, api);
+                        assertions_1.expectSuccessfulKickOff(response);
                     }
-                    else {
-                        assertions_1.expectClientError(response);
-                    }
+                    assertions_1.expectClientError(response);
                 });
-                bdt_1.test({
+                test({
                     name: "Handles the _typeFilter parameter",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: "The `_typeFilter` parameter is optional. Servers that do not support it " +
                         "should reject it, unless `handling=lenient` is included in the `Prefer` header"
                 }, async ({ config, api }) => {
@@ -394,13 +392,13 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     // If the export was successful assume that _typeFilter is
                     // supported. We have nothing else to do here.
                     if (response1.statusCode === 202) {
-                        return assertions_1.expectSuccessfulKickOff(response1, api, "Parameter _typeFilter was rejected");
+                        assertions_1.expectSuccessfulKickOff(response1, "Parameter _typeFilter was rejected");
                     }
                     // Second attempt
                     const { response: response2 } = await client.kickOff({
                         type,
                         headers: {
-                            prefer: ["respond-async", "handling=lenient"]
+                            prefer: "respond-async, handling=lenient"
                         },
                         params: {
                             _typeFilter: "Patient?status=active"
@@ -409,16 +407,16 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     });
                     await client.cancelIfStarted(response2);
                     try {
-                        assertions_1.expectSuccessfulKickOff(response2, api, "Parameter _typeFilter plus header \"prefer: respond-async, handling=lenient\" was rejected");
+                        assertions_1.expectSuccessfulKickOff(response2, "Parameter _typeFilter plus header \"prefer: respond-async, handling=lenient\" was rejected");
                     }
                     catch (ex) {
                         ex.message = "\n✖ The server was expected to ignore the _typeFilter parameter if handling=lenient is included in the Prefer header" + ex.message;
                         throw ex;
                     }
                 });
-                bdt_1.test({
+                test({
                     name: "Handles multiple _typeFilter parameters",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: "The `_typeFilter` parameter is optional. Servers that do not support it " +
                         "should reject it, unless `handling=lenient` is included in the `Prefer` header"
                 }, async ({ config, api }) => {
@@ -434,13 +432,13 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     // If the export was successful assume that _typeFilter is
                     // supported. We have nothing else to do here.
                     if (response1.statusCode === 202) {
-                        return assertions_1.expectSuccessfulKickOff(response1, api, "Request with multiple _typeFilter parameters failed");
+                        assertions_1.expectSuccessfulKickOff(response1, "Request with multiple _typeFilter parameters failed");
                     }
                     // Second attempt
                     const { response: response2 } = await client.kickOff({
                         type,
                         headers: {
-                            prefer: ["respond-async", "handling=lenient"]
+                            prefer: "respond-async, handling=lenient"
                         },
                         params: {
                             _typeFilter: ["Patient?status=active", "Patient?gender=male"]
@@ -449,15 +447,15 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     });
                     await client.cancelIfStarted(response2);
                     try {
-                        assertions_1.expectSuccessfulKickOff(response2, api, "Request with multiple _typeFilter parameters and handling=lenient failed");
+                        assertions_1.expectSuccessfulKickOff(response2, "Request with multiple _typeFilter parameters and handling=lenient failed");
                     }
                     catch (ex) {
                         ex.message = "\n✖ The server was expected to ignore multiple _typeFilter parameter errors if handling=lenient is included in the Prefer header" + ex.message;
                         throw ex;
                     }
                 });
-                bdt_1.test({
-                    minVersion: "1.2",
+                test({
+                    minVersion: "2",
                     name: "Accepts the _typeFilter parameter in POST requests",
                     description: "The `_typeFilter` parameter is optional so the servers " +
                         "should not reject it, even if they don't support it"
@@ -482,14 +480,14 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     // If the export was successful assume that _typeFilter is
                     // supported. We have nothing else to do here.
                     if (response1.statusCode === 202) {
-                        return assertions_1.expectSuccessfulKickOff(response1, api, "Request with _typeFilter parameter was rejected");
+                        assertions_1.expectSuccessfulKickOff(response1, "Request with _typeFilter parameter was rejected");
                     }
                     // Second attempt
                     const { response: response2 } = await client.kickOff({
                         method: "POST",
                         type,
                         headers: {
-                            prefer: ["respond-async", "handling=lenient"]
+                            prefer: "respond-async, handling=lenient"
                         },
                         json: {
                             resourceType: "Parameters",
@@ -504,7 +502,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     });
                     await client.cancelIfStarted(response2);
                     try {
-                        assertions_1.expectSuccessfulKickOff(response2, api, "Request with _typeFilter parameter and handling=lenient was rejected");
+                        assertions_1.expectSuccessfulKickOff(response2, "Request with _typeFilter parameter and handling=lenient was rejected");
                     }
                     catch (ex) {
                         ex.message = "\n✖ The server was expected to ignore _typeFilter parameter errors if handling=lenient is included in the Prefer header" + ex.message;
@@ -513,7 +511,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                 });
                 // _elements ---------------------------------------------------
                 ["GET", "POST"].forEach((method) => {
-                    bdt_1.test({
+                    test({
                         name: `Accepts the _elements parameter through ${method} ${type}-level kick-off requests`,
                         description: "Verifies that the server starts an export if called with valid parameters. " +
                             "The status code must be `202 Accepted` and a `Content-Location` header must be " +
@@ -540,7 +538,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                         // OperationOutcome resource so clients can re-submit a request omitting
                         // the _elements parameter.
                         if (response1.statusCode != 202) {
-                            return assertions_1.expectFailedKickOff(response1, api, "Kick-off with _elements parameter failed");
+                            assertions_1.expectFailedKickOff(response1, "Kick-off with _elements parameter failed");
                         }
                         await client.waitForExport();
                         assertions_1.expectSuccessfulExport(client.statusResponse, "Export failed");
@@ -578,7 +576,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                         // });
                     });
                 });
-                bdt_1.test({
+                test({
                     name: `Accepts multiple _elements parameters through GET ${type}-level kick-off requests`,
                     description: "Verifies that the server starts an export if called with multiple _elements parameters. " +
                         "The status code must be `202 Accepted` and a `Content-Location` header must be " +
@@ -606,7 +604,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     // OperationOutcome resource so clients can re-submit a request omitting
                     // the _elements parameter.
                     if (response1.statusCode != 202) {
-                        return assertions_1.expectFailedKickOff(response1, api, "Kick-off with multiple _elements parameters failed");
+                        assertions_1.expectFailedKickOff(response1, "Kick-off with multiple _elements parameters failed");
                     }
                     await client.waitForExport();
                     assertions_1.expectSuccessfulExport(client.statusResponse, "Export failed");
@@ -645,7 +643,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                 });
                 // patient -----------------------------------------------------
                 if (type !== "system") {
-                    bdt_1.test({
+                    test({
                         name: `Supports the patient parameter via the ${type}-export endpoint`,
                         description: "Makes a normal export and then tries to make another one limited to the first patient from the result."
                     }, async ({ config, api }) => {
@@ -708,7 +706,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     });
                 }
                 else {
-                    bdt_1.test({
+                    test({
                         name: "Rejects system-level export with patient parameter",
                         description: "The patient parameter is not applicable to system level export requests. " +
                             "This test verifies that such invalid export attempts are being rejected."
@@ -744,11 +742,11 @@ bdt_1.suite("Kick-off Endpoint", () => {
                             // It seems that system-level export via POST is not supported by this server
                             return api.setNotSupported();
                         }
-                        assertions_1.expectFailedKickOff(response, api, "This kick-off request should have failed");
+                        assertions_1.expectFailedKickOff(response, "This kick-off request should have failed");
                     });
                 }
             });
-            bdt_1.test({
+            test({
                 name: "Can start an export",
                 description: "Verifies that the server starts an export if called with valid parameters. " +
                     "The status code must be `202 Accepted` and a `Content-Location` header must be " +
@@ -757,10 +755,10 @@ bdt_1.suite("Kick-off Endpoint", () => {
                 const client = new BulkDataClient_1.BulkDataClient(config, api);
                 const { response } = await client.kickOff({ type });
                 await client.cancelIfStarted(response);
-                assertions_1.expectSuccessfulKickOff(response, api);
+                assertions_1.expectSuccessfulKickOff(response);
             });
-            bdt_1.test({
-                minVersion: "1.2",
+            test({
+                minVersion: "2",
                 name: "Can start an export from POST requests",
                 description: "Verifies that the server starts an export if called with valid parameters. " +
                     "The status code must be `202 Accepted` and a `Content-Location` header must be " +
@@ -777,11 +775,11 @@ bdt_1.suite("Kick-off Endpoint", () => {
                     }
                 });
                 await client.cancelIfStarted(response);
-                assertions_1.expectSuccessfulKickOff(response, api, "Failed to make an export via POST");
+                assertions_1.expectSuccessfulKickOff(response, "Failed to make an export via POST");
             });
             if (type === "system") {
-                bdt_1.test({
-                    minVersion: "1.2",
+                test({
+                    minVersion: "2",
                     name: "Rejects system-level export with patient parameter",
                     description: "The patient parameter is not applicable to system level export requests. " +
                         "This test verifies that such invalid export attempts are being rejected."
@@ -805,13 +803,13 @@ bdt_1.suite("Kick-off Endpoint", () => {
                         }
                     });
                     await client.cancelIfStarted(response);
-                    assertions_1.expectFailedKickOff(response, api, "Export with patient parameter was not rejected");
+                    assertions_1.expectFailedKickOff(response, "Export with patient parameter was not rejected");
                 });
             }
             else {
-                bdt_1.test({
+                test({
                     name: "Can start an export with patient parameter",
-                    minVersion: "1.2",
+                    minVersion: "2",
                     description: "This test verifies that export attempts including patient are not being rejected."
                 }, async ({ config, api }) => {
                     const client = new BulkDataClient_1.BulkDataClient(config, api);
@@ -823,7 +821,7 @@ bdt_1.suite("Kick-off Endpoint", () => {
                         }
                     });
                     await client.cancelIfStarted(response);
-                    assertions_1.expectSuccessfulKickOff(response, api, "Kick-off with patient parameter failed");
+                    assertions_1.expectSuccessfulKickOff(response, "Kick-off with patient parameter failed");
                 });
             }
         });

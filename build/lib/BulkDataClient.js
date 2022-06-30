@@ -169,7 +169,12 @@ class BulkDataClient {
         // if (requestOptions.method == "POST")
         //     console.log(requestOptions)
         // console.log(requestOptions.url.toString(), requestOptions)
-        const result = await got_1.default(requestOptions);
+        const result = await (async () => {
+            let job = got_1.default(requestOptions);
+            const abort = () => job.cancel("Test(s) canceled");
+            this.testApi.abortController.signal.addEventListener("abort", abort);
+            return job.finally(() => this.testApi.abortController.signal.removeEventListener("abort", abort));
+        })();
         if (result.statusCode === 401 && requestOptions.headers.authorization && !options.context?.retried) {
             this.accessToken = null;
             return this.request({ ...options, context: { ...options.context, retried: true } });
@@ -279,7 +284,7 @@ class BulkDataClient {
      *     method: "POST",
      *     type: "group",
      *     headers: {
-     *         prefer: ["respond-async", "handling=lenient"]
+     *         prefer: "respond-async, handling=lenient"
      *     },
      *     params: {
      *         includeAssociatedData: "LatestProvenanceResources",
@@ -314,7 +319,7 @@ class BulkDataClient {
             }
         }
         else {
-            path = (systemExportEndpoint || patientExportEndpoint || groupExportEndpoint);
+            path = (groupExportEndpoint || patientExportEndpoint || systemExportEndpoint);
             if (!path) {
                 throw new errors_1.NotSupportedError("No export endpoints defined in configuration");
             }
@@ -497,7 +502,7 @@ class BulkDataClient {
         this.statusRequest = request;
         this.statusResponse = response;
         if (response.statusCode === 202) {
-            await lib_1.wait(Math.min(2000 + 1000 * suffix, 10000));
+            await lib_1.wait(Math.min(2000 + 1000 * suffix, 10000), this.testApi.abortController.signal);
             return this.waitForExport(suffix + 1);
         }
     }
@@ -526,7 +531,7 @@ class BulkDataClient {
             else {
                 retryAfterSeconds = Math.min(1 + suffix, 10);
             }
-            await lib_1.wait(retryAfterSeconds * 1000);
+            await lib_1.wait(retryAfterSeconds * 1000, this.testApi.abortController.signal);
             return this.getExportManifest(res, suffix + 1);
         }
         if (response.statusCode === 200) {
@@ -625,7 +630,7 @@ class BulkDataClient {
      * @see [[expectSuccessfulKickOff]]
      */
     async cancel(kickOffResponse, labelPrefix = "Unlabeled ") {
-        assertions_1.expectSuccessfulKickOff(kickOffResponse, this.testApi, "Failed to cancel export");
+        assertions_1.expectSuccessfulKickOff(kickOffResponse, "Failed to cancel export");
         return await this.request({
             url: kickOffResponse.headers["content-location"],
             method: "DELETE",

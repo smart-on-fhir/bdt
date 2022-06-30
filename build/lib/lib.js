@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUnfulfilledScopes = exports.scopeSet = exports.wait = exports.expectStatusText = exports.roundToPrecision = exports.getErrorMessageFromResponse = exports.formatHttpError = exports.joinSentences = exports.truncate = exports.getPath = void 0;
 const code_1 = require("@hapi/code");
+const promises_1 = require("timers/promises");
 /**
  * Walks thru an object (ar array) and returns the value found at the
  * provided path. This function is very simple so it intentionally does not
@@ -119,8 +120,8 @@ exports.expectStatusText = expectStatusText;
  * Simple utility for waiting. Returns a promise that will resolve after @ms
  * milliseconds.
  */
-function wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+function wait(ms, signal) {
+    return promises_1.setTimeout(ms, `Waited for ${ms} ms`, { signal });
 }
 exports.wait = wait;
 function scopeSet(scopes) {

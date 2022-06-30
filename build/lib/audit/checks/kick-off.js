@@ -138,7 +138,7 @@ const suite = async function ({ config, check }) {
                 weights: { reliability: 4, compliance: 5 },
                 minVersion: "2"
             }, async () => {
-                const { response } = await client.kickOff({ type, method, headers: { prefer: ["respond-async", "handling=lenient"] } });
+                const { response } = await client.kickOff({ type, method, headers: { prefer: "respond-async, handling=lenient" } });
                 await client.cancelIfStarted(response);
                 return response.statusCode === 202;
             });
@@ -209,7 +209,7 @@ const suite = async function ({ config, check }) {
                 return response.statusCode >= 400 && response.statusCode < 500;
             });
             await check({
-                minVersion: "1.2",
+                minVersion: "2",
                 name: `${type}-level ${method} kick-off accepts multiple "_type" parameters`,
                 description: "Clients can use multiple `_type` parameters instead of single comma-separated lists",
                 weights: { reliability: 5, compliance: 5 }
@@ -224,7 +224,7 @@ const suite = async function ({ config, check }) {
             // includeAssociatedData ------------------------------------------
             await check({
                 name: `${type}-level ${method} kick-off accepts the includeAssociatedData parameter`,
-                minVersion: "1.2",
+                minVersion: "2",
                 description: "When provided, servers with support for the parameter and " +
                     "requested values SHALL return or omit a pre-defined set of FHIR " +
                     "resources associated with the request. The `includeAssociatedData` " +
@@ -237,7 +237,7 @@ const suite = async function ({ config, check }) {
             });
             await check({
                 name: `${type}-level ${method} kick-off accepts multiple includeAssociatedData values as comma separated list`,
-                minVersion: "1.2",
+                minVersion: "2",
                 description: "When provided, servers with support for the parameter and " +
                     "requested values SHALL return or omit a pre-defined set of FHIR " +
                     "resources associated with the request. The `includeAssociatedData` " +
@@ -255,7 +255,7 @@ const suite = async function ({ config, check }) {
             });
             await check({
                 name: `${type}-level ${method} kick-off accepts multiple includeAssociatedData parameters`,
-                minVersion: "1.2",
+                minVersion: "2",
                 description: "When provided, servers with support for the parameter and " +
                     "requested values SHALL return or omit a pre-defined set of FHIR " +
                     "resources associated with the request. The `includeAssociatedData` " +
@@ -339,26 +339,23 @@ const suite = async function ({ config, check }) {
                                     _type: "Patient"
                                 }
                             })).response;
-                            {
-                                const manifest = await client.getExportManifest(kickOffResponse2);
-                                const fileUrl = manifest.output[0].url;
-                                const file = await client.downloadFile(fileUrl);
-                                await client.cancel(kickOffResponse2);
-                                const lines = file.body.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-                                if (lines.length !== 1) {
-                                    return false;
-                                }
-                                return JSON.parse(lines[0]).id === patient.id;
+                            const manifest2 = await client.getExportManifest(kickOffResponse2);
+                            const fileUrl2 = manifest2.output[0].url;
+                            const file2 = await client.downloadFile(fileUrl2);
+                            await client.cancel(kickOffResponse2);
+                            const lines2 = file2.body.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                            if (lines2.length !== 1) {
+                                return false;
                             }
+                            return JSON.parse(lines2[0]).id === patient.id;
                         }
-                        catch (error) {
+                        finally {
                             if (kickOffResponse2) {
                                 await client.cancel(kickOffResponse2);
                             }
                             if (kickOffResponse1) {
                                 await client.cancel(kickOffResponse1);
                             }
-                            throw error;
                         }
                     });
                 }

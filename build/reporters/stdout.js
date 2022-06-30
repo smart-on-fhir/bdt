@@ -130,7 +130,12 @@ function StdoutReporter(runner) {
         log(`${icon(node)} ${text(node) + " " + duration(node)}`);
         // counters
         counts.total += 1;
-        counts[node.status] += 1;
+        if (node.status !== "warned" &&
+            node.status !== "running" &&
+            node.status !== "unknown" &&
+            node.status !== "aborted") {
+            counts[node.status] += 1;
+        }
         ++depth;
         // // Tests with errors or warnings also render the description (if any)
         // if (node.description && (node.error || node.warnings.length)) {

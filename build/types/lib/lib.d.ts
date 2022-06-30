@@ -33,7 +33,7 @@ export declare function expectStatusText(response: Response, text: string, messa
  * Simple utility for waiting. Returns a promise that will resolve after @ms
  * milliseconds.
  */
-export declare function wait(ms: number): Promise<unknown>;
+export declare function wait(ms: number, signal?: AbortSignal): Promise<string>;
 interface Scope {
     system: string;
     resource: string;

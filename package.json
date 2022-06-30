@@ -13,6 +13,7 @@
   "scripts": {
     "test": "lab -v --sourcemaps --transform node_modules/lab-transform-typescript ./test/*.test.ts",
     "build": "tsc --build tsconfig.json",
+    "clean": "rm -rf build/*",
     "build:watch": "tsc --build tsconfig.json --incremental --watch",
     "doc": "typedoc --watch && touch docs/api/.nojekyll"
   },

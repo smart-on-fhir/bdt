@@ -1,6 +1,5 @@
 import "colors";
-import { NormalizedConfig } from "../Config";
-import { Config as ConfigType } from "../bdt";
+import { bdt } from "../../../types";
 declare type weight = 1 | 2 | 3 | 4 | 5;
 interface WeightDescriptor {
     weight: weight;
@@ -13,7 +12,7 @@ declare type Weights = {
     performance?: weight | WeightDescriptor;
 };
 export declare type suiteFunction = (ctx: {
-    config: NormalizedConfig;
+    config: bdt.NormalizedConfig;
     check: (options: checkOptions, fn: () => any) => Promise<void>;
 }) => any;
 interface checkOptions {
@@ -23,5 +22,5 @@ interface checkOptions {
     maxVersion?: string;
     description?: string;
 }
-declare function report(options: ConfigType, destination: string, openFile?: boolean): Promise<void>;
+declare function report(options: bdt.BDTOptions, destination: string, openFile?: boolean): Promise<void>;
 export default report;

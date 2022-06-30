@@ -1,7 +1,6 @@
 import { Response } from "got/dist/source";
-import { TestAPI } from "./TestAPI";
-import { OAuth, BulkData, FHIR } from "./BulkDataClient";
 import moment from "moment";
+import { bdt } from "../../types";
 export declare const HTTP_DATE_FORMATS: (string | moment.MomentBuiltinFormat)[];
 export interface AssertAPI {
     bulkData: BulkDataAssertion;
@@ -22,8 +21,8 @@ export interface BulkDataAssertion {
         withElements: (body: string, elements: string[], prefix?: string) => void;
     };
     kickOff: {
-        OK: (response: Response, testApi: TestAPI, prefix?: string) => string | void;
-        notOK: (response: Response, testApi: TestAPI, prefix?: string) => void;
+        OK: (response: Response, prefix?: string) => string | void;
+        notOK: (response: Response, prefix?: string) => void;
     };
     /**
      * A set of assertions to verify the proper structure of the export manifest
@@ -48,7 +47,7 @@ export interface StatusResponseAssertions {
      * assert.bulkData.status.OK(response, "Status response is invalid")
      * ```
      */
-    OK(response: BulkData.StatusResponse<BulkData.ExportManifest>, prefix?: string): void;
+    OK(response: bdt.BulkData.StatusResponse<bdt.BulkData.ExportManifest>, prefix?: string): void;
     /**
      * Asserts that the status endpoint reply is valid, but also produces
      * non-empty `output` array.
@@ -57,7 +56,7 @@ export interface StatusResponseAssertions {
      * assert.bulkData.status.notEmpty(response, "No files exported")
      * ```
      */
-    notEmpty(response: BulkData.StatusResponse<BulkData.ExportManifest>, prefix?: string): void;
+    notEmpty(response: bdt.BulkData.StatusResponse<bdt.BulkData.ExportManifest>, prefix?: string): void;
     /**
      * @tutorial https://hl7.org/Fhir/uv/bulkdata/export/index.html#response---error-status-1
      * @example
@@ -65,7 +64,7 @@ export interface StatusResponseAssertions {
      * assert.bulkData.status.notOK(response, "The status endpoint was expected to fail")
      * ```
      */
-    notOK(res: BulkData.StatusResponse<FHIR.OperationOutcome>, prefix?: string): void;
+    notOK(res: bdt.BulkData.StatusResponse<bdt.FHIR.OperationOutcome>, prefix?: string): void;
     /**
      * Asserts that:
      * - The status endpoint replies with `202 Accepted`.
@@ -88,13 +87,13 @@ export interface StatusResponseAssertions {
      * assert.bulkData.status.pending(response, "The status must be pending")
      * ```
      */
-    pending(res: BulkData.StatusResponse<any>, prefix?: string): void;
+    pending(res: bdt.BulkData.StatusResponse<any>, prefix?: string): void;
 }
 /**
  * A set of assertions to verify the proper structure of the export manifest
  */
 export interface ManifestAssertions {
-    OK(res: Response<BulkData.ExportManifest>, prefix?: string): void;
+    OK(res: Response<bdt.BulkData.ExportManifest>, prefix?: string): void;
     body: ManifestBodyAssertions;
     deleted: ManifestDeletedAssertions;
     error: ManifestErrorAssertions;
@@ -104,19 +103,19 @@ export interface ManifestAssertions {
  * Assertions for the body of the export manifest
  */
 export interface ManifestBodyAssertions {
-    OK(manifest: BulkData.ExportManifest, kickOffUrl: string, prefix?: string): void;
+    OK(manifest: bdt.BulkData.ExportManifest, kickOffUrl: string, prefix?: string): void;
 }
 export interface ManifestDeletedAssertions {
-    OK(items: BulkData.ExportManifestFile<"Bundle">[], prefix?: string): void;
+    OK(items: bdt.BulkData.ExportManifestFile<"Bundle">[], prefix?: string): void;
 }
 export interface ManifestErrorAssertions {
-    OK(items: BulkData.ExportManifestFile<"OperationOutcome">[], prefix?: string): void;
+    OK(items: bdt.BulkData.ExportManifestFile<"OperationOutcome">[], prefix?: string): void;
 }
 /**
  * Assertions for the body of the export manifest
  */
 export interface ManifestOutputAssertions {
-    OK(items: BulkData.ExportManifestFile<string>[], type: string, prefix?: string): void;
+    OK(items: bdt.BulkData.ExportManifestFile<string>[], type: string, prefix?: string): void;
 }
 export interface ResponseAssertions {
     OperationOutcome(response: Response, prefix?: string): void;
@@ -126,7 +125,7 @@ export interface ResponseAssertions {
     json(response: Response, prefix?: string): void;
     ndJson(response: Response, prefix?: string): void;
     oauthError(response: Response, prefix?: string): void;
-    oauthErrorType(response: Response, type: OAuth.errorType, prefix?: string): void;
+    oauthErrorType(response: Response, type: bdt.OAuth.errorType, prefix?: string): void;
     statusCode(response: Response, code: number | number[], prefix?: string): void;
     statusText(response: Response, text: string | string[], prefix?: string): void;
 }
@@ -187,7 +186,7 @@ export declare function expectOAuthError(response: Response, prefix?: string): v
 /**
  * @category Response Assertion
  */
-export declare function expectOAuthErrorType(response: Response, type: OAuth.errorType, prefix?: string): void;
+export declare function expectOAuthErrorType(response: Response, type: bdt.OAuth.errorType, prefix?: string): void;
 /**
  * @category Response Assertion
  */
@@ -195,11 +194,11 @@ export declare function expectSuccessfulAuth(response: Response, prefix?: string
 /**
  * @category Response Assertion
  */
-export declare function expectFailedKickOff(response: Response, testApi: TestAPI, prefix?: string): void;
+export declare function expectFailedKickOff(response: Response, prefix?: string): void;
 /**
  * @category Response Assertion
  */
-export declare function expectSuccessfulKickOff(response: Response, testApi: TestAPI, prefix?: string): string | void;
+export declare function expectSuccessfulKickOff(response: Response, prefix?: string): void;
 export declare function expectHttpDate(date: string, prefix?: string): void;
 export declare function expectHttpDateAfter(date: string, after?: string | null, prefix?: string): void;
 export declare function expectHttpDateBefore(date: string, before?: string | null, prefix?: string): void;
@@ -223,5 +222,5 @@ export declare function expectNDJSONElements(body: string, elements: string[], p
  * @param prefix
  * @internal
  */
-export declare function expectValidManifestEntry(item: BulkData.ExportManifestFile, type: string, prefix?: string): void;
+export declare function expectValidManifestEntry(item: bdt.BulkData.ExportManifestFile, type: string, prefix?: string): void;
 export declare const assert: AssertAPI;

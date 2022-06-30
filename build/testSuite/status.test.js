@@ -5,10 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const moment_1 = __importDefault(require("moment"));
 const code_1 = require("@hapi/code");
-const bdt_1 = require("../lib/bdt");
 const BulkDataClient_1 = require("../lib/BulkDataClient");
 const assertions_1 = require("../lib/assertions");
-bdt_1.suite("Status Endpoint", () => {
+suite("Status Endpoint", () => {
     // After a bulk data request has been started, the client MAY poll the
     // URI provided in the Content-Location header.
     // Note: Clients SHOULD follow an exponential back-off approach when
@@ -26,7 +25,7 @@ bdt_1.suite("Status Endpoint", () => {
     // for indicating content type application/json. In the case that errors
     // prevent the export from completing, the server SHOULD respond with a
     // JSON-encoded FHIR OperationOutcome resource.
-    bdt_1.test({
+    test({
         name: "Responds with 202 for active exports",
         description: "The status endpoint should return **202** status code until the export is completed.\n\n" +
             'See [Response in progress status]' +
@@ -48,7 +47,7 @@ bdt_1.suite("Status Endpoint", () => {
         // Finally check the status code returned by the status endpoint
         assertions_1.assert.bulkData.status.pending(client.statusResponse, "When called immediately after kick-off, the status endpoint must reply with '202 Accepted'");
     });
-    bdt_1.test({
+    test({
         id: "Status-03",
         name: "Generates valid status response",
         description: "Runs a set of assertions to verify that:\n" +
@@ -68,13 +67,12 @@ bdt_1.suite("Status Endpoint", () => {
             "    - Every item may a `count` number property\n"
     }, async ({ config, api }) => {
         const client = new BulkDataClient_1.BulkDataClient(config, api);
-        const resourceType = config.fastestResource;
-        const { response: kickOffResponse } = await client.kickOff({ params: { _type: resourceType } });
+        const { response: kickOffResponse } = await client.kickOff({ params: { _type: "Patient" } });
         await client.waitForExport();
         await client.cancel(kickOffResponse);
         assertions_1.assert.bulkData.status.OK(client.statusResponse, "Status response is invalid");
     });
-    bdt_1.test({
+    test({
         name: "Exports can be canceled",
         description: "After a bulk data request has been started, a client MAY send a **DELETE** " +
             "request to the URL provided in the `Content-Location` header to cancel the request. " +
@@ -84,29 +82,42 @@ bdt_1.suite("Status Endpoint", () => {
         const client = new BulkDataClient_1.BulkDataClient(config, api);
         // Start an export
         const { response: kickOffResponse } = await client.kickOff();
+        // Make sure the kick-off was successful
+        assertions_1.assert.bulkData.kickOff.OK(kickOffResponse, "Kick-off failed");
         // Cancel the export immediately
-        const { response: cancelResponse1 } = await client.cancel(kickOffResponse);
-        // Verify that we didn't get an error
-        assertions_1.assert.bulkData.kickOff.OK(kickOffResponse, api);
+        const { response: cancelResponse1 } = await client.cancel(kickOffResponse, "First ");
         if (cancelResponse1.statusCode < 200 || cancelResponse1.statusCode >= 300) {
             return api.setNotSupported(`DELETE requests to the status endpoint are not supported by this server`);
         }
         assertions_1.assert.bulkData.cancellation.OK(cancelResponse1, "Servers that support export job canceling should reply with 202 status code");
         const { response: cancelResponse2 } = await client.request({
             url: client.kickOffResponse.headers["content-location"],
-            method: "DELETE"
+            requestLabel: "Second Cancellation Request",
+            responseLabel: "Second Cancellation Response",
+            method: "DELETE",
+            headers: {
+                accept: "application/json"
+            }
         });
         assertions_1.assert.bulkData.cancellation.notOK(cancelResponse2, "Following the delete request, when subsequent requests are " +
             "made to the polling location, the server SHALL return a 404 " +
             "error and an associated FHIR OperationOutcome in JSON format");
     });
-    bdt_1.test({
+    test({
         name: "Includes lenient errors in the payload errors array",
-        minVersion: "1.2",
+        minVersion: "2",
         description: "If the request contained invalid or unsupported parameters " +
             "along with a `Prefer: handling=lenient` header and the server " +
             "processed the request, the server SHOULD include an OperationOutcome " +
-            "resource for each of these parameters."
+            "resource for each of these parameters.\n\nTo properly execute this " +
+            "test we need to find at least one optional parameter that is not " +
+            "supported by this server, which is why we start by making a few test " +
+            "kick-off requests using different parameters until we find one that fails. " +
+            "If all of these request are successful the test cannot continue. Otherwise " +
+            "we repeat the request with the unsupported parameter, but this time we " +
+            "send a `prefer` header of `respond-async, handling=lenient`, and we expect " +
+            "a manifest with an OperationOutcome(s) in the `error` array mentioning the " +
+            "unsupported parameter."
     }, async ({ config, api }) => {
         const client = new BulkDataClient_1.BulkDataClient(config, api);
         // use a recent data to reduce the possible payload size
@@ -123,6 +134,7 @@ bdt_1.suite("Status Endpoint", () => {
         let unsupportedParam;
         for (const param of Object.keys(optionalParams)) {
             const { response } = await client.kickOff({
+                labelPrefix: `Trying kick-off with \`${param}\` parameter - `,
                 method: param === "patient" ? "POST" : "GET",
                 type: param === "patient" ? "patient" : null,
                 params: {
@@ -131,13 +143,16 @@ bdt_1.suite("Status Endpoint", () => {
                 }
             });
             await client.cancelIfStarted(response);
-            if (client.kickOffResponse.statusCode >= 400 && client.kickOffResponse.statusCode < 500) {
+            if (client.kickOffResponse.statusCode >= 400 /* && client.kickOffResponse.statusCode < 500*/) {
                 unsupportedParam = param;
                 break;
             }
         }
         // If all the optional params are supported there is nothing more we can do!
         if (!unsupportedParam) {
+            api.setNotSupported("All the kick-off parameters used by this test seem to be " +
+                "supported by this server. We cannot continue since we can't " +
+                "find an unsupported parameter to test with.");
             return;
         }
         // Kick-off with that unsupported param and handling=lenient
@@ -145,7 +160,7 @@ bdt_1.suite("Status Endpoint", () => {
             method: unsupportedParam === "patient" ? "POST" : "GET",
             type: unsupportedParam === "patient" ? "patient" : null,
             headers: {
-                prefer: ["respond-async", "handling=lenient"]
+                prefer: "respond-async, handling=lenient"
             },
             params: {
                 [unsupportedParam]: optionalParams[unsupportedParam],
@@ -153,10 +168,11 @@ bdt_1.suite("Status Endpoint", () => {
             }
         });
         // console.log(client.kickOffResponse.body)
-        assertions_1.assert.bulkData.kickOff.OK(response, api, "Kick-off failed");
+        assertions_1.assert.bulkData.kickOff.OK(response, "Kick-off failed");
         await client.waitForExport();
         await client.cancel(response);
-        const outcomes = (client.statusResponse.body.error || []).filter((x) => x.resourceType === "OperationOutcome");
+        const outcomes = (client.statusResponse.body.error || [])
+            .filter((x) => x.resourceType === "OperationOutcome");
         code_1.expect(outcomes.length, "No OperationOutcome errors found in the errors array").to.be.greaterThan(0);
         code_1.expect(JSON.stringify(outcomes), `"${unsupportedParam}" should be mentioned in at least one of the OperationOutcome errors`).to.contain(unsupportedParam);
     });

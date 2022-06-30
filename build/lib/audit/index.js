@@ -50,6 +50,7 @@ class Audit extends events_1.default {
         }
         catch (e) {
             if (!(e instanceof errors_1.NotSupportedError)) {
+                console.log("\n\n\n");
                 console.error(e);
             }
             result = false;
@@ -121,18 +122,23 @@ async function report(options, destination, openFile = false) {
             "\n" + line.join("   ") + "\n");
     });
     audit.once("end", score => {
-        process.stdout.write("\u001b[2A\u001b[2K" + "FINAL SCORE:".bold + "\u001b[2B\n");
         const html = pug_1.default.renderFile("./audit-report-template.pug", {
             score,
             server: options.baseURL
         });
-        fs_1.default.writeFileSync(destination, html);
-        console.log(`Report saved to "${path_1.resolve(destination)}"`);
-        if (openFile) {
-            open_1.default(path_1.resolve(destination)).catch(e => {
-                console.log(`Failed opening "${path_1.resolve(destination)}" in browser:`);
-                console.error(e);
-            });
+        if (destination) {
+            destination = path_1.resolve(process.cwd(), destination);
+            fs_1.default.writeFileSync(destination, html);
+            console.log(`Report saved to "${destination}"`);
+            if (openFile) {
+                open_1.default(destination).catch(e => {
+                    console.log(`Failed opening "${destination}" in browser:`);
+                    console.error(e);
+                });
+            }
+        }
+        else {
+            console.log(html);
         }
     });
     await audit.run();

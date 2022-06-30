@@ -6,6 +6,7 @@ class TestAPI {
     constructor(test) {
         this.test = test;
         this.console = test.console;
+        this.abortController = new AbortController();
     }
     /**
      * Sets the status of this test

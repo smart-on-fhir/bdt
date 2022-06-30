@@ -268,22 +268,22 @@ function StdoutReporter(runner, options) {
     }
     function text(node) {
         let name = node.name;
-        let info = "path: " + node.path;
+        let info = "";
         if (node.status === "not-implemented") {
             name = name.grey;
-            info += ", not implemented".grey;
+            info = (" (not implemented)").grey.dim;
         }
         else if (node.status === "not-supported") {
             name = name.grey;
-            info += ", not supported".yellow;
+            info = (" (not supported)").yellow.dim;
         }
         else if (node.status === "skipped") {
             name = name.grey;
-            info += (isInOnlyMode && !node.only ?
+            info = (isInOnlyMode && !node.only ?
                 ", skipped due to only mode" :
-                ", skipped").grey.italic;
+                ", skipped").grey.italic.dim;
         }
-        return name + (" (" + info + ")").dim;
+        return name + info;
     }
     function logConsoleEntry(entry, verbose) {
         if (entry.tags.indexOf("request") >= 0 && !verbose)
@@ -345,7 +345,7 @@ function StdoutReporter(runner, options) {
             let prefix = indent(depth++);
             log(`${prefix} ${icon(node)} ${wrap(
             // @ts-ignore
-            node.name.bold + ` (path: ${node.path})`.dim, prefix, options.wrap)}`);
+            node.name.bold, prefix, options.wrap)}`);
         }
     }
     function onGroupEnd(node) {
@@ -380,7 +380,12 @@ function StdoutReporter(runner, options) {
         log(`${currentIndent} ${wrap(icon(node) + " " + text(node) + " " + duration(node), nextIndent, options.wrap)}`);
         // counters
         counts.total += 1;
-        counts[node.status] += 1;
+        if (node.status !== "warned" &&
+            node.status !== "running" &&
+            node.status !== "unknown" &&
+            node.status !== "aborted") {
+            counts[node.status] += 1;
+        }
         depth++;
         // Tests with errors or warnings also render the description (if any)
         if (node.description && (node.status == "failed" || node.error || node.console.byTags(["warning", "error"]).length)) {

@@ -1,1 +1,1 @@
-import "colors";
+export * from "./lib";

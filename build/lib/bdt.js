@@ -3,198 +3,260 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.test = exports.suite = exports.afterEach = exports.beforeEach = exports.after = exports.before = exports.bdt = void 0;
-const slug_1 = __importDefault(require("slug"));
-const glob_1 = require("glob");
 const path_1 = __importDefault(require("path"));
+const glob_1 = require("glob");
+const slug_1 = __importDefault(require("slug"));
+const fs_1 = require("fs");
+const Config_1 = __importDefault(require("./Config"));
+const Suite_1 = require("./Suite");
+const Test_1 = require("./Test");
 const TestRunner_1 = __importDefault(require("./TestRunner"));
+const Version_1 = require("./Version");
 const stdout_1 = __importDefault(require("../reporters/stdout"));
 const json_stream_1 = __importDefault(require("../reporters/json-stream"));
 const console_1 = __importDefault(require("../reporters/console"));
-const globalContext_1 = __importDefault(require("./globalContext"));
-const Test_1 = require("./Test");
-const Suite_1 = require("./Suite");
-const Version_1 = require("./Version");
-const globalContext = globalContext_1.default;
 const reporters = {
     console: console_1.default,
     stdout: stdout_1.default,
     json: json_stream_1.default
 };
-async function bdt(options) {
-    // settings ----------------------------------------------------------------
-    const config = options;
-    // try {
-    //     Object.assign(settings, require(Path.resolve(__dirname, APP.config)));
-    // } catch (ex) {
-    //     console.error(`Failed to load settings from "${APP.config}". ${ex.message}`);
-    //     process.exit(1);
-    // }
-    // load --------------------------------------------------------------------
-    load(options.pattern);
-    let node = getPath(options.path || "");
-    if (node) {
-        if (options.list) {
-            if (options.apiVersion) {
-                node = filterByVersion(node.toJSON(), options.apiVersion);
+class BDT {
+    constructor(config) {
+        this.globalContext = { onlyMode: false };
+        this.globalContext.root = new Suite_1.Suite({ name: "__ROOT__", path: "" });
+        this.globalContext.currentGroup = this.globalContext.root;
+        if (config) {
+            this.configure(config);
+        }
+    }
+    configure(config) {
+        this.config = config;
+    }
+    load(path = "**/*.test.js") {
+        this.globalContext.root = new Suite_1.Suite({ name: "__ROOT__", path: "" });
+        this.globalContext.currentGroup = this.globalContext.root;
+        this.globalContext.onlyMode = false;
+        const testsDir = path_1.default.resolve(__dirname, "../../build/testSuite");
+        const paths = glob_1.sync(path, { cwd: testsDir });
+        if (!paths.length) {
+            throw new Error(`No files were found in "${testsDir}" matching the pattern "${path}".`);
+        }
+        paths.forEach((file) => {
+            const fullPath = path_1.default.resolve(testsDir, file);
+            try {
+                const moduleWrapper = Function("exports, require, module, __filename, __dirname, suite, test, before, beforeEach, after, afterEach", fs_1.readFileSync(fullPath, "utf8"));
+                moduleWrapper(exports, require, module, __filename, __dirname, this.suite.bind(this), this.test.bind(this), this.before.bind(this), this.beforeEach.bind(this), this.after.bind(this), this.afterEach.bind(this));
             }
-            console.log(JSON.stringify(node, null, 4));
-        }
-        else {
-            // runner ------------------------------------------------------------------
-            const runner = new TestRunner_1.default(config, !!globalContext.onlyMode);
-            // reporter ----------------------------------------------------------------
-            reporters[options.reporter](runner, config.reporterOptions);
-            await runner.run(node);
-        }
+            catch (e) {
+                console.log(`No tests could be loaded from ${fullPath}.\n${e.stack}`);
+            }
+        });
+        return this.globalContext.root;
     }
-    return globalContext.root;
-}
-exports.bdt = bdt;
-function load(pattern) {
-    globalContext.root = new Suite_1.Suite({ name: "__ROOT__", path: "" });
-    globalContext.currentGroup = globalContext.root;
-    globalContext.onlyMode = false;
-    const paths = glob_1.sync(pattern);
-    paths.forEach((file) => {
-        const fullPath = path_1.default.resolve(file);
+    list(path = "") {
+        let node = this.getPath(path);
+        if (!node) {
+            throw new Error(`No test node found at path ${JSON.stringify(path)}.`);
+        }
+        if (this.config.apiVersion) {
+            return this.filterByVersion(node.toJSON(), this.config.apiVersion);
+        }
+        return node.toJSON();
+    }
+    createRunner() {
+        return new TestRunner_1.default(this.config, !!this.globalContext.onlyMode, this.globalContext);
+    }
+    getPath(path = "") {
+        if (!path) {
+            return this.globalContext.root;
+        }
+        return path.split(".").reduce((out, i) => out && out.children ? out.children[+i] : undefined, this.globalContext.root);
+    }
+    filterByVersion(node, version) {
+        if (node.minVersion && new Version_1.Version(node.minVersion).isAbove(version)) {
+            return undefined;
+        }
+        if (node.maxVersion && new Version_1.Version(node.maxVersion).isBelow(version)) {
+            return undefined;
+        }
+        if (Array.isArray(node.children)) {
+            const out = { ...node, children: [] };
+            node.children.forEach(child => {
+                const result = this.filterByVersion(child, version);
+                if (result) {
+                    out.children.push(result);
+                }
+            });
+            return out;
+        }
+        return node;
+    }
+    /**
+     * This function is called by tests. It creates new group and appends it to
+     * the current group.
+     * @param nameOrOptions The group name or settings object
+     * @param fn The function that will be called to build the group
+     */
+    suite(nameOrOptions, fn) {
+        if (typeof nameOrOptions === "string") {
+            return this.suite({ name: nameOrOptions }, fn);
+        }
+        let group = new Suite_1.Suite({
+            ...nameOrOptions,
+            only: nameOrOptions.only || this.globalContext.currentGroup.only,
+            path: [
+                this.globalContext.currentGroup.path,
+                this.globalContext.currentGroup.children.length + ""
+            ].filter(Boolean).join(".")
+        });
+        this.globalContext.currentGroup.children.push(group);
+        const parent = this.globalContext.currentGroup;
+        this.globalContext.currentGroup = group;
+        fn();
+        this.globalContext.currentGroup = parent;
+    }
+    /**
+     * The `it` function that will be made available to tests. It will simply
+     * "remember" the test by appending it to the children structure of the parent
+     * group element.
+     */
+    test(nameOrOptions, fn) {
+        if (typeof nameOrOptions === "string") {
+            return this.test({ name: nameOrOptions }, fn);
+        }
+        const path = [
+            this.globalContext.currentGroup.path,
+            this.globalContext.currentGroup.children.length + ""
+        ].filter(Boolean).join(".");
+        const id = nameOrOptions.id || slug_1.default(path + "--" + nameOrOptions.name);
+        this.globalContext.currentGroup.children.push(new Test_1.Test({
+            ...nameOrOptions,
+            only: nameOrOptions.only || this.globalContext.currentGroup.only,
+            path,
+            id,
+            fn
+        }));
+    }
+    /**
+     * Register a function to be executed before a test group execution starts.
+     * @param fn Can return a promise for async stuff
+     */
+    before(fn) {
+        this.globalContext.currentGroup.before = fn;
+    }
+    /**
+     * Register a function to be executed after a test group execution ends.
+     * @param fn Can return a promise for async stuff
+     */
+    after(fn) {
+        this.globalContext.currentGroup.after = fn;
+    }
+    /**
+     * Register a function to be executed before a test execution starts.
+     * @param fn Can return a promise for async stuff
+     */
+    beforeEach(fn) {
+        this.globalContext.currentGroup.beforeEach = fn;
+    }
+    /**
+     * Register a function to be executed after a test execution ends.
+     * @param fn Can return a promise for async stuff
+     */
+    afterEach(fn) {
+        this.globalContext.currentGroup.afterEach = fn;
+    }
+    // STATIC METHODS
+    // -------------------------------------------------------------------------
+    /**
+     * Given a path to JS configuration file:
+     * 1. Resolves it relative to CWD
+     * 2. Loads it using `require`
+     * 3. Validates it and throws if needed
+     * 4. Creates a [[Config]] object from it
+     * 5. Runs the `normalize` method on that object
+     * 6. Finally returns the `NormalizedConfig` object
+     * @param path path to JS configuration file, relative to CWD
+     * @param signal Optional AbortSignal to cancel async jobs
+     */
+    static async loadConfigFile(path, signal) {
+        const configPath = path_1.default.resolve(process.cwd(), path);
         try {
-            require(fullPath);
+            const options = require(configPath);
+            try {
+                await Config_1.default.validate(options, signal);
+            }
+            catch (ex) {
+                const message = `Found some errors in your configuration file. ` +
+                    `Please fix them first.\n${ex.message}`;
+                throw new Error(message);
+            }
+            const config = new Config_1.default(options);
+            return await config.normalize(signal);
         }
-        catch (e) {
-            console.log(`No tests could be loaded from ${fullPath}. ${e.stack}`);
+        catch (ex) {
+            throw new Error(`Failed to load settings from "${configPath}".\n${ex.message}`);
         }
-    });
-    return globalContext.root;
-}
-/**
- * Given a path (which is a dot-separated list of indexes), finds and returns
- * the node at that path. For example getPath("2.1.5") will return the sixth
- * child of the second child of the third child of the root node.
- */
-function getPath(path = "") {
-    if (!path) {
-        return globalContext.root;
     }
-    return path.split(".").reduce((out, i) => out && out.children ? out.children[+i] : undefined, globalContext.root);
-}
-function filterByVersion(node, version) {
-    if (node.minVersion && new Version_1.Version(node.minVersion).isAbove(version)) {
-        return undefined;
+    /**
+     * To get the tests list one needs to create new bdt instance, load the
+     * tests, find the right node and filter it's children by version. This
+     * method does all that in a single call
+     * @param [options]
+     * @param [options.path] The node path if any (e.g.: "1.2.3")
+     * @param [options.pattern] A glob pattern matching the test file names
+     * @param [options.apiVersion] To limit the results to that Api version
+     */
+    static list({ path, apiVersion, pattern } = {}) {
+        const bdt = new BDT();
+        bdt.load(pattern);
+        const node = bdt.getPath(path).toJSON();
+        const filtered = bdt.filterByVersion(node, apiVersion);
+        if (!path) {
+            return filtered.children;
+        }
+        return filtered;
     }
-    if (node.maxVersion && new Version_1.Version(node.maxVersion).isBelow(version)) {
-        return undefined;
+    static async test({ config, path = "", pattern, // = "**/*.test.js",
+    reporter, reporterOptions = {} }) {
+        const bdt = new BDT(config);
+        bdt.load(pattern);
+        const node = bdt.getPath(path);
+        const runner = bdt.createRunner();
+        if (reporter)
+            reporters[reporter](runner, reporterOptions);
+        await runner.run(node);
+        return node;
+        // return { node, runner, bdt }
     }
-    const out = { ...node };
-    if (Array.isArray(out.children)) {
-        out.children = out.children.map((child) => filterByVersion(child, version)).filter(Boolean);
-    }
-    return out;
 }
-/**
- * Register a function to be executed before a test group execution starts.
- * @param fn Can return a promise for async stuff
- */
-function before(fn) {
-    globalContext.currentGroup.before = fn;
-}
-exports.before = before;
-/**
- * Register a function to be executed after a test group execution ends.
- * @param fn Can return a promise for async stuff
- */
-function after(fn) {
-    globalContext.currentGroup.after = fn;
-}
-exports.after = after;
-/**
- * Register a function to be executed before a test execution starts.
- * @param fn Can return a promise for async stuff
- */
-function beforeEach(fn) {
-    globalContext.currentGroup.beforeEach = fn;
-}
-exports.beforeEach = beforeEach;
-/**
- * Register a function to be executed after a test execution ends.
- * @param fn Can return a promise for async stuff
- */
-function afterEach(fn) {
-    globalContext.currentGroup.afterEach = fn;
-}
-exports.afterEach = afterEach;
-/**
- * This function is called by tests. It creates new group and appends it to the
- * current group.
- * @param nameOrOptions The group name or settings object
- * @param fn The function that will be called to build the group
- */
-function suite(nameOrOptions, fn) {
+exports.default = BDT;
+// suite.only
+BDT.prototype.suite.only = function (nameOrOptions, fn) {
+    this.globalContext.onlyMode = true;
     if (typeof nameOrOptions === "string") {
-        return suite({ name: nameOrOptions }, fn);
-    }
-    let group = new Suite_1.Suite({
-        ...nameOrOptions,
-        only: nameOrOptions.only || globalContext.currentGroup.only,
-        path: [
-            globalContext.currentGroup.path,
-            globalContext.currentGroup.children.length + ""
-        ].filter(Boolean).join(".")
-    });
-    globalContext.currentGroup.children.push(group);
-    const parent = globalContext.currentGroup;
-    globalContext.currentGroup = group;
-    fn();
-    globalContext.currentGroup = parent;
-}
-exports.suite = suite;
-suite.only = function (nameOrOptions, fn) {
-    globalContext.onlyMode = true;
-    if (typeof nameOrOptions === "string") {
-        suite({ name: nameOrOptions, only: true }, fn);
+        this.suite({ name: nameOrOptions, only: true }, fn);
     }
     else {
-        suite({ ...nameOrOptions, only: true }, fn);
+        this.suite({ ...nameOrOptions, only: true }, fn);
     }
 };
-/**
- * The `it` function that will be made available to tests. It will simply
- * "remember" the test by appending it to the children structure of the parent
- * group element.
- */
-function test(nameOrOptions, fn) {
+// test.only
+BDT.prototype.suite.only = function (nameOrOptions, fn) {
+    this.globalContext.onlyMode = true;
     if (typeof nameOrOptions === "string") {
-        return test({ name: nameOrOptions }, fn);
-    }
-    const path = [
-        globalContext.currentGroup.path,
-        globalContext.currentGroup.children.length + ""
-    ].filter(Boolean).join(".");
-    const id = nameOrOptions.id || slug_1.default(path + "--" + nameOrOptions.name);
-    globalContext.currentGroup.children.push(new Test_1.Test({
-        ...nameOrOptions,
-        only: nameOrOptions.only || globalContext.currentGroup.only,
-        path,
-        id,
-        fn
-    }));
-}
-exports.test = test;
-test.only = function (nameOrOptions, fn) {
-    globalContext.onlyMode = true;
-    if (typeof nameOrOptions === "string") {
-        test({ name: nameOrOptions, only: true }, fn);
+        this.test({ name: nameOrOptions, only: true }, fn);
     }
     else {
-        test({ ...nameOrOptions, only: true }, fn);
+        this.test({ ...nameOrOptions, only: true }, fn);
     }
 };
-test.skip = function (nameOrOptions, fn) {
+// suite.skip
+BDT.prototype.suite.skip = function (nameOrOptions, fn) {
     if (typeof nameOrOptions === "string") {
-        test({ name: nameOrOptions, only: true });
+        this.test({ name: nameOrOptions, only: true });
     }
     else {
-        test({ ...nameOrOptions, only: true });
+        this.test({ ...nameOrOptions, only: true });
     }
 };
 //# sourceMappingURL=bdt.js.map

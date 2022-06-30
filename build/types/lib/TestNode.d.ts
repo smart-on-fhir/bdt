@@ -1,13 +1,5 @@
 import { Version } from "./Version";
-export interface TestNodeOptions {
-    name: string;
-    description?: string;
-    minVersion?: string;
-    maxVersion?: string;
-    path?: string;
-    only?: boolean;
-    skip?: boolean;
-}
+import { bdt } from "../../types";
 /**
  * This is the base class for Test and Group classes which are nodes in the test
  * tree.
@@ -47,7 +39,7 @@ export declare abstract class TestNode {
      */
     readonly only?: boolean;
     readonly skip?: boolean;
-    constructor(options: TestNodeOptions);
+    constructor(options: bdt.TestNodeOptions);
     get minVersion(): Version;
     get maxVersion(): Version;
     toJSON(): Record<string, any>;

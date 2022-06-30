@@ -3,18 +3,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const source_1 = __importDefault(require("got/dist/source"));
 const node_jose_1 = __importDefault(require("node-jose"));
 const code_1 = require("@hapi/code");
-const source_1 = __importDefault(require("got/dist/source"));
-// import jwt         from "jsonwebtoken"
-// import crypto      from "crypto"
-const lib_1 = require("./lib");
 const ms_1 = __importDefault(require("ms"));
+const lib_1 = require("./lib");
 class Config {
     constructor(originalConfig) {
         this.originalConfig = originalConfig;
     }
-    async normalize() {
+    async normalize(signal) {
         const out = {
             systemExportEndpoint: "",
             patientExportEndpoint: "",
@@ -31,7 +29,7 @@ class Config {
             },
             requests: {
                 strictSSL: true,
-                timeout: 5000,
+                timeout: 10000,
                 customHeaders: {}
             }
         };
@@ -75,7 +73,7 @@ class Config {
                 out.authentication.tokenEndpoint = tokenEndpoint.trim();
             }
             else {
-                out.authentication.tokenEndpoint = await this.getTokenEndpoint(out);
+                out.authentication.tokenEndpoint = await this.getTokenEndpoint(out, signal);
                 code_1.expect(out.authentication.tokenEndpoint, "authentication.tokenEndpoint was not set and could not be auto-detected").to.be.string();
                 code_1.expect(out.authentication.tokenEndpoint, "authentication.tokenEndpoint was not set and could not be auto-detected properly").to.match(/^https?:\/\/.+/);
             }
@@ -119,7 +117,10 @@ class Config {
         // jwksUrl
         if (jwksUrl) {
             code_1.expect(jwksUrl, "authentication.jwksUrl must be a string").to.be.string();
-            code_1.expect(jwksUrl, "authentication.jwksUrl must be an https url").to.match(/^https:\/\/.+/);
+            // jwksUrl must be on https but we allow http on localhost for dev
+            if (!jwksUrl.match(/\/\/(localhost|127.0.0.1)(:\d+)?\//)) {
+                code_1.expect(jwksUrl, "authentication.jwksUrl must be an https url").to.match(/^https:\/\/.+/);
+            }
             out.authentication.jwksUrl = jwksUrl.trim();
         }
         // Requests -----------------------------------------------------------
@@ -146,7 +147,7 @@ class Config {
             out.systemExportEndpoint = options.systemExportEndpoint;
         }
         else {
-            out.systemExportEndpoint = await this.getSystemExportEndpoint(out);
+            out.systemExportEndpoint = await this.getSystemExportEndpoint(out, signal);
         }
         // patientExportEndpoint
         if (options.patientExportEndpoint) {
@@ -154,7 +155,7 @@ class Config {
             out.patientExportEndpoint = options.patientExportEndpoint;
         }
         else {
-            out.patientExportEndpoint = await this.getPatientExportEndpoint(out);
+            out.patientExportEndpoint = await this.getPatientExportEndpoint(out, signal);
         }
         // groupExportEndpoint
         if (options.groupExportEndpoint) {
@@ -169,7 +170,7 @@ class Config {
             out.supportedResourceTypes = options.supportedResourceTypes;
         }
         else {
-            out.supportedResourceTypes = await this.getSupportedResourceTypes(out);
+            out.supportedResourceTypes = await this.getSupportedResourceTypes(out, signal);
         }
         // fastestResource
         if (options.fastestResource) {
@@ -184,30 +185,41 @@ class Config {
         code_1.expect(out.groupExportEndpoint || out.patientExportEndpoint || out.systemExportEndpoint, "At least one export endpoint must be configured (groupExportEndpoint|patientExportEndpoint|systemExportEndpoint)");
         return out;
     }
-    async getCapabilityStatement(options) {
+    async getCapabilityStatement(options, signal) {
         if (this._capabilityStatement === undefined) {
+            if (signal?.aborted) {
+                // @ts-ignore
+                throw new DOMException(signal.reason || "Aborted", "AbortError");
+            }
+            this._capabilityStatement = null;
+            const url = `${options.baseURL}/metadata?_format=json`;
             try {
-                this._capabilityStatement = await source_1.default({
-                    url: `${options.baseURL}/metadata?_format=json`,
-                    https: {
-                        rejectUnauthorized: false
-                    },
+                const req = source_1.default(url, {
                     headers: {
                         accept: "application/fhir+json,application/json+fhir,application/json"
                     }
-                }).json();
+                });
+                if (signal) {
+                    signal.addEventListener("abort", () => req.cancel(), { once: true });
+                }
+                const json = await req.json();
+                this._capabilityStatement = json;
             }
             catch (ex) {
-                this._capabilityStatement = null;
-                console.error(`Could not fetch the CapabilityStatement from ${options.baseURL}/metadata?_format=json. ${ex.message}`);
-                // ex.message = `Could not fetch the CapabilityStatement from ${options.baseURL}/metadata?_format=json. ${ex.message}`
-                // throw ex
+                console.error(`Could not fetch the CapabilityStatement from ${url}: ${ex.message}`);
             }
         }
         return this._capabilityStatement;
     }
-    async getTokenEndpoint(options) {
-        const capabilityStatement = await this.getCapabilityStatement(options);
+    getOperationDefinition(operations, name, ref) {
+        return operations.find((e) => {
+            return e.name === name && (e.definition === ref ||
+                e.definition?.reference === ref // Incorrect but needed for some servers
+            );
+        });
+    }
+    async getTokenEndpoint(options, signal) {
+        const capabilityStatement = await this.getCapabilityStatement(options, signal);
         if (capabilityStatement) {
             const securityExtensions = lib_1.getPath(capabilityStatement, "rest.0.security.extension") || [];
             const oauthUrisUrl = "http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris";
@@ -216,23 +228,21 @@ class Config {
         }
         return "";
     }
-    async getSystemExportEndpoint(options) {
-        const capabilityStatement = await this.getCapabilityStatement(options);
+    async getSystemExportEndpoint(options, signal) {
+        const capabilityStatement = await this.getCapabilityStatement(options, signal);
         if (capabilityStatement) {
             const operations = lib_1.getPath(capabilityStatement, "rest.0.operation") || [];
-            const definition = operations.find((e) => (e.name === "export" &&
-                e.definition === "http://hl7.org/fhir/uv/bulkdata/OperationDefinition/export"));
-            return definition ? "$export" : "";
+            return this.getOperationDefinition(operations, "export", "http://hl7.org/fhir/uv/bulkdata/OperationDefinition/export") ? "$export" : "";
         }
         return "";
     }
-    async getPatientExportEndpoint(options) {
-        const capabilityStatement = await this.getCapabilityStatement(options);
+    async getPatientExportEndpoint(options, signal) {
+        const capabilityStatement = await this.getCapabilityStatement(options, signal);
         if (capabilityStatement) {
             let supported;
             try {
-                supported = !!capabilityStatement.rest[0].resource.find((x) => x.type === "Patient").operation.find((x) => (x.name === "patient-export" &&
-                    x.definition === "http://hl7.org/fhir/uv/bulkdata/OperationDefinition/patient-export"));
+                const patient = capabilityStatement.rest[0].resource.find((x) => x.type === "Patient");
+                supported = !!this.getOperationDefinition(patient.operation, "patient-export", "http://hl7.org/fhir/uv/bulkdata/OperationDefinition/patient-export");
             }
             catch {
                 supported = false;
@@ -241,14 +251,18 @@ class Config {
         }
         return "";
     }
-    async getSupportedResourceTypes(options) {
-        const capabilityStatement = await this.getCapabilityStatement(options);
+    async getSupportedResourceTypes(options, signal) {
+        const capabilityStatement = await this.getCapabilityStatement(options, signal);
         if (capabilityStatement) {
             return (capabilityStatement.rest[0].resource || []).map((x) => x.type);
         }
         return [];
     }
-    static async validate(cfg) {
+    static async validate(cfg, signal) {
+        if (signal?.aborted) {
+            // @ts-ignore
+            throw new DOMException(signal.reason || "Aborted", "AbortError");
+        }
         // baseURL -------------------------------------------------------------
         code_1.expect(cfg, "The baseURL property is required").to.include("baseURL");
         code_1.expect(cfg.baseURL, "The baseURL property must be a string").to.be.string();

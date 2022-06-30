@@ -26,7 +26,7 @@ class Console {
      * @param error The error to add
      */
     error(error) {
-        this.add("error", "error", [], error);
+        this.add("error", "error", [], error + "");
     }
     /**
      * Add new entry of type "warn"
@@ -144,6 +144,9 @@ class Console {
      */
     forEach(callback) {
         this.entries.forEach(callback);
+    }
+    clear() {
+        this.entries = [];
     }
 }
 exports.Console = Console;

@@ -1,18 +1,18 @@
 import { Console } from "./Console";
-import { TestCallbackFn } from "./Suite";
-import { TestNode, TestNodeOptions } from "./TestNode";
-export interface TestOptions extends TestNodeOptions {
+import { TestNode } from "./TestNode";
+import { bdt } from "../../types";
+export interface TestOptions extends bdt.TestNodeOptions {
     id?: string;
-    fn?: TestCallbackFn;
+    fn?: bdt.TestCallbackFn;
 }
-export declare type TestStatus = "succeeded" | "failed" | "not-supported" | "not-implemented" | "skipped";
+export declare type TestStatus = "succeeded" | "failed" | "not-supported" | "not-implemented" | "skipped" | "aborted" | "warned" | "running" | "unknown";
 export declare class Test extends TestNode {
     /**
      * The actual function that will be called to execute the test. If omitted
      * the test is considered "not implemented" or "todo". Can only be set once
      * while constructing the instance via the `fn` option.
      */
-    readonly fn?: TestCallbackFn;
+    readonly fn?: bdt.TestCallbackFn;
     /**
      * Each test must have unique ID. The test itself does not need this to
      * function properly. It is a metadata assigned to it by the test loader.
@@ -25,8 +25,9 @@ export declare class Test extends TestNode {
     startedAt?: number;
     error?: Error;
     console: Console;
-    after?: TestCallbackFn;
+    after?: bdt.TestCallbackFn;
     constructor(options: TestOptions);
+    reset(): void;
     toJSON(): Record<string, any>;
     set status(status: TestStatus);
     get status(): TestStatus;

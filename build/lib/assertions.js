@@ -7,6 +7,7 @@ exports.assert = exports.expectValidManifestEntry = exports.expectNDJSONElements
 const code_1 = require("@hapi/code");
 const lib_1 = require("./lib");
 const moment_1 = __importDefault(require("moment"));
+const errors_1 = require("./errors");
 const REGEXP_INSTANT = new RegExp("([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)-" +
     "(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([01][0-9]|2[0-3])" +
     ":[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?(Z|(\\+|-)((0[0-9]|1[0-3])" +
@@ -190,8 +191,8 @@ exports.expectUnauthorized = expectUnauthorized;
  * @category Response Assertion
  */
 function expectOAuthError(response, prefix = "") {
-    expectJsonResponse(response, prefix);
-    expectClientError(response, prefix);
+    expectJsonResponse(response, prefix + "Invalid OAuth error response! ");
+    expectClientError(response, prefix + "Invalid OAuth error response! ");
     const body = response.body;
     const validErrorTypes = [
         "invalid_request",
@@ -204,17 +205,17 @@ function expectOAuthError(response, prefix = "") {
     const { error, error_description, error_uri } = body;
     const err = "Got " + lib_1.getErrorMessageFromResponse(response);
     // body.error
-    code_1.expect(error, concat(prefix, err, "The 'error' property of OAuth error responses is required")).to.exist();
-    code_1.expect(error, concat(prefix, err, "The 'error' property of OAuth error responses must be a string")).to.be.string();
-    code_1.expect(validErrorTypes, concat(prefix, err, "Invalid OAuth error 'error' property")).to.include(error);
+    code_1.expect(error, concat(prefix, err, "Invalid OAuth error response! The 'error' property of OAuth error responses is required")).to.exist();
+    code_1.expect(error, concat(prefix, err, "Invalid OAuth error response! The 'error' property of OAuth error responses must be a string")).to.be.string();
+    code_1.expect(validErrorTypes, concat(prefix, err, "Invalid OAuth error response! Invalid OAuth error 'error' property")).to.include(error);
     // body.error_description
     if (error_description) {
-        code_1.expect(error_description, concat(prefix, err, `The 'error_description' property of OAuth error responses must be a string if present`)).to.be.string();
+        code_1.expect(error_description, concat(prefix, err, `Invalid OAuth error response! The 'error_description' property of OAuth error responses must be a string if present`)).to.be.string();
     }
     // body.error_uri
     if (error_uri) {
-        code_1.expect(error_uri, concat(prefix, err, `If present, the 'error_uri' property of OAuth error responses must be a string`)).to.be.string();
-        code_1.expect(error_uri, concat(prefix, err, `If present, the 'error_uri' property of OAuth error responses must be an url`)).to.match(/^https?:\/\/.+/);
+        code_1.expect(error_uri, concat(prefix, err, `Invalid OAuth error response! If present, the 'error_uri' property of OAuth error responses must be a string`)).to.be.string();
+        code_1.expect(error_uri, concat(prefix, err, `Invalid OAuth error response! If present, the 'error_uri' property of OAuth error responses must be an url`)).to.match(/^https?:\/\/.+/);
     }
 }
 exports.expectOAuthError = expectOAuthError;
@@ -278,14 +279,14 @@ exports.expectSuccessfulAuth = expectSuccessfulAuth;
 /**
  * @category Response Assertion
  */
-function expectFailedKickOff(response, testApi, prefix = "") {
+function expectFailedKickOff(response, prefix = "") {
     const { statusCode } = response;
     const { options } = response.request;
     if (statusCode === 404 || statusCode === 405 /* Method Not Allowed */) {
-        return testApi.setNotSupported(`${options.method} ${options.url.pathname} is not supported by this server`);
+        throw new errors_1.NotSupportedError(`${options.method} ${options.url.pathname} is not supported by this server`);
     }
     if (statusCode >= 500) {
-        return testApi.setNotSupported(`${options.method} ${options.url.pathname} is not supported by this server. Received a server error.`);
+        throw new errors_1.NotSupportedError(`${options.method} ${options.url.pathname} is not supported by this server. Received a server error.`);
     }
     expectClientError(response, concat(prefix, "The kick-off request was expected to fail"));
     expectOperationOutcome(response, concat(prefix, "In case of error the server should return an OperationOutcome"));
@@ -294,14 +295,14 @@ exports.expectFailedKickOff = expectFailedKickOff;
 /**
  * @category Response Assertion
  */
-function expectSuccessfulKickOff(response, testApi, prefix = "") {
+function expectSuccessfulKickOff(response, prefix = "") {
     const { statusCode } = response;
     const { options } = response.request;
     if (statusCode === 404 || statusCode === 405 /* Method Not Allowed */) {
-        return testApi.setNotSupported(`${options.method} ${options.url.pathname} is not supported by this server`);
+        throw new errors_1.NotSupportedError(`${options.method} ${options.url.pathname} is not supported by this server`);
     }
     if (statusCode >= 500) {
-        return `${options.method} ${options.url.pathname} is not supported by this server. Received a server error.`;
+        throw new errors_1.NotSupportedError(`${options.method} ${options.url.pathname} is not supported by this server. Received a server error.`);
     }
     const error = "Got: " + lib_1.getErrorMessageFromResponse(response);
     expectResponseCode(response, 202, concat(prefix, error));

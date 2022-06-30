@@ -7,15 +7,17 @@ const events_1 = __importDefault(require("events"));
 const errors_1 = require("./errors");
 const Test_1 = require("./Test");
 const TestAPI_1 = require("./TestAPI");
-const globalContext_1 = __importDefault(require("./globalContext"));
+const lib_1 = require("./lib");
 class TestRunner extends events_1.default {
-    constructor(settings, onlyMode = false) {
+    constructor(settings, onlyMode = false, context = {}) {
         super();
         this.canceled = false;
         this.onlyMode = false;
+        this.startPath = null;
         this.canceled = false;
         this.onlyMode = onlyMode;
         this.settings = settings;
+        this.context = context;
     }
     async endTest(test, context, error) {
         test.endedAt = Date.now();
@@ -23,7 +25,7 @@ class TestRunner extends events_1.default {
             // Not supported
             if (error instanceof errors_1.NotSupportedError) {
                 test.status = "not-supported";
-                // test.console.info(error.message)
+                test.console.info(String(error));
             }
             // Other errors
             else {
@@ -63,6 +65,10 @@ class TestRunner extends events_1.default {
         //     this.currentGroup.completed++
         // }
         this.emit("testEnd", test);
+        if (test.path === this.startPath) {
+            this.emit("end");
+            this.startPath = null;
+        }
     }
     async endGroup(node, parent, context, error) {
         // if (parent) parent.completed += node.completed
@@ -76,25 +82,28 @@ class TestRunner extends events_1.default {
             }
         }
         this.emit("groupEnd", node);
-        if (node.name === "__ROOT__") {
+        if (node.path === this.startPath) {
             this.emit("end");
+            this.startPath = null;
         }
     }
     async run(node, context = {}) {
+        this.startPath = node.path;
+        this.emit("start", { onlyMode: this.onlyMode });
+        return this._run(node, context);
+    }
+    async _run(node, context = {}) {
         if (node instanceof Test_1.Test) {
             // If run is called for a leaf node we don't know its parent so make
             // sure we find it manually and set it as `currentGroup`
             let path = node.path.split(".");
             path.pop();
             // @ts-ignore
-            this.currentGroup = globalContext_1.default.root.getNodeAt(path.join("."));
+            this.currentGroup = this.context.root.getNodeAt(path.join("."));
             return await this.runTest(node, context);
         }
         let parentGroup = this.currentGroup;
         this.currentGroup = node;
-        if (node.name === "__ROOT__") {
-            this.emit("start", { onlyMode: this.onlyMode });
-        }
         this.emit("groupStart", node);
         if (node.before) {
             try {
@@ -106,14 +115,16 @@ class TestRunner extends events_1.default {
             }
         }
         for (const child of node.children) {
-            await this.run(child, context);
             if (this.canceled) {
                 break;
             }
+            await lib_1.wait(50);
+            await this._run(child, context);
         }
         await this.endGroup(node, parentGroup, context);
     }
     async runTest(test, context = {}) {
+        test.reset();
         test.startedAt = Date.now();
         // Exit if onlyMode is being used elsewhere
         if (this.onlyMode && !(test.only || this.currentGroup.only)) {
@@ -163,20 +174,42 @@ class TestRunner extends events_1.default {
         // execute
         try {
             this.emit("testStart", test);
-            await test.fn({ config: this.settings, api: new TestAPI_1.TestAPI(test), context });
+            this.currentTestApi = new TestAPI_1.TestAPI(test);
+            await test.fn({ config: this.settings, api: this.currentTestApi, context });
             await this.endTest(test, context);
         }
         catch (error) {
-            const thrownRe = /\: Expected \[Function\] to not throw an error but got \[/g;
-            const match = error.message.match(thrownRe);
-            if (match) {
-                error.message = error.message
-                    .replace(/Error\: /g, "")
-                    .replace(thrownRe, `\n✖ `) // 🛈❌
-                    .replace(/\]*$/, "");
+            if (error instanceof errors_1.NotSupportedError) {
+                test.status = "not-supported";
+                this.currentTestApi.setNotSupported(error.message);
+                await this.endTest(test, context);
             }
-            await this.endTest(test, context, error);
+            else if (error.name === "AbortError" || error.name === "CancelError") {
+                test.status = "aborted";
+                this.currentTestApi.console.warn("Test aborted");
+                await this.endTest(test, context);
+            }
+            else {
+                const thrownRe = /\: Expected \[Function\] to not throw an error but got \[/g;
+                const match = error.message.match(thrownRe);
+                if (match) {
+                    error.message = error.message
+                        .replace(/Error\: /g, "")
+                        .replace(thrownRe, `\n✖ `) // ❌
+                        .replace(/\]*$/, "");
+                }
+                await this.endTest(test, context, error);
+            }
         }
+        finally {
+            this.currentTestApi = null;
+        }
+    }
+    abort(aportAll = false) {
+        if (aportAll) {
+            this.canceled = true;
+        }
+        this.currentTestApi && this.currentTestApi.abortController.abort();
     }
 }
 exports.default = TestRunner;

@@ -3,16 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bdt_1 = require("../lib/bdt");
 const BulkDataClient_1 = require("../lib/BulkDataClient");
 const node_jose_1 = __importDefault(require("node-jose"));
 const assertions_1 = require("../lib/assertions");
 const code_1 = require("@hapi/code");
-bdt_1.suite("Authorization", () => {
+suite("Authorization", () => {
     // A few tests that are the same for each of the kick-off endpoints
     ["system", "patient", "group"].forEach((type) => {
-        bdt_1.suite(`Kick-off request at the ${type}-level export endpoint`, () => {
-            bdt_1.test({
+        suite(`Kick-off request at the ${type}-level export endpoint`, () => {
+            test({
                 name: `Requires authorization header`,
                 description: `The server should require authorization header at the ${type}-level export endpoint`
             }, async ({ config, api }) => {
@@ -35,7 +34,7 @@ bdt_1.suite("Authorization", () => {
                     assertions_1.expectOperationOutcome(client.kickOffResponse, "The body SHALL be a FHIR OperationOutcome resource in JSON format");
                 }
             });
-            bdt_1.test({
+            test({
                 name: `Rejects invalid token`,
                 description: `The server should reject invalid tokens at the ${type}-level export endpoint`,
             }, async ({ config, api }) => {
@@ -51,8 +50,8 @@ bdt_1.suite("Authorization", () => {
             });
         });
     });
-    bdt_1.suite("Token endpoint", () => {
-        bdt_1.beforeEach(({ config, api, context }) => {
+    suite("Token endpoint", () => {
+        beforeEach(({ config, api, context }) => {
             api.prerequisite({
                 assertion: config.authentication.type === "backend-services",
                 message: "This test is only applicable for servers that support SMART Backend Services authorization."
@@ -81,7 +80,7 @@ bdt_1.suite("Authorization", () => {
             };
         });
         // ====================================================================
-        bdt_1.test({
+        test({
             name: "Clients can authorize",
             description: "Does not test any edge cases. Just verifies that the " +
                 "authorization works with the provided settings"
@@ -93,7 +92,7 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectSuccessfulAuth(response, "Authorization failed");
         });
-        bdt_1.test({
+        test({
             name: 'Requires "application/x-www-form-urlencoded" POSTs',
             description: "After generating an authentication JWT, the client " +
                 "requests a new access token via HTTP POST to the FHIR " +
@@ -115,7 +114,7 @@ bdt_1.suite("Authorization", () => {
             "scope",
             "client_assertion"
         ].forEach(param => {
-            bdt_1.test({
+            test({
                 name: `The '${param}' parameter must be present`,
                 description: "The server should reply with 400 Bad Request if the " +
                     `\`${param}\` parameter is not sent by the client.`
@@ -130,7 +129,7 @@ bdt_1.suite("Authorization", () => {
                 });
                 assertions_1.expectOAuthError(response, `Authorization should fail if the "${param}" parameter is omitted from the POST body`);
             });
-            bdt_1.test({
+            test({
                 name: `The '${param}' parameter must be valid`,
                 description: "The server should reply with 400 Bad Request if the " +
                     `\`${param}\` parameter has invalid value.`
@@ -146,7 +145,7 @@ bdt_1.suite("Authorization", () => {
                 assertions_1.expectOAuthError(response, `Authorization should fail if the "${param}" parameter of the POST body is invalid`);
             });
         });
-        bdt_1.test({
+        test({
             name: "Validates authenticationToken.aud",
             description: "The `aud` claim of the authentication JWT must be the " +
                 "authorization server's \"token URL\" (the same URL to which " +
@@ -166,7 +165,7 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectOAuthError(response, `Authorization should fail if the "aud" claim of the authentication token is invalid`);
         });
-        bdt_1.test({
+        test({
             name: "Validates authenticationToken.iss",
             description: "The `iss` claim of the authentication JWT must equal the registered `client_id`"
         }, async ({ config, api, context }) => {
@@ -184,7 +183,7 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectOAuthError(response, `Authorization should fail if the "iss" claim of the authentication token is invalid`);
         });
-        bdt_1.test({
+        test({
             name: "Only accept registered client IDs",
             description: "Verify that clients can't use random client id"
         }, async ({ config, api, context }) => {
@@ -205,7 +204,7 @@ bdt_1.suite("Authorization", () => {
                 `do not equal the client's client_id`);
         });
         // Scopes -------------------------------------------------------------
-        bdt_1.test({
+        test({
             name: "Rejects empty scope",
             description: "The server should reject requests to the token endpoint that are requesting an empty scope"
         }, async ({ config, api, context }) => {
@@ -219,7 +218,7 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectOAuthErrorType(response, "invalid_scope", 'The authorization attempt should fail if an empty ("") scope is requested');
         });
-        bdt_1.test({
+        test({
             name: "Validates scopes",
             description: "This test verifies that only valid system scopes are accepted by the server"
         }, async ({ config, api, context }) => {
@@ -233,7 +232,7 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectOAuthErrorType(response, "invalid_scope", "The authorization attempt must fail if a non-system scope is requested");
         });
-        bdt_1.test({
+        test({
             name: "Handles V1 scopes correctly",
             description: "Verifies that scopes like `system/Patient.*` or `system/*.*` are handled correctly.\n" +
                 "- Servers should avoid granting `.*` action scopes and prefer `.read` instead\n" +
@@ -253,21 +252,20 @@ bdt_1.suite("Authorization", () => {
                     form: { ...context.form, scope }
                 });
                 if (response.statusCode === 200) {
-                    assertions_1.expectSuccessfulAuth(response, `If the server supports the "${scope}" scope, then it must reply with valid token response`);
+                    assertions_1.expectSuccessfulAuth(response, `If the server supports the \`${scope}\` scope, then it must reply with valid token response`);
                     code_1.expect(response.body.scope, "Servers should not grant any write scopes").not.to.match(/\.\*\b|\.write\b|\.[cud]+\b/);
                 }
                 else {
-                    assertions_1.expectOAuthErrorType(response, "invalid_scope", `It appears that the "${scope}" scope is not supported by the server.` +
+                    assertions_1.expectOAuthErrorType(response, "invalid_scope", `It appears that the \`${scope}\` scope is not supported by the server. ` +
                         `In this case we expect a proper OAuth error response from the token ` +
                         `endpoint.`);
                 }
             }
         });
-        bdt_1.test({
+        test({
             name: "Handles V2 scopes correctly",
-            description: "Verifies that scopes like `system/Patient.*` or `system/*.*` are handled correctly.\n" +
-                "- Servers should avoid granting `.*` action scopes and prefer `.read` instead\n" +
-                "- Servers should NOT explicitly grant any `.write` scopes\n",
+            description: "Verifies that scopes like `system/Patient.rs` or `system/*.cruds` are handled correctly.\n" +
+                "- Bulk Data Servers should NOT explicitly grant any write-level scopes like `c`, `u` or `d`.\n",
             minVersion: "2"
         }, async ({ config, context, api }) => {
             const scopes = [
@@ -285,17 +283,17 @@ bdt_1.suite("Authorization", () => {
                     form: { ...context.form, scope }
                 });
                 if (response.statusCode === 200) {
-                    assertions_1.expectSuccessfulAuth(response, `If the server supports the "${scope}" scope, then it must reply with valid token response`);
+                    assertions_1.expectSuccessfulAuth(response, `If the server supports the \`${scope}\` scope, then it must reply with valid token response`);
                     code_1.expect(response.body.scope, "Servers should not grant any write scopes").not.to.match(/\.[cud]+\b/);
                 }
                 else {
-                    assertions_1.expectOAuthErrorType(response, "invalid_scope", `It appears that the "${scope}" scope is not supported by the server.` +
+                    assertions_1.expectOAuthErrorType(response, "invalid_scope", `It appears that the \`${scope}\` scope is not supported by the server. ` +
                         `In this case we expect a proper OAuth error response from the token ` +
                         `endpoint.`);
                 }
             }
         });
-        bdt_1.test({
+        test({
             name: "Accepts wildcard resource scopes",
             description: "Verifies that scopes like `system/*.read` are supported."
         }, async ({ config, context }) => {
@@ -309,7 +307,7 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectSuccessfulAuth(response, 'The authorization attempt should be successful with a "system/*.read" scope');
         });
-        bdt_1.test({
+        test({
             name: "Accepts wildcard resource V2 scopes",
             description: "Verifies that scopes like `system/*.rs` are supported.",
             minVersion: "2"
@@ -324,7 +322,7 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectSuccessfulAuth(response, 'The authorization attempt should be successful with a "system/*.rs" scope');
         });
-        bdt_1.test({
+        test({
             name: "Rejects unknown action scopes",
             description: "Verifies that scopes like `system/Patient.unknownAction` are rejected"
         }, async ({ config, context }) => {
@@ -338,7 +336,7 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectOAuthErrorType(response, "invalid_scope", "The authorization attempt must fail if a scope is requesting an unknown action (other than read, write or *)");
         });
-        bdt_1.test({
+        test({
             name: "Rejects unknown action in V2 scopes",
             description: "Verifies that scopes like `system/Patient.xyz` are rejected",
             minVersion: "2"
@@ -353,7 +351,7 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectOAuthErrorType(response, "invalid_scope", "The authorization attempt must fail if a scope is requesting an unknown action (other than c, r, u, d or s)");
         });
-        bdt_1.test({
+        test({
             name: "Rejects unknown resource scopes",
             description: "Verifies that scopes like `system/UnknownResource.read` are rejected"
         }, async ({ config, context }) => {
@@ -367,7 +365,7 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectOAuthErrorType(response, "invalid_scope", "The authorization attempt must fail if requested scopes are pointing to unknown FHIR resources");
         });
-        bdt_1.test({
+        test({
             name: "Rejects unknown resource in V2 scopes",
             description: "Verifies that scopes like `system/UnknownResource.r` are rejected",
             minVersion: "2"
@@ -382,7 +380,7 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectOAuthErrorType(response, "invalid_scope", "The authorization attempt must fail if requested scopes are pointing to unknown FHIR resources");
         });
-        bdt_1.test({
+        test({
             name: "Rejects explicit mutation scopes",
             description: "Verifies that scopes like `system/Patient.write` are rejected. In this case this is " +
                 "the only scope requested and it requires write access. The server should not grant it and if " +
@@ -398,7 +396,7 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectOAuthErrorType(response, "invalid_scope", "The authorization attempt must fail for explicit mutation scopes");
         });
-        bdt_1.test({
+        test({
             name: "Supports mixed v1 and v2 scopes",
             description: "Tests the server behavior if a mixture of (otherwise valid) V1 and V2 scopes is requested." +
                 "The expectation is that all scopes should be granted either as they have been requested, or converted " +
@@ -421,7 +419,7 @@ bdt_1.suite("Authorization", () => {
                 code_1.expect(granted).to.contain("system/Patient.rs");
             }
         });
-        bdt_1.test({
+        test({
             name: "Rejects explicit mutation V2 scopes",
             description: "Verifies that scopes like `system/Patient.u` are rejected. In this case this is " +
                 "the only scope requested and it requires write access. The server should not grant it and if " +
@@ -447,7 +445,7 @@ bdt_1.suite("Authorization", () => {
             }
         });
         // End Scopes ---------------------------------------------------------
-        bdt_1.test({
+        test({
             name: "validates the jku token header",
             description: "When present, the `jku` authentication JWT header should match a value " +
                 "that the client supplied to the FHIR server at client registration time. This test " +
@@ -468,7 +466,7 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectOAuthError(response, "The authorization attempt must fail if a bad jku token header is passed");
         });
-        bdt_1.test({
+        test({
             name: "Validates the token signature",
             description: "This test attempts to obtain an access token with a " +
                 "request that is completely valid, except that the authentication token " +
@@ -496,7 +494,7 @@ bdt_1.suite("Authorization", () => {
             });
             assertions_1.expectOAuthError(response, "The authorization attempt must fail if the token is not signed with the correct private key");
         });
-        bdt_1.test({
+        test({
             name: "Authorization using JWKS URL",
             description: "Verify that the server supports JWKS URL authorization. This would also verify " +
                 "that JWK key rotation is possible, because this test will create new key, every time it " +
