@@ -71,3 +71,4 @@ report.html
 audit-report-template.pug
 tsconfig.tsbuildinfo
 .DS_Store
+docs/.DS_Store
