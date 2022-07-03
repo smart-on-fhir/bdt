@@ -451,7 +451,7 @@ export class BulkDataClient
                 throw new NotSupportedError("Group-level export is not supported by this server");
             }
         } else {
-            path = (groupExportEndpoint || patientExportEndpoint || systemExportEndpoint);
+            path = (systemExportEndpoint || patientExportEndpoint || groupExportEndpoint);
             if (!path) {
                 throw new NotSupportedError("No export endpoints defined in configuration");
             }

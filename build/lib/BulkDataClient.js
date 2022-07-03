@@ -319,7 +319,7 @@ class BulkDataClient {
             }
         }
         else {
-            path = (groupExportEndpoint || patientExportEndpoint || systemExportEndpoint);
+            path = (systemExportEndpoint || patientExportEndpoint || groupExportEndpoint);
             if (!path) {
                 throw new errors_1.NotSupportedError("No export endpoints defined in configuration");
             }
