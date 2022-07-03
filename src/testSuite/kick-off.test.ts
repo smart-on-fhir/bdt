@@ -434,8 +434,9 @@ suite("Kick-off Endpoint", () => {
                     // a server error
                     if (response.statusCode === 202) {
                         expectSuccessfulKickOff(response);
+                    } else {
+                        expectClientError(response)
                     }
-                    expectClientError(response)
                 });
     
                 test({

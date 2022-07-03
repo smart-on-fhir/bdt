@@ -372,7 +372,9 @@ suite("Kick-off Endpoint", () => {
                     if (response.statusCode === 202) {
                         assertions_1.expectSuccessfulKickOff(response);
                     }
-                    assertions_1.expectClientError(response);
+                    else {
+                        assertions_1.expectClientError(response);
+                    }
                 });
                 test({
                     name: "Handles the _typeFilter parameter",
