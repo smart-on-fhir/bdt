@@ -286,7 +286,7 @@ function expectFailedKickOff(response, prefix = "") {
         throw new errors_1.NotSupportedError(`${options.method} ${options.url.pathname} is not supported by this server`);
     }
     if (statusCode >= 500) {
-        throw new errors_1.NotSupportedError(`${options.method} ${options.url.pathname} is not supported by this server. Received a server error.`);
+        throw new errors_1.NotSupportedError(`${options.method} ${options.url.pathname} may not be supported by this server. Received a server error: ${lib_1.getErrorMessageFromResponse(response)}`);
     }
     expectClientError(response, concat(prefix, "The kick-off request was expected to fail"));
     expectOperationOutcome(response, concat(prefix, "In case of error the server should return an OperationOutcome"));
@@ -302,7 +302,7 @@ function expectSuccessfulKickOff(response, prefix = "") {
         throw new errors_1.NotSupportedError(`${options.method} ${options.url.pathname} is not supported by this server`);
     }
     if (statusCode >= 500) {
-        throw new errors_1.NotSupportedError(`${options.method} ${options.url.pathname} is not supported by this server. Received a server error.`);
+        throw new errors_1.NotSupportedError(`${options.method} ${options.url.pathname} may not be supported by this server. Received a server error: ${lib_1.getErrorMessageFromResponse(response)}`);
     }
     const error = "Got: " + lib_1.getErrorMessageFromResponse(response);
     expectResponseCode(response, 202, concat(prefix, error));

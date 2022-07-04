@@ -496,7 +496,7 @@ export function expectFailedKickOff(response: Response, prefix = "")
 
     if (statusCode >= 500) {
         throw new NotSupportedError(
-            `${options.method} ${options.url.pathname} is not supported by this server. Received a server error.`
+            `${options.method} ${options.url.pathname} may not be supported by this server. Received a server error: ${getErrorMessageFromResponse(response)}`
         );
     }
 
@@ -524,7 +524,7 @@ export function expectSuccessfulKickOff(response: Response, prefix = "")
 
     if (statusCode >= 500) {
         throw new NotSupportedError(
-            `${options.method} ${options.url.pathname} is not supported by this server. Received a server error.`
+            `${options.method} ${options.url.pathname} may not be supported by this server. Received a server error: ${getErrorMessageFromResponse(response)}`
         )
     }
     
