@@ -51,10 +51,10 @@ bdt test -c config-examples/reference-server-r4.js
 
 Tests a server but only run authorization-related tests
 ```sh
-bdt test -c config-examples/reference-server-r4.js --pattern './build/testSuite/**/authorization.test.js'
+bdt test -c config-examples/reference-server-r4.js -P authorization.test.js
 ```
 
-Tests a server against Bulk Data v2
+Tests a server against Bulk Data v1
 ```sh
-bdt test -c config-examples/reference-server-r4.js --api-version 2
+bdt test -c config-examples/reference-server-r4.js --api-version 1
 ```
