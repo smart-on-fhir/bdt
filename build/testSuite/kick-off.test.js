@@ -518,6 +518,7 @@ suite("Kick-off Endpoint", () => {
                         description: "Verifies that the server starts an export if called with valid parameters. " +
                             "The status code must be `202 Accepted` and a `Content-Location` header must be " +
                             "returned. The response body should be either empty, or a JSON OperationOutcome.",
+                        minVersion: "2"
                     }, async ({ config, api, context }) => {
                         const client = context.client = new BulkDataClient_1.BulkDataClient(config, api);
                         api.after(({ context }) => {
@@ -547,7 +548,7 @@ suite("Kick-off Endpoint", () => {
                         if (!client.statusResponse?.body.output?.length) {
                             return api.setNotSupported("Unable to find enough data to export and complete this test");
                         }
-                        const response = await client.downloadFileAt(0);
+                        const response = await client.downloadFileAt(0, client.statusResponse.body.requiresAccessToken === false);
                         assertions_1.expectSuccessfulDownload(response, "Failed to download file at position 0");
                         // When provided, the server SHOULD omit unlisted, non-mandatory elements
                         // from the resources returned. Elements should be of the form
@@ -582,7 +583,8 @@ suite("Kick-off Endpoint", () => {
                     name: `Accepts multiple _elements parameters through GET ${type}-level kick-off requests`,
                     description: "Verifies that the server starts an export if called with multiple _elements parameters. " +
                         "The status code must be `202 Accepted` and a `Content-Location` header must be " +
-                        "returned. The response body should be either empty, or a JSON OperationOutcome."
+                        "returned. The response body should be either empty, or a JSON OperationOutcome.",
+                    minVersion: "2"
                 }, async ({ config, api, context }) => {
                     const client = context.client = new BulkDataClient_1.BulkDataClient(config, api);
                     api.after(({ context }) => {
@@ -613,7 +615,7 @@ suite("Kick-off Endpoint", () => {
                     if (!client.statusResponse?.body.output?.length) {
                         return api.setNotSupported("Unable to find enough data to export and complete this test");
                     }
-                    const response = await client.downloadFileAt(0);
+                    const response = await client.downloadFileAt(0, client.statusResponse.body.requiresAccessToken === false);
                     assertions_1.expectSuccessfulDownload(response, "Failed to download file at position 0");
                     // When provided, the server SHOULD omit unlisted, non-mandatory elements
                     // from the resources returned. Elements should be of the form
@@ -657,7 +659,7 @@ suite("Kick-off Endpoint", () => {
                                 _type: "Patient"
                             }
                         });
-                        const file = await client.downloadFileAt(0);
+                        const file = await client.downloadFileAt(0, client.statusResponse.body.requiresAccessToken === false);
                         await client.cancel(kickOffResponse1);
                         const lines = file.body.split(/\r?\n/);
                         let patient;
