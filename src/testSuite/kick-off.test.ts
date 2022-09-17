@@ -641,7 +641,7 @@ suite("Kick-off Endpoint", () => {
                             return api.setNotSupported("Unable to find enough data to export and complete this test");
                         }
     
-                        const response = await client.downloadFileAt(0);
+                        const response = await client.downloadFileAt(0, client.statusResponse.body.requiresAccessToken === false);
 
                         expectSuccessfulDownload(response, "Failed to download file at position 0")
     
@@ -722,7 +722,7 @@ suite("Kick-off Endpoint", () => {
                         return api.setNotSupported("Unable to find enough data to export and complete this test");
                     }
     
-                    const response = await client.downloadFileAt(0);
+                    const response = await client.downloadFileAt(0, client.statusResponse.body.requiresAccessToken === false);
                     
                     expectSuccessfulDownload(response, "Failed to download file at position 0")
     
@@ -773,7 +773,7 @@ suite("Kick-off Endpoint", () => {
                             }
                         });
 
-                        const file = await client.downloadFileAt(0);
+                        const file = await client.downloadFileAt(0, client.statusResponse.body.requiresAccessToken === false);
                         await client.cancel(kickOffResponse1);
 
                         const lines = file.body.split(/\r?\n/);
