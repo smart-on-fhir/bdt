@@ -77,7 +77,7 @@ suite("Download Endpoint", () => {
         let kickOffResponse;
         try {
             kickOffResponse = (await client.kickOff({ params: { _type: [config.fastestResource] }})).response;
-            const resp = await client.downloadFileAt(0, client.statusResponse.body.requiresAccessToken === false);
+            const resp = await client.downloadFileAt(0);
 
             expectSuccessfulDownload(resp, "Download failed")
             // expect(resp.statusCode, getResponseError(resp)).to.equal(200);
@@ -323,7 +323,7 @@ suite("Download Endpoint", () => {
         let kickOffResponse
         try {
             kickOffResponse = (await client.kickOff({ params: { _type: [config.fastestResource] }})).response;
-            const resp = await client.downloadFileAt(0, client.statusResponse.body.requiresAccessToken === false);
+            const resp = await client.downloadFileAt(0);
             expectSuccessfulDownload(resp, "Download failed");
             await client.cancel(kickOffResponse);
             let fileUrl = client.statusResponse.body.output[0].url;

@@ -174,7 +174,8 @@ export declare class BulkDataClient {
      * @param index The (zero-based) index of the file in the status list
      * @param skipAuth If true, the authorization header will NOT be
      * included, even if the `requiresAuth` property of the server settings is
-     * true.
+     * true. If not provided it will be set to true if the requiresAccessToken
+     * property of the status response is false.
      */
     downloadFileAt(index: number, skipAuth?: boolean): Promise<Response<string>>;
     /**

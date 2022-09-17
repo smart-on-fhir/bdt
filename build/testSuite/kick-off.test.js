@@ -548,7 +548,7 @@ suite("Kick-off Endpoint", () => {
                         if (!client.statusResponse?.body.output?.length) {
                             return api.setNotSupported("Unable to find enough data to export and complete this test");
                         }
-                        const response = await client.downloadFileAt(0, client.statusResponse.body.requiresAccessToken === false);
+                        const response = await client.downloadFileAt(0);
                         assertions_1.expectSuccessfulDownload(response, "Failed to download file at position 0");
                         // When provided, the server SHOULD omit unlisted, non-mandatory elements
                         // from the resources returned. Elements should be of the form
@@ -615,7 +615,7 @@ suite("Kick-off Endpoint", () => {
                     if (!client.statusResponse?.body.output?.length) {
                         return api.setNotSupported("Unable to find enough data to export and complete this test");
                     }
-                    const response = await client.downloadFileAt(0, client.statusResponse.body.requiresAccessToken === false);
+                    const response = await client.downloadFileAt(0);
                     assertions_1.expectSuccessfulDownload(response, "Failed to download file at position 0");
                     // When provided, the server SHOULD omit unlisted, non-mandatory elements
                     // from the resources returned. Elements should be of the form
@@ -659,7 +659,7 @@ suite("Kick-off Endpoint", () => {
                                 _type: "Patient"
                             }
                         });
-                        const file = await client.downloadFileAt(0, client.statusResponse.body.requiresAccessToken === false);
+                        const file = await client.downloadFileAt(0);
                         await client.cancel(kickOffResponse1);
                         const lines = file.body.split(/\r?\n/);
                         let patient;

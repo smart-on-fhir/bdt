@@ -739,9 +739,10 @@ export class BulkDataClient
      * @param index The (zero-based) index of the file in the status list
      * @param skipAuth If true, the authorization header will NOT be
      * included, even if the `requiresAuth` property of the server settings is
-     * true. 
+     * true. If not provided it will be set to true if the requiresAccessToken
+     * property of the status response is false.
      */
-    async downloadFileAt(index: number, skipAuth = false) {
+    async downloadFileAt(index: number, skipAuth?: boolean) {
         if (!this.kickOffRequest) {
             await this.kickOff();
         }
@@ -754,6 +755,11 @@ export class BulkDataClient
         } catch (e) {
             throw new Error(`No file was found at "output[${index}]" in the status response.`);
         }
+
+        if (skipAuth === undefined) {
+            skipAuth = this.statusResponse.body.requiresAccessToken === false
+        }
+
         return await this.downloadFile(fileUrl, { skipAuth });
     }
  
