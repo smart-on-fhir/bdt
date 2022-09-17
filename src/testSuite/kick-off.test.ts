@@ -602,6 +602,7 @@ suite("Kick-off Endpoint", () => {
                         description: "Verifies that the server starts an export if called with valid parameters. " +
                             "The status code must be `202 Accepted` and a `Content-Location` header must be " +
                             "returned. The response body should be either empty, or a JSON OperationOutcome.",
+                        minVersion: "2"
                     }, async ({ config, api, context }) => {
     
                         const client = context.client = new BulkDataClient(config, api);
@@ -678,7 +679,8 @@ suite("Kick-off Endpoint", () => {
                     name: `Accepts multiple _elements parameters through GET ${type}-level kick-off requests`,
                     description: "Verifies that the server starts an export if called with multiple _elements parameters. " +
                         "The status code must be `202 Accepted` and a `Content-Location` header must be " +
-                        "returned. The response body should be either empty, or a JSON OperationOutcome."
+                        "returned. The response body should be either empty, or a JSON OperationOutcome.",
+                    minVersion: "2"
                 }, async ({ config, api, context }) => {
 
                     const client = context.client = new BulkDataClient(config, api);
