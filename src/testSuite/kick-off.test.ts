@@ -760,7 +760,8 @@ suite("Kick-off Endpoint", () => {
                 if (type !== "system") {
                     test({
                         name: `Supports the patient parameter via the ${type}-export endpoint`,
-                        description: "Makes a normal export and then tries to make another one limited to the first patient from the result."
+                        description: "Makes a normal export and then tries to make another one limited to the first patient from the result.",
+                        minVersion: "2"
                     }, async ({ config, api }) => {
         
                         const client = new BulkDataClient(config, api);
@@ -831,7 +832,8 @@ suite("Kick-off Endpoint", () => {
                     test({
                         name: "Rejects system-level export with patient parameter",
                         description: "The patient parameter is not applicable to system level export requests. " +
-                            "This test verifies that such invalid export attempts are being rejected."
+                            "This test verifies that such invalid export attempts are being rejected.",
+                        minVersion: "2"
                     }, async ({ config, api }) => {
 
                         api.prerequisite({
