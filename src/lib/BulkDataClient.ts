@@ -274,7 +274,7 @@ export class BulkDataClient
 
         if (result.headers["content-encoding"]?.match(/\bgzip\b/)) {
             result.body = await promisify(unzip)(result.rawBody)
-            result.body = result.body.toString()
+            result.body = (result.body as Buffer).toString("utf8")
         }
 
         if (typeof result.body === "string" && result.headers["content-type"]?.match(/^application\/(json|fhir+json|json+fhir)/)) {

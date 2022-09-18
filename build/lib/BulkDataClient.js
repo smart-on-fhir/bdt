@@ -185,7 +185,8 @@ class BulkDataClient {
         // console.log(result.request.requestUrl, result.request.options.headers)
         if (result.headers["content-encoding"]?.match(/\bgzip\b/)) {
             result.body = await util_1.promisify(zlib_1.unzip)(result.rawBody);
-            result.body = result.body.toString();
+            result.body = result.body.toString("utf8");
+            console.log(result.body);
         }
         if (typeof result.body === "string" && result.headers["content-type"]?.match(/^application\/(json|fhir+json|json+fhir)/)) {
             result.body = JSON.parse(result.body);
