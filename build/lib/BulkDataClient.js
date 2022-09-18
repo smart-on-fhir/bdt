@@ -12,6 +12,8 @@ const assertions_1 = require("./assertions");
 const auth_1 = require("./auth");
 // @ts-ignore
 const package_json_1 = __importDefault(require("../../package.json"));
+const util_1 = require("util");
+const zlib_1 = require("zlib");
 /**
  * Implements all the interactions with a bulk-data server that tests may need
  * to use. Helps keeping the tests clean and readable.
@@ -111,6 +113,7 @@ class BulkDataClient {
             resolveBodyOnly: false,
             responseType: "text",
             timeout: this.options.requests.timeout,
+            decompress: false,
             retry: {
                 limit: 0
             },
@@ -180,7 +183,10 @@ class BulkDataClient {
             return this.request({ ...options, context: { ...options.context, retried: true } });
         }
         // console.log(result.request.requestUrl, result.request.options.headers)
-        // let body = result.body
+        if (result.headers["content-encoding"]?.match(/\bgzip\b/)) {
+            result.body = await util_1.promisify(zlib_1.unzip)(result.rawBody);
+            result.body = result.body.toString();
+        }
         if (typeof result.body === "string" && result.headers["content-type"]?.match(/^application\/(json|fhir+json|json+fhir)/)) {
             result.body = JSON.parse(result.body);
         }

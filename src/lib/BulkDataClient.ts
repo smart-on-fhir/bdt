@@ -9,6 +9,8 @@ import { createAuthToken } from "./auth"
 // @ts-ignore
 import pkg from "../../package.json"
 import { bdt } from "../../types";
+import { promisify } from "util"
+import { unzip } from "zlib"
 
 
 
@@ -185,6 +187,7 @@ export class BulkDataClient
             resolveBodyOnly: false,
             responseType: "text",
             timeout: this.options.requests.timeout,
+            decompress: false,
             retry: {
                 limit: 0
             },
@@ -269,7 +272,11 @@ export class BulkDataClient
 
         // console.log(result.request.requestUrl, result.request.options.headers)
 
-        // let body = result.body
+        if (result.headers["content-encoding"]?.match(/\bgzip\b/)) {
+            result.body = await promisify(unzip)(result.rawBody)
+            result.body = result.body.toString()
+        }
+
         if (typeof result.body === "string" && result.headers["content-type"]?.match(/^application\/(json|fhir+json|json+fhir)/)) {
             result.body = JSON.parse(result.body)
         }
