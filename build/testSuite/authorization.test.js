@@ -401,6 +401,7 @@ suite("Authorization", () => {
             description: "Tests the server behavior if a mixture of (otherwise valid) V1 and V2 scopes is requested." +
                 "The expectation is that all scopes should be granted either as they have been requested, or converted " +
                 "to V2. Converting V2 scope to V1 is not lossless, thus it is considered an error.",
+            minVersion: "2"
         }, async ({ config, context }) => {
             const { response } = await context.client.request({
                 method: "POST",
