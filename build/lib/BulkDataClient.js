@@ -136,7 +136,10 @@ class BulkDataClient {
                     }
                 ],
                 afterResponse: [
-                    (response) => {
+                    async (response) => {
+                        if (response.headers["content-encoding"]?.match(/\bgzip\b/)) {
+                            response.body = (await util_1.promisify(zlib_1.unzip)(response.rawBody)).toString("utf8");
+                        }
                         this.testApi.console.response(response, "log", responseLabel);
                         return response;
                     }
@@ -183,10 +186,6 @@ class BulkDataClient {
             return this.request({ ...options, context: { ...options.context, retried: true } });
         }
         // console.log(result.request.requestUrl, result.request.options.headers)
-        if (result.headers["content-encoding"]?.match(/\bgzip\b/)) {
-            result.body = (await util_1.promisify(zlib_1.unzip)(result.rawBody)).toString("utf8");
-        }
-        // console.log(result.body)
         if (typeof result.body === "string" && result.headers["content-type"]?.match(/^application\/(json|fhir+json|json+fhir)/)) {
             result.body = JSON.parse(result.body);
         }
